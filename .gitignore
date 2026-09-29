@@ -1,1 +1,9 @@
 .finesse/
+.superpowers/
+artifacts/
+android/.gradle/
+android/.kotlin/
+android/**/build/
+android/local.properties
+android/.idea/
+*.iml
