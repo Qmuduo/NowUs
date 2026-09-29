@@ -1,4 +1,5 @@
-import { PEOPLE, SCENARIOS, parts, dayBounds, routineAt, commonWindows, timeline, scenarioOverride, offsetDifference, canContact } from './model.mjs';
+import { PEOPLE, SCENARIOS, parts, dayBounds, routineAt as modelRoutine, commonWindows as modelWindows, activitySegments, nextWindow, scenarioOverride, offsetDifference, canContact as modelContact } from './model.mjs?v=2';
+import { loadRhythm, saveRhythm, mountRhythm } from './rhythm.mjs?v=2';
 
 const $ = selector => document.querySelector(selector);
 const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -23,7 +24,7 @@ const paths = {
 };
 const icon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.clock}</svg>`;
 const initialNote = { text: '今天看到一只小猫，趴在书店门口晒太阳。\n等你有空，想讲给你听。', time: Date.parse('2026-09-29T11:45:00Z') };
-const state = { scenario: 'normal', tab: 'home', dayOffset: 0, override: null, ownNote: null, reminder: null };
+const state = { scenario: 'normal', tab: 'home', dayOffset: 0, dayMode:'nearby', override: null, ownNote: null, reminder: null, rhythm:loadRhythm() };
 try { const saved = JSON.parse(localStorage.getItem('nowus.prototype.note.v1') || 'null'); if (saved && typeof saved.text === 'string' && Number.isFinite(saved.time)) state.ownNote = saved; } catch { /* Local storage is optional for the demo. */ }
 let lastFocus = null;
 let toastTimer;
@@ -31,9 +32,15 @@ let currentRows = [];
 let currentWindows = [];
 const now = () => Date.parse(SCENARIOS[state.scenario].now);
 const overrides = () => [state.override, scenarioOverride(state.scenario)].filter(Boolean);
+const routineAt = (person, instant, scenario = state.scenario, active = overrides()) => modelRoutine(person,instant,scenario,active,state.rhythm);
+const canContact = (person, instant, scenario = state.scenario, active = overrides()) => modelContact(person,instant,scenario,active,state.rhythm);
+const commonWindows = (range, scenario = state.scenario, active = overrides()) => modelWindows(range,scenario,active,state.rhythm);
 const dateText = (time, zone) => { const p = parts(time, zone); return `${Number(p.month)}月${Number(p.day)}日`; };
 const fullDateText = (time, zone) => `${dateText(time, zone)} ${parts(time, zone).time}`;
-const minutesText = ms => ms >= 3600000 && ms % 3600000 === 0 ? `${ms / 3600000} 小时` : `${Math.round(ms / 60000)} 分钟`;
+const minutesText = ms => {
+  const minutes = Math.round(ms/60000), hours = Math.floor(minutes/60), remainder = minutes % 60;
+  return hours ? `${hours} 小时${remainder ? ` ${remainder} 分钟` : ''}` : `${minutes} 分钟`;
+};
 const bounds = () => {
   const base = dayBounds(now(), PEOPLE.me.zone);
   return dayBounds(base.start + state.dayOffset * 86400000 + 12 * 3600000, PEOPLE.me.zone);
@@ -60,15 +67,19 @@ function nextStage(person) {
   return '以平时的生活安排为参考';
 }
 function upcomingWindow() {
-  return commonWindows(dayBounds(now(), PEOPLE.me.zone), state.scenario, overrides()).find(w => w.end > now());
+  return nextWindow(now(),state.scenario,overrides(),state.rhythm);
 }
 function commonCard() {
+  if (state.scenario === 'missing') return `<div class="common-card no-common"><div class="common-label">${icon('clock')}等待彼此的节奏</div><h3 class="common-title">暂时还不能推荐时间</h3><p>阿远尚未设置作息和联系偏好，未知时间不会算作共同空闲。</p><button type="button" class="text-button" data-action="edit-note">先留一句关心 ${icon('arrow')}</button></div>`;
   const window = upcomingWindow();
-  if (!window) return `<div class="common-card no-common"><div class="common-label">${icon('heart')}我们的时间</div><h3 class="common-title">今天的空闲，暂时错开了</h3><p>按目前安排，今天没有共同可联系时间。留句话，等彼此方便时再聊。</p><button type="button" class="text-button" data-action="edit-note">留一句关心 ${icon('arrow')}</button></div>`;
+  const ownUnknown = canContact('me',now()) === null;
+  if (!window) return `<div class="common-card no-common"><div class="common-label">${icon('heart')}我们的时间</div><h3 class="common-title">${ownUnknown ? '我的联系时间还未设置' : '接下来七天，暂时没有交集'}</h3><p>${ownUnknown ? '未知时间不作推荐。可以补充通常愿意联系的时间，也可以先留句话。' : '按目前的联系偏好，没有找到共同窗口。留句话，等彼此方便时再聊。'}</p><button type="button" class="text-button" data-action="${ownUnknown ? 'open-rhythm' : 'edit-note'}">${ownUnknown ? '设置我的节奏' : '留一句关心'} ${icon('arrow')}</button></div>`;
   const start = Math.max(now(), window.start);
-  const title = window.start <= now() ? '现在，刚好都有空' : `${minutesText(start - now())}后，时间交汇`;
+  const laterDay = parts(start, PEOPLE.me.zone).date !== parts(now(), PEOPLE.me.zone).date;
+  const title = window.start <= now() ? '现在处于共同可联系时段' : laterDay ? '今天接下来暂时错开' : `${minutesText(start - now())}后，可以联系`;
   const times = Object.keys(PEOPLE).map(person => `<div><small>${person === 'me' ? '我' : PEOPLE[person].name} · ${dateText(start, PEOPLE[person].zone)}</small><strong>${parts(start, PEOPLE[person].zone).time}–${parts(window.end, PEOPLE[person].zone).time}</strong></div>`).join('');
-  return `<div class="common-card"><div class="common-top"><span class="common-label">${icon('heart')}下一段共同时间</span><span>${minutesText(window.end - start)}</span></div><h3 class="common-title">${title}</h3><div class="common-times">${times}</div><div class="common-footer"><span>按联系偏好估计 · 尚未约定</span><button type="button" data-action="window-detail">${state.reminder === window.start ? '已保存提醒' : '看看这段时间'}</button></div></div>`;
+  const busy = ['me','partner'].filter(person => routineAt(person,start).kind === 'busy').map(person => person === 'me' ? '我' : PEOPLE[person].name);
+  return `<div class="common-card"><div class="common-top"><span class="common-label">${icon('heart')}${window.start <= now() ? '当前共同窗口' : '下一段共同时间'}</span><span>${minutesText(window.end - start)}</span></div><h3 class="common-title">${title}</h3><div class="common-times">${times}</div>${busy.length ? `<p class="contact-context">${busy.join('、')}通常有活动安排，但这段时间单独设为可联系。</p>` : ''}${ownUnknown ? '<p class="contact-context">今天的联系偏好尚未设置，以下来自已设置的未来安排。</p>' : ''}<div class="common-footer"><span>按双方联系偏好 · 尚未约定</span><button type="button" data-action="window-detail">${state.reminder === window.start ? '已保存提醒' : '查看时段'}</button></div></div>`;
 }
 function noteMarkup(note, person) {
   if (!note) return `<p class="note-empty">留一句今天想告诉${PEOPLE.partner.name}的话。</p>`;
@@ -78,46 +89,66 @@ function renderHome() {
   const other = routineAt('partner', now(), state.scenario, overrides());
   const me = routineAt('me', now(), state.scenario, overrides());
   const differentDate = parts(now(), PEOPLE.me.zone).date !== parts(now(), PEOPLE.partner.zone).date;
-  $('#home-view').innerHTML = `<h1 class="screen-title">${differentDate ? '日期不同，彼此都在' : '我的夜晚，你的早晨'}</h1>${state.scenario === 'normal' ? '' : `<p class="screen-subtitle">${esc(SCENARIOS[state.scenario].description)}</p>`}<div class="time-pair">${timePerson('me')}${timePerson('partner')}</div><p class="offset-caption">${icon('link')}${PEOPLE.partner.name}比我慢 ${offsetDifference(now())} 小时${differentDate ? ' · 那里还是昨天' : ''}</p><div class="section-heading"><h2>你的一天，走到这里</h2><button type="button" class="text-button" data-action="open-day">看完整一天 ${icon('arrow')}</button></div><div class="life-card"><div class="life-row"><div class="activity-symbol">${icon(other.icon)}</div><div class="life-content"><div class="life-line"><strong>${esc(other.source === '主动设置' ? other.label : `通常在${other.label}`)}</strong>${source(other)}</div><p class="life-description">${esc(other.end ? `设置持续到当地 ${parts(other.end, PEOPLE.partner.zone).time}` : nextStage('partner'))}</p></div></div><div class="my-life">${icon(me.icon)}<span>我 · ${esc(me.label)}</span>${me.source === '主动设置' ? '<span class="source active">主动设置</span>' : ''}<button type="button" class="text-button" data-action="status">调整状态</button></div></div><div class="section-heading"><h2>我们可以聊聊的时间</h2></div>${commonCard()}<div class="section-heading"><h2>给你留句话</h2><button type="button" class="text-button" data-action="edit-note">${icon('edit')}${state.ownNote ? '编辑留言' : '写一句'}</button></div><div class="notes">${noteMarkup(initialNote, 'partner')}<div class="own-note">${noteMarkup(state.ownNote, 'me')}</div></div><p class="quiet-footnote">生活有各自的节奏，关心可以慢慢抵达。</p>`;
+  $('#home-view').innerHTML = `<h1 class="screen-title">${differentDate ? '日期不同，彼此都在' : '我的夜晚，你的早晨'}</h1><div class="time-pair">${timePerson('me')}${timePerson('partner')}</div><p class="offset-caption">${icon('link')}${PEOPLE.partner.name}比我慢 ${offsetDifference(now())} 小时${differentDate ? ' · 那里还是昨天' : ''}</p><div class="section-heading"><h2>阿远的一天，走到这里</h2><button type="button" class="text-button" data-action="open-day">看时间轴 ${icon('arrow')}</button></div><div class="life-card"><div class="life-row"><div class="activity-symbol">${icon(other.icon)}</div><div class="life-content"><div class="life-line"><strong>${esc(other.source === '按通常作息' ? `这个时段通常在${other.label}` : other.label)}</strong></div><div class="life-source">${source(other)}</div><p class="life-description">${esc(other.source === '未知' ? '等对方填写后再显示，不作活动推测。' : other.end ? `主动设置持续到纽约 ${parts(other.end, PEOPLE.partner.zone).time}` : nextStage('partner'))}</p></div></div><div class="my-life">${icon(me.icon)}<span>我 · ${esc(me.label)}</span>${me.source === '主动设置' ? '<span class="source active">主动设置</span>' : ''}<button type="button" class="text-button" data-action="status">调整状态</button></div></div><button type="button" class="note-preview" data-action="read-note"><span class="note-preview-head">${icon('message')}阿远留给我的一句话 <span>${dateText(initialNote.time,PEOPLE.me.zone)} ${parts(initialNote.time,PEOPLE.me.zone).time}</span></span><span class="note-preview-text">${esc(initialNote.text)}</span><span class="note-preview-more">展开留言 ${icon('arrow')}</span></button><div class="section-heading"><h2>我们可以聊聊的时间</h2></div>${commonCard()}<div class="section-heading"><h2>我留给你的话</h2><button type="button" class="text-button" data-action="edit-note">${icon('edit')}${state.ownNote ? '编辑留言' : '写一句'}</button></div><div class="notes">${state.ownNote ? noteMarkup(state.ownNote,'me') : '<p class="note-empty">把今天的一点小事留给阿远，不必等到同时在线。</p>'}</div><p class="quiet-footnote">生活有各自的节奏，关心可以慢慢抵达。</p>`;
 }
 function renderDay() {
-  const range = bounds();
-  currentRows = timeline(range, state.scenario, overrides());
-  currentWindows = commonWindows(range, state.scenario, overrides());
-  const positionScale = 2.8;
-  const rows = currentRows.map((row, index) => {
-    const blocks = ['me', 'partner'].map(person => {
-      const local = parts(row.start, PEOPLE[person].zone), previousDate = index > 0 ? parts(currentRows[index - 1].start, PEOPLE[person].zone).date : '';
-      const date = index === 0 || local.date !== previousDate ? `<span class="block-date">${dateText(row.start, PEOPLE[person].zone)}</span>` : '';
-      return `<button type="button" class="timeline-block ${row[person].kind}" data-activity="${index}" data-person="${person}" aria-label="${PEOPLE[person].city} ${dateText(row.start, PEOPLE[person].zone)} ${local.time} ${esc(row[person].label)}，查看详情"><span class="block-time">${local.time}${date}</span><span class="block-label">${icon(row[person].icon)}${esc(row[person].label)}</span>${row.shared ? '<span class="block-contact">都愿意联系</span>' : ''}</button>`;
-    });
-    return `<div class="timeline-row ${row.shared ? 'shared' : ''}" style="height:${(row.end - row.start) / 60000 * positionScale}px">${blocks[0]}<div class="timeline-middle" aria-hidden="true"></div>${blocks[1]}</div>`;
-  }).join('');
-  const marker = now() >= range.start && now() < range.end ? `<div class="timeline-now" id="now-marker" style="top:${(now() - range.start) / 60000 * positionScale}px"><span>此刻</span></div>` : '';
-  $('#day-view').innerHTML = `<h1 class="screen-title">我们的一天</h1><p class="screen-subtitle">同一位置，同一个时刻，两种生活。</p><div class="day-controls"><button type="button" data-action="previous-day" aria-label="查看前一天">‹</button><strong>我的 ${dateText(range.start, PEOPLE.me.zone)}</strong><button type="button" data-action="next-day" aria-label="查看后一天">›</button></div><div class="day-legend"><span><i class="legend-dot"></i>共同可联系</span><span>按各自当地时间显示</span></div><div class="timeline-people"><div><span class="avatar">满</span><span>我 · 北京</span></div><span></span><div><span>阿远 · 纽约</span><span class="avatar">远</span></div></div><div class="timeline">${rows}${marker}</div><div class="day-end"><span>${fullDateText(range.end, PEOPLE.me.zone)}</span><span>${fullDateText(range.end, PEOPLE.partner.zone)}</span></div><p class="quiet-footnote">${currentWindows.length ? `这一天有 ${currentWindows.length} 段共同时间` : '这一天没有共同可联系时间'}</p><div class="return-now"><button type="button" class="pill-button" data-action="return-now">回到此刻</button></div>`;
+  const day = bounds();
+  const nearby = state.dayMode === 'nearby' && state.dayOffset === 0;
+  const range = nearby ? {start:Math.max(day.start,now()-30*60000),end:Math.min(day.end,now()+5.5*3600000)} : day;
+  const scale = 2.8;
+  const top = time => (time-range.start)/60000*scale;
+  currentRows = ['me','partner'].flatMap(person => activitySegments(range,person,state.scenario,overrides(),state.rhythm));
+  currentWindows = commonWindows(range);
+  const short = currentRows.filter(row => row.end-row.start < 30*60000);
+  const columns = ['me','partner'].map(person => `<div class="activity-column ${person}">${currentRows.map((row,index) => {
+    if (row.person !== person) return '';
+    const height = (row.end-row.start)/60000*scale;
+    const name = `${PEOPLE[person].city} ${fullDateText(row.start,PEOPLE[person].zone)} ${row.activity.label}，${row.activity.source}`;
+    if (height < 84) return `<div class="timeline-short ${row.activity.kind}" style="top:${top(row.start)}px;height:${height}px" title="${esc(name)}" aria-hidden="true"></div>`;
+    return `<button type="button" class="timeline-block ${row.activity.kind}${height < 100 ? ' compact' : ''}" data-activity="${index}" aria-label="${esc(name)}，查看详情" style="top:${top(row.start)}px;height:${height-6}px"><span class="block-time">${parts(row.start,PEOPLE[person].zone).time}–${parts(row.end,PEOPLE[person].zone).time}</span>${parts(row.start,PEOPLE[person].zone).date !== parts(row.end,PEOPLE[person].zone).date ? `<span class="block-date">${dateText(row.start,PEOPLE[person].zone)} → ${dateText(row.end,PEOPLE[person].zone)}</span>` : ''}<span class="block-label">${icon(row.activity.icon)}${esc(row.activity.label)}</span><span class="block-source">${row.activity.source === '主动设置' ? '主动设置' : row.activity.source === '未知' ? '未知' : '通常安排'}</span></button>`;
+  }).join('')}</div>`).join('');
+  const bands = currentWindows.map(window => `<div class="shared-band" style="top:${top(window.start)}px;height:${(window.end-window.start)/60000*scale}px" aria-hidden="true"></div>`).join('');
+  const ticks = [];
+  for (let instant = range.start; instant < range.end; instant += 30*60000) {
+    if (instant !== range.start && parts(instant,PEOPLE.me.zone).minutes % 60 !== 0) continue;
+    ticks.push(`<div class="axis-tick" style="top:${top(instant)}px" aria-hidden="true"><span>${parts(instant,PEOPLE.me.zone).time}</span><span>${parts(instant,PEOPLE.partner.zone).time}</span></div>`);
+  }
+  const marker = now() >= range.start && now() < range.end ? `<div class="timeline-now" id="now-marker" style="top:${top(now())}px"><span>此刻</span></div>` : '';
+  const firstWindow = currentWindows.find(window => window.end > now()) || currentWindows[0];
+  const windowLabel = firstWindow ? `${currentWindows.length > 1 ? `${currentWindows.length} 段 · ` : ''}${parts(firstWindow.start,PEOPLE.me.zone).time} / ${parts(firstWindow.start,PEOPLE.partner.zone).time} · ${minutesText(firstWindow.end-firstWindow.start)}` : state.scenario === 'missing' ? '资料不足，暂不能推荐' : '这段范围没有共同窗口';
+  $('#day-view').innerHTML = `<h1 class="screen-title">我们的一天</h1><p class="screen-subtitle">活动各自连续，同一高度是同一时刻。</p><div class="timeline-toolbar"><div class="day-controls"><button type="button" data-action="previous-day" aria-label="查看前一天">‹</button><strong>我的 ${dateText(day.start, PEOPLE.me.zone)}</strong><button type="button" data-action="next-day" aria-label="查看后一天">›</button><button type="button" class="text-button" data-action="return-now">回到此刻</button></div><div class="day-scope"><div class="range-switch" role="group" aria-label="时间轴范围"><button type="button" data-range="nearby" aria-pressed="${nearby}">附近几小时</button><button type="button" data-range="full" aria-pressed="${!nearby}">展开全天</button></div></div><div class="timeline-people"><div><span>我 · 北京</span><small>${dateText(range.start,PEOPLE.me.zone)}</small></div><span class="axis-key">我 / 你</span><div><span>阿远 · 纽约</span><small>${dateText(range.start,PEOPLE.partner.zone)}</small></div></div><button type="button" class="window-summary" ${firstWindow ? 'data-action="timeline-window"' : 'disabled'}>${icon(firstWindow ? 'heart' : 'clock')}<span>${firstWindow ? '共同可联系 · ' : ''}${windowLabel}</span>${firstWindow ? icon('arrow') : ''}</button>${short.length ? `<button type="button" class="text-button short-detail" data-action="short-activities">查看 ${short.length} 段短活动 ${icon('arrow')}</button>` : ''}</div><div class="timeline continuous" style="height:${top(range.end)}px">${bands}${columns}<div class="timeline-axis">${ticks.join('')}</div>${marker}</div><div class="day-end"><span>${fullDateText(range.end,PEOPLE.me.zone)}</span><span>${fullDateText(range.end,PEOPLE.partner.zone)}</span></div><p class="quiet-footnote">绿色横带按联系偏好估计，尚未约定。</p>`;
+}
+function renderRhythm() {
+  mountRhythm($('#rhythm-view'),state.rhythm,value => {
+    state.rhythm = value;
+    const persisted = saveRhythm(value);
+    state.reminder = null;
+    renderHome(); renderDay();
+    toast(persisted ? '我的节奏已保存，共同时间已更新' : '本次节奏已更新，浏览器未允许保存');
+  });
 }
 function render() {
   const savedScroll = $('#app').scrollTop;
-  renderHome(); renderDay();
+  renderHome(); renderDay(); renderRhythm();
   $('#desktop-scenarios').innerHTML = scenarioButtons();
   setTab(state.tab, false);
   $('#app').scrollTop = savedScroll;
 }
 function setTab(tab, scroll = true) {
   state.tab = tab;
-  for (const name of ['home', 'day']) {
+  for (const name of ['home', 'day','rhythm']) {
     $(`#${name}-view`).hidden = name !== tab;
     const button = $(`[data-tab="${name}"]`);
     if (name === tab) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current');
   }
   if (scroll) {
     $('#app').scrollTop = 0;
-    if (tab === 'day') REDUCED_MOTION ? scrollToNow() : requestAnimationFrame(scrollToNow);
+    if (tab === 'day' && state.dayMode === 'full') REDUCED_MOTION ? scrollToNow() : requestAnimationFrame(scrollToNow);
   }
 }
 function scrollToNow() {
   const marker = $('#now-marker');
-  if (marker) $('#app').scrollTop = marker.offsetTop + marker.parentElement.offsetTop - 180;
+  if (marker) $('#app').scrollTop = marker.offsetTop + marker.parentElement.offsetTop - ($('.timeline-toolbar')?.offsetHeight || 0) - 90;
 }
 function openSheet(title, html) {
   lastFocus = document.activeElement;
@@ -155,34 +186,49 @@ function statusSheet() {
 }
 function windowSheet(window = upcomingWindow()) {
   if (!window) return;
-  const effectiveStart = Math.max(now(), window.start);
-  openSheet('这段时间，属于我们', `<p>双方都标记了愿意联系。这是时间建议，尚未和对方约定。</p>${Object.keys(PEOPLE).map(person => `<div class="detail-line"><span>${person === 'me' ? '我' : PEOPLE[person].name} · ${PEOPLE[person].city}</span><strong>${dateText(effectiveStart, PEOPLE[person].zone)}<br>${parts(effectiveStart, PEOPLE[person].zone).time}–${parts(window.end, PEOPLE[person].zone).time}</strong></div>`).join('')}<div class="detail-line"><span>共同时间</span><strong>${minutesText(window.end - effectiveStart)}</strong></div><p style="margin-top:16px">原型只演示保存提醒，不会发送通知。</p><div class="sheet-actions"><button type="button" class="primary-button" data-remind="${window.start}">${state.reminder === window.start ? '取消这个提醒' : '给自己留个提醒'}</button></div>`);
+  const effectiveStart = now() >= window.start && now() < window.end ? now() : window.start;
+  const busy = ['me','partner'].filter(person => routineAt(person,effectiveStart).kind === 'busy').map(person => `${person === 'me' ? '我' : PEOPLE[person].name}通常在${routineAt(person,effectiveStart).label}，但单独把这段时间设为可联系。`).join(' ');
+  openSheet('共同可联系时段', `<p>按双方设置的联系偏好估计，可能与实际安排不同。尚未约定，也不要求立即回复。</p>${busy ? `<p class="contact-explanation">${busy}</p>` : ''}${Object.keys(PEOPLE).map(person => `<div class="detail-line"><span>${person === 'me' ? '我' : PEOPLE[person].name} · ${PEOPLE[person].city}</span><strong>${fullDateText(effectiveStart,PEOPLE[person].zone)}<br>至 ${fullDateText(window.end,PEOPLE[person].zone)}</strong></div>`).join('')}<div class="detail-line"><span>共同时间</span><strong>${minutesText(window.end - effectiveStart)}</strong></div>${window.end > now() ? `<p style="margin-top:16px">原型只演示保存提醒，不会发送通知。</p><div class="sheet-actions"><button type="button" class="primary-button" data-remind="${window.start}">${state.reminder === window.start ? '取消这个提醒' : '给自己留个提醒'}</button></div>` : '<p style="margin-top:16px">这是按当前模板回看的时段，不是实际活动记录。</p>'}`);
 }
-function activitySheet(index, person) {
-  const row = currentRows[index], activity = row[person], p = PEOPLE[person];
-  openSheet(`${p.role} · ${activity.label}`, `<p>${activity.source === '主动设置' ? '这是主动分享的临时状态。' : '这是通常作息，可能和此刻的实际安排不同。'}</p><div class="detail-line"><span>${p.city}当地时间</span><strong>${fullDateText(row.start, p.zone)}<br>至 ${fullDateText(row.end, p.zone)}</strong></div><div class="detail-line"><span>信息来源</span><strong>${activity.source}</strong></div><div class="detail-line"><span>联系偏好</span><strong>${canContact(person, row.start, state.scenario, overrides()) ? '愿意联系' : '暂不方便'}</strong></div>${row.shared ? '<p style="margin-top:16px">这段时间双方都愿意联系。</p>' : ''}<div class="sheet-actions"><button type="button" class="primary-button" data-action="close-sheet">知道了</button></div>`);
+function activitySheet(index) {
+  const row = currentRows[index], {activity,person} = row, p = PEOPLE[person];
+  const contactRanges = [];
+  let start = null, unknown = false;
+  for (let time = row.start; time <= row.end; time += 60000) {
+    const value = time < row.end ? canContact(person,time) : false;
+    if (value === null) unknown = true;
+    if (value === true && start === null) start = time;
+    if (value !== true && start !== null) {contactRanges.push(`${parts(start,p.zone).time}–${parts(time,p.zone).time}`); start = null;}
+  }
+  openSheet(`${person === 'me' ? '我' : p.name} · ${activity.label}`, `<p>${activity.source === '主动设置' ? '这是主动分享的临时状态。' : activity.source === '未知' ? '尚未设置，不推测这段时间的活动。' : '这是通常安排，可能与实际生活不同。'}</p><div class="detail-line"><span>${p.city}当地时间</span><strong>${fullDateText(row.start, p.zone)}<br>至 ${fullDateText(row.end, p.zone)}</strong></div><div class="detail-line"><span>信息来源</span><strong>${activity.source}</strong></div><div class="detail-line"><span>单独设置的联系偏好</span><strong>${contactRanges.length ? `${contactRanges.join('、')} 可联系` : unknown ? '尚未设置' : '未设为可联系'}</strong></div>${activity.kind === 'busy' && contactRanges.length ? '<p style="margin-top:16px">活动与联系偏好独立：有活动安排也可以单独标记一段可联系时间。</p>' : ''}<div class="sheet-actions"><button type="button" class="primary-button" data-action="close-sheet">知道了</button></div>`);
 }
 
 document.addEventListener('click', event => {
   const button = event.target.closest('button'); if (!button) return;
   if (button.dataset.tab) { setTab(button.dataset.tab); return; }
-  if (button.dataset.scenario) { state.scenario = button.dataset.scenario; state.dayOffset = 0; state.override = null; state.reminder = null; closeSheet(); render(); $('#app').scrollTop = 0; if (state.tab === 'day') REDUCED_MOTION ? scrollToNow() : requestAnimationFrame(scrollToNow); return; }
+  if (button.dataset.scenario) { state.scenario = button.dataset.scenario; state.dayOffset = 0; state.dayMode = 'nearby'; state.override = null; state.reminder = null; closeSheet(); render(); $('#app').scrollTop = 0; return; }
+  if (button.dataset.range) {state.dayMode = button.dataset.range; if (state.dayMode === 'nearby') state.dayOffset = 0; renderDay(); $('#app').scrollTop = 0; return;}
+  if (button.dataset.windowIndex) {windowSheet(currentWindows[Number(button.dataset.windowIndex)]); return;}
   if (button.dataset.status) {
     if (button.dataset.status === 'reset') state.override = null;
     else state.override = { person: 'me', kind: button.dataset.status, start: now(), end: now() + Number($('#status-duration').value) * 60000 };
     closeSheet(); render(); toast(state.override ? '临时状态已更新' : '已恢复通常作息'); return;
   }
   if (button.dataset.remind) { const instant = Number(button.dataset.remind); state.reminder = state.reminder === instant ? null : instant; closeSheet(); render(); toast(state.reminder ? '已保存演示提醒，不会发送通知' : '已取消演示提醒'); return; }
-  if (button.dataset.activity) { activitySheet(Number(button.dataset.activity), button.dataset.person); return; }
+  if (button.dataset.activity) { activitySheet(Number(button.dataset.activity)); return; }
   switch (button.dataset.action) {
-    case 'open-day': state.dayOffset = 0; renderDay(); setTab('day'); break;
+    case 'open-day': state.dayOffset = 0; state.dayMode = 'nearby'; renderDay(); setTab('day'); break;
+    case 'open-rhythm': setTab('rhythm'); break;
+    case 'read-note': openSheet('阿远留给我的一句话', `<div class="expanded-note">${noteMarkup(initialNote,'partner')}</div><p class="note-local-times">发布时：北京 ${fullDateText(initialNote.time,PEOPLE.me.zone)}<br>纽约 ${fullDateText(initialNote.time,PEOPLE.partner.zone)}</p><p>没有已读，也不需要立刻回应。</p><div class="sheet-actions"><button type="button" class="primary-button" data-action="edit-note">我也留一句</button></div>`); break;
     case 'edit-note': noteSheet(); break;
     case 'status': statusSheet(); break;
     case 'window-detail': windowSheet(); break;
+    case 'timeline-window': if (currentWindows.length === 1) windowSheet(currentWindows[0]); else openSheet('这段范围的共同时间', `<p>按双方联系偏好估计，尚未约定。过去的时段只按当前模板回看。</p><div class="scenario-list">${currentWindows.map((window,index) => `<button type="button" class="scenario-button" data-window-index="${index}"><span>我 ${fullDateText(window.start,PEOPLE.me.zone)}<br>阿远 ${fullDateText(window.start,PEOPLE.partner.zone)}</span><span>${minutesText(window.end-window.start)}</span></button>`).join('')}</div>`); break;
+    case 'short-activities': openSheet('短活动详情', `<p>图上按真实时长显示，短活动在这里展开。</p><div class="scenario-list">${currentRows.map((row,index) => row.end-row.start < 30*60000 ? `<button type="button" class="scenario-button" data-activity="${index}">${PEOPLE[row.person].city} ${parts(row.start,PEOPLE[row.person].zone).time} · ${esc(row.activity.label)}</button>` : '').join('')}</div>`); break;
     case 'close-sheet': closeSheet(); break;
-    case 'previous-day': state.dayOffset--; renderDay(); $('#app').scrollTop = 0; break;
-    case 'next-day': state.dayOffset++; renderDay(); $('#app').scrollTop = 0; break;
-    case 'return-now': state.dayOffset = 0; renderDay(); scrollToNow(); break;
+    case 'previous-day': state.dayOffset--; state.dayMode = 'full'; renderDay(); $('#app').scrollTop = 0; break;
+    case 'next-day': state.dayOffset++; state.dayMode = 'full'; renderDay(); $('#app').scrollTop = 0; break;
+    case 'return-now': state.dayOffset = 0; state.dayMode = 'nearby'; renderDay(); $('#app').scrollTop = 0; break;
     case 'delete-note': { const deleted = state.ownNote; state.ownNote = null; saveNoteStorage(); closeSheet(); render(); toast('留言已删除', () => { state.ownNote = deleted; saveNoteStorage(); render(); }); break; }
   }
 });
@@ -202,4 +248,5 @@ document.addEventListener('keydown', event => {
 function clock() { $('#device-clock').textContent = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }); }
 clock(); setInterval(clock, 30000);
 $('#home-tab-icon').innerHTML = icon('heart'); $('#day-tab-icon').innerHTML = icon('day');
+$('#rhythm-tab-icon').innerHTML = icon('clock');
 render();
