@@ -49,6 +49,6 @@ node --test prototype/model.test.mjs prototype/pairing-model.test.mjs
 
 [正式 MVP 功能与验收清单](docs/superpowers/specs/2026-09-29-nowus-mvp-acceptance.md)明确真实配对、时间规则、分享控制、同步失败与首版取舍；[首次使用设计](docs/superpowers/specs/2026-09-29-nowus-onboarding-design.md)说明本轮流程。
 
-原型已试用，下一步确定移动端与后端技术方案，实现两账号／两设备闭环，再邀请 3–5 对情侣内测。
+原型已试用，下一步先做 Android，iOS 后续；确定移动端与后端技术方案，实现两账号／两设备闭环，再邀请 3–5 对情侣内测。
 
-首批地区已确认「中国大陆一方 + 海外一方」。用户选择 **iOS／Android App + 邮箱验证码登录**。[首发平台与登录方案](docs/superpowers/specs/2026-09-29-nowus-launch-auth-design.md)包含安装、国内外访问、邮件送达与邀请接续的要求。移动端框架尚未选定，目前仓库仍为网页交互原型。
+首批地区已确认「中国大陆一方 + 海外一方」。用户选择 **原生 App + 邮箱验证码登录，Android 优先、iOS 后续**。[首发平台与登录方案](docs/superpowers/specs/2026-09-29-nowus-launch-auth-design.md)包含安装、国内外访问、邮件送达与邀请接续的要求。[Android 起步方案](docs/superpowers/specs/2026-09-29-nowus-android-start-design.md)列出框架取舍与第一阶段交付。移动端框架尚未选定，目前仓库仍为网页交互原型。
