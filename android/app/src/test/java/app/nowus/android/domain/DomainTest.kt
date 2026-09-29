@@ -68,4 +68,31 @@ class DomainTest {
         assertNotNull(Rules.saveNote(state,"😀".repeat(121),1000).error)
         assertEquals(120,Rules.saveNote(state,"😀".repeat(120),1000).state.note!!.text.codePointCount(0,240))
     }
+    @Test fun overnightSleepCrossesRealLocalDates() {
+        val moments=listOf("2026-09-29T14:59:00Z","2026-09-29T15:00:00Z","2026-09-29T22:59:00Z","2026-09-29T23:00:00Z")
+        assertEquals(listOf("未安排","睡觉","睡觉","未安排"),moments.map {TimeEngine.activityAt(me,schedule,null,instant(it)).label})
+    }
+    @Test fun weekdaySelectionUsesEachProfilesLocalDate() {
+        val distinct=Schedule(Rhythm(activity="工作",activityStart="01:00",activityEnd="22:00",sleepStart="22:30",sleepEnd="00:30"),Rhythm(activity="周末",activityStart="01:00",activityEnd="22:00",sleepStart="22:30",sleepEnd="00:30"))
+        assertEquals("周末",TimeEngine.activityAt(me,distinct,null,instant("2026-10-02T17:00:00Z")).label)
+        assertEquals("工作",TimeEngine.activityAt(Profile("你","new-york"),distinct,null,instant("2026-10-03T01:00:00Z")).label)
+    }
+    @Test fun dstContactWindowsPreserveSkippedAndRepeatedHours() {
+        val ny=Profile("你","new-york")
+        val r=Rhythm(sleepStart="04:00",sleepEnd="08:00",contactStart="01:00",contactEnd="03:00")
+        val s=Schedule(r,r)
+        assertEquals(listOf(Window(instant("2026-03-08T06:00:00Z"),instant("2026-03-08T07:00:00Z"))),TimeEngine.commonWindows(instant("2026-03-08T05:00:00Z"),instant("2026-03-08T09:00:00Z"),ny,s,null,ny,s))
+        assertEquals(listOf(Window(instant("2026-11-01T05:00:00Z"),instant("2026-11-01T08:00:00Z"))),TimeEngine.commonWindows(instant("2026-11-01T04:00:00Z"),instant("2026-11-01T10:00:00Z"),ny,s,null,ny,s))
+    }
+    @Test fun temporaryOnlyAppliesInsideItsActualLifetime() {
+        val from=instant("2026-09-29T02:00:15.125Z")
+        val until=from.plusSeconds(90)
+        val temp=TemporaryStatus(true,until.toEpochMilli(),from.toEpochMilli())
+        assertFalse(TimeEngine.contactAt(me,schedule,temp,from.minusMillis(1))!!)
+        assertTrue(TimeEngine.contactAt(me,schedule,temp,from)!!)
+        assertFalse(TimeEngine.contactAt(me,schedule,temp,until)!!)
+        val partnerRhythm=Rhythm(contactStart="09:00",contactEnd="18:00")
+        assertEquals(listOf(Window(from,until)),TimeEngine.commonWindows(from.minusSeconds(30),until.plusSeconds(30),me,schedule,temp,me,Schedule(partnerRhythm,partnerRhythm)))
+        assertEquals("上班",TimeEngine.activityAt(me,schedule,temp,from).label)
+    }
 }

@@ -29,24 +29,24 @@ object TimeEngine {
   return Activity(when {contains(m,r.sleepStart,r.sleepEnd)->"睡觉"; contains(m,r.activityStart,r.activityEnd)->r.activity; else->"未安排"},ActivitySource.TEMPLATE)
  }
  fun contactAt(profile: Profile,schedule: Schedule?,temporary: TemporaryStatus?,instant: Instant): Boolean? {
-  if(temporary!=null && instant.toEpochMilli()<temporary.untilMillis) return temporary.available
+  if(temporary!=null && instant.toEpochMilli()>=temporary.fromMillis && instant.toEpochMilli()<temporary.untilMillis) return temporary.available
   val r=rhythm(profile,schedule,instant) ?: return null
   if(!r.contactKnown) return null
   val m=minute(profile,instant)
   return !contains(m,r.sleepStart,r.sleepEnd) && contains(m,r.contactStart,r.contactEnd)
  }
- private fun boundaries(start: Instant,end: Instant,extra: Instant?=null): List<Instant> {
+ private fun boundaries(start: Instant,end: Instant,extras: List<Instant> = emptyList()): List<Instant> {
   require(start<=end)
   val result=mutableListOf(start)
   var point=start.truncatedTo(ChronoUnit.MINUTES).plusSeconds(60)
   while(point<end) { result.add(point); point=point.plusSeconds(60) }
-  if(extra!=null && extra>start && extra<end) result.add(extra)
+  result.addAll(extras.filter { it>start && it<end })
   result.add(end)
   return result.distinct().sorted()
  }
  fun commonWindows(start: Instant,end: Instant,me: Profile,meSchedule: Schedule?,temporary: TemporaryStatus?,partner: Profile,partnerSchedule: Schedule?): List<Window> {
   val result=mutableListOf<Window>()
-  boundaries(start,end,temporary?.let { Instant.ofEpochMilli(it.untilMillis) }).zipWithNext().forEach { (a,b)->
+  boundaries(start,end,temporary?.let { listOf(Instant.ofEpochMilli(it.fromMillis), Instant.ofEpochMilli(it.untilMillis)) } ?: emptyList()).zipWithNext().forEach { (a,b)->
    if(a<b && contactAt(me,meSchedule,temporary,a)==true && contactAt(partner,partnerSchedule,null,a)==true) {
     if(result.lastOrNull()?.end==a) result[result.lastIndex]=result.last().copy(end=b) else result.add(Window(a,b))
    }
@@ -63,3 +63,4 @@ object TimeEngine {
   return result
  }
 }
+
