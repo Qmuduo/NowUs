@@ -50,3 +50,5 @@ node --test prototype/model.test.mjs prototype/pairing-model.test.mjs
 [正式 MVP 功能与验收清单](docs/superpowers/specs/2026-09-29-nowus-mvp-acceptance.md)明确真实配对、时间规则、分享控制、同步失败与首版取舍；[首次使用设计](docs/superpowers/specs/2026-09-29-nowus-onboarding-design.md)说明本轮流程。
 
 下一步邀请 3–5 对情侣试用原型，观察配对是否顺畅、能否看懂通常活动与联系偏好的区别，再确定首发平台与登录方式。
+
+首批地区已确认「中国大陆一方 + 海外一方」。[首发平台与登录方案](docs/superpowers/specs/2026-09-29-nowus-launch-auth-design.md)推荐手机网页／PWA 与邮箱验证码，待确认；包含国内外访问、邮件送达与邀请接续的验收要求。
