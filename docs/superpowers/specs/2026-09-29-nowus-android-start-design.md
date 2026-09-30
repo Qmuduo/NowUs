@@ -2,7 +2,7 @@
 
 日期：2026-09-29。
 
-已确认：Android 优先、iOS 后续，真实账号采用邮箱验证码。以下实现框架与阶段范围为建议稿，尚未开始搭建工程。
+已确认：Android 优先、iOS 后续，真实账号采用邮箱验证码；用户选择 Kotlin + Jetpack Compose。第一阶段的 Android 本地体验工程已完成并可安装试用。
 
 ## 框架取舍
 
@@ -11,7 +11,7 @@
 | Kotlin + Jetpack Compose，Android 优先推荐 | Android 原生 UI 与系统行为；可在现有 Windows／Android SDK 环境本地构建和测试 | 现有 JavaScript 时间模型需迁移成 Kotlin 并复验；iOS 后续单独选择界面方案，不能默认整套 UI 直接共享。 |
 | React Native + Expo | 部分 JavaScript 时间逻辑可验证后迁移；以后更容易在同一工程推进 iOS | 现有 HTML／CSS 仍需改写成移动组件；Android 仍要做键盘、返回、安装和时间计算的真机验证。 |
 
-推荐依据：当前重点已改为先交付 Android 原生版本。如果用户更看重后续 iOS 共享界面与逻辑，可选择 React Native + Expo。此前用户只确认 App 形态，未确认具体框架。
+最终选择：Kotlin + Jetpack Compose。表格保留此前路线比较；第一阶段源代码位于 `android/`，iOS 不在当前交付范围。
 
 ## 环境观察
 

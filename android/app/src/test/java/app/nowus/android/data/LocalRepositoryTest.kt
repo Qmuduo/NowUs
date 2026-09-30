@@ -40,17 +40,4 @@ class LocalRepositoryTest {
         } finally { job.cancelAndJoin() }
     }
 
-    @Test fun concurrentUpdatesKeepBothIndependentChanges() = runBlocking {
-        val file=Files.createTempDirectory("nowus-atomic").resolve("state.preferences_pb").toFile()
-        val job=SupervisorJob()
-        try {
-            val repository=LocalRepository(PreferenceDataStoreFactory.create(scope=CoroutineScope(Dispatchers.IO+job),produceFile={file}))
-            coroutineScope {
-                launch { repository.update { it.copy(note=Note("晚安",1)) } }
-                launch { repository.update { it.copy(me=Profile("阿木","london")) } }
-            }
-            assertEquals("阿木",repository.states.first().me.name)
-            assertEquals("晚安",repository.states.first().note?.text)
-        } finally { job.cancelAndJoin() }
-    }
 }

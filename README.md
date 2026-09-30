@@ -6,7 +6,7 @@
 
 ## 当前阶段
 
-产品原型阶段，已有可交互的手机界面，用于验证信息呈现和体验。
+已完成网页交互原型，正在验证 Android 本地体验版。原型仍可用于快速比较信息呈现；Android 工程位于 [android/](android/README.md)。
 
 - 首页优先「看见你的生活」，共同联系时间紧随其后。
 - 区分通常作息、主动分享的当前状态和联系意愿。
@@ -49,6 +49,8 @@ node --test prototype/model.test.mjs prototype/pairing-model.test.mjs
 
 [正式 MVP 功能与验收清单](docs/superpowers/specs/2026-09-29-nowus-mvp-acceptance.md)明确真实配对、时间规则、分享控制、同步失败与首版取舍；[首次使用设计](docs/superpowers/specs/2026-09-29-nowus-onboarding-design.md)说明本轮流程。
 
-原型已试用，下一步先做 Android，iOS 后续；确定移动端与后端技术方案，实现两账号／两设备闭环，再邀请 3–5 对情侣内测。
+原型已试用，第一步先做 Android 本地体验，iOS 后续；下一步接入真实邮箱登录和两账号／两设备同步，再邀请 3–5 对情侣内测。
 
-首批地区已确认「中国大陆一方 + 海外一方」。用户选择 **原生 App + 邮箱验证码登录，Android 优先、iOS 后续**。[首发平台与登录方案](docs/superpowers/specs/2026-09-29-nowus-launch-auth-design.md)包含安装、国内外访问、邮件送达与邀请接续的要求。[Android 起步方案](docs/superpowers/specs/2026-09-29-nowus-android-start-design.md)列出框架取舍与第一阶段交付。移动端框架尚未选定，目前仓库仍为网页交互原型。
+首批地区已确认「中国大陆一方 + 海外一方」。用户选择 **原生 App + 邮箱验证码登录，Android 优先、iOS 后续，Android 使用 Kotlin + Jetpack Compose**。[首发平台与登录方案](docs/superpowers/specs/2026-09-29-nowus-launch-auth-design.md)包含安装、国内外访问、邮件送达与邀请接续的要求。[Android 起步方案](docs/superpowers/specs/2026-09-29-nowus-android-start-design.md)列出已确定框架与阶段边界。
+
+Android 第一阶段是本地体验，可安装、使用真实时间、调整节奏并保存一条留言，配对仅为同机演示。与伴侣实际同步、邮箱验证码和远端邀请属于第二阶段。构建、安装和测试见 [Android 工程说明](android/README.md)。
