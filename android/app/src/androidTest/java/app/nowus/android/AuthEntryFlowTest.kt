@@ -1,6 +1,7 @@
 package app.nowus.android
 
 import androidx.compose.ui.test.*
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -73,7 +74,7 @@ class AuthEntryFlowTest {
         compose.onNodeWithText("发送 6 位验证码").assertDoesNotExist()
     }
 
-    @Test fun newAccountDoesNotPreselectBeijingOrUploadSuggestedRhythms() {
+    @Test fun newAccountGetsEditableScheduleSuggestionsThatUploadOnlyWhenSaved() {
         val api = FakeAccountApi(freshAccount = true)
         val sessions = MemorySessionStore()
         val local = MemoryRepository(AppState(Profile("", "beijing")))
@@ -96,9 +97,27 @@ class AuthEntryFlowTest {
         compose.onNodeWithText("城市：请选择 ▾").performClick()
         compose.onNodeWithText("纽约 · America/New_York").performClick()
         compose.onNodeWithText("下一步：我的节奏").performScrollTo().performClick()
-        compose.onNodeWithText("保存节奏并继续").performScrollTo().performClick()
 
-        compose.runOnIdle { org.junit.Assert.assertEquals(0, api.savedScheduleCount) }
+        compose.onNodeWithText("23:00").assertExists()
+        compose.onNodeWithTag("rhythm-weekday-sleep-start").assertExists()
+        compose.onNodeWithText("休息日").performClick()
+        compose.onNodeWithText("08:00").assertExists()
+        compose.onNodeWithTag("rhythm-rest-sleep-end").assertExists()
+        compose.onNodeWithText("工作日").performClick()
+        val sleepStartSlider=compose.onNodeWithTag("rhythm-weekday-sleep-start")
+        val sliderSize=sleepStartSlider.fetchSemanticsNode().size
+        sleepStartSlider.performTouchInput { swipe(start=Offset(sliderSize.width*0.96f,sliderSize.height/2f),end=Offset(sliderSize.width*0.1f,sliderSize.height/2f),durationMillis=1000) }
+        compose.onNodeWithText("23:00").assertDoesNotExist()
+        compose.runOnIdle { assertEquals(0, api.savedScheduleCount) }
+
+        compose.onNodeWithText("保存节奏并继续").performScrollTo().performClick()
+        compose.waitUntil(10_000) { api.savedScheduleCount == 1 }
+        compose.runOnIdle {
+            assertEquals(1, api.savedScheduleCount)
+            org.junit.Assert.assertNotEquals("23:00", api.savedSchedule!!.weekday.sleepStart)
+            org.junit.Assert.assertTrue(Rules.validateRhythm(api.savedSchedule!!.weekday).valid)
+            org.junit.Assert.assertTrue(Rules.validateRhythm(api.savedSchedule!!.rest).valid)
+        }
     }
 
     private class MemorySessionStore(initial: AccountSession? = null) : SessionStore {
@@ -125,6 +144,7 @@ class AuthEntryFlowTest {
         var verifiedCode: String? = null
         var previewedCode: String? = null
         var savedScheduleCount = 0
+        var savedSchedule: Schedule? = null
         private var profile: Profile? = if (freshAccount) null else Profile("小舟", "beijing")
         private var schedule: Schedule? = if (freshAccount) null else defaultSchedule()
         private var setupComplete = !freshAccount
@@ -143,7 +163,7 @@ class AuthEntryFlowTest {
             serverTime = Instant.now().toString(),
         )
         override suspend fun saveProfile(token: String, profile: Profile) { this.profile = profile }
-        override suspend fun saveSchedule(token: String, schedule: Schedule) { savedScheduleCount += 1; this.schedule = schedule }
+        override suspend fun saveSchedule(token: String, schedule: Schedule) { savedScheduleCount += 1; savedSchedule = schedule; this.schedule = schedule }
         override suspend fun saveNote(token: String, text: String) = Unit
         override suspend fun deleteNote(token: String) = Unit
         override suspend fun setTemporary(token: String, available: Boolean, minutes: Int) = Unit

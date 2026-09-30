@@ -15,7 +15,7 @@
 
 ## 环境观察
 
-当前仓库已有 `android/` 工程；本机 JDK 21、Android SDK 和 ADB 可用于 Android 开发，ADB 目前识别一台实体手机。真实账号接口与登录 UI 已完成，Android 单元测试、debug APK 构建及 13 项 Compose 仪器测试均通过。Google Maven 在此环境的 TLS 请求曾失败，本轮通过仓库附带的可选 Tencent/Aliyun Gradle init script 完成本地构建；此镜像仅是当前开发网络的取回方式，不改变 Gradle 默认仓库。现有设备数不足以完成两台实体手机验收。
+当前仓库已有 `android/` 工程；本机 JDK 21、Android SDK 和 ADB 可用于 Android 开发，ADB 目前识别一台实体手机。真实账号接口与登录 UI 已完成，Android 单元测试、debug APK 构建及 15 项 Android 设备仪器测试均通过。Google Maven 在此环境的 TLS 请求曾失败，本轮通过仓库附带的可选 Tencent/Aliyun Gradle init script 完成本地构建；此镜像仅是当前开发网络的取回方式，不改变 Gradle 默认仓库。现有设备数不足以完成两台实体手机验收。
 
 ## 第一阶段建议交付
 
