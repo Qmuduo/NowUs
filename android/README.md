@@ -99,7 +99,7 @@ Invite links use `nowus://invite/{CODE}`. Android stores the pending code encryp
 
 ## Data and time model
 
-- `domain/` keeps the existing Kotlin IANA timezone calculations, weekday/rest-day schedules, timeline, temporary contact preference, and common contact windows.
+- `domain/` keeps the existing Kotlin IANA timezone calculations, weekday/rest-day schedules, timeline, temporary contact preference, and common contact windows. New accounts start with a city-adjusted editable student template; an office-worker template is also available. Both split the day into named blocks and allow custom blocks. Exact clock times are starting suggestions, not claims about everyone in a city; details and evidence limits are in [the routine template note](../docs/superpowers/specs/2026-09-30-nowus-routine-templates.md).
 - `backend/` owns accounts, OTPs, hashed sessions, invitations, pair membership, and each user's own profile, schedule, temporary preference, and current note.
 - The server returns partner data only while both members are sharing and the current pair exists. Pause and unpair checks apply on each read. A/B synchronization refreshes while the app is open (30-second poll) and when a request succeeds; offline UI shows the last server timestamp.
 - Unknown partner fields remain absent. There are no demo defaults sent to the server. The editor's suggested schedule is not uploaded until the user saves it.
@@ -110,7 +110,7 @@ Invite links use `nowus://invite/{CODE}`. Android stores the pending code encryp
 
 - `docker compose --profile test run --rm tests`: 23 backend tests passed against PostgreSQL.
 - `python backend/scripts/acceptance.py`: A/B/C OTP and Mailpit flow passed, including two-way schedule/note visibility, C access denial, pause/resume, and unpair revocation.
-- `:app:testDebugUnitTest`: 30 Android unit tests passed; `:app:assembleDebug` built the debug APK.
-- `:app:connectedDebugAndroidTest`: all 15 instrumentation tests passed on one connected physical Android device with the local API and Mailpit available over ADB reverse (ports 8000 and 8025). The real random OTP probe is skipped when those local services are unreachable.
+- `:app:testDebugUnitTest`: 33 Android unit tests passed; `:app:assembleDebug` built the debug APK.
+- `:app:connectedDebugAndroidTest`: 16 instrumentation tests ran on one connected physical Android device: 15 passed; the real random OTP probe was skipped in the default emulator-URL run. A targeted rerun with the host's LAN API URL and Mailpit forwarded on port 8025 passed the real random OTP, encrypted session restore, and snapshot check on that device.
 
 Android builds were run with `--init-script .\gradle-mirror.init.gradle` because this development network failed TLS requests to Google Maven. This is a local dependency-fetch workaround; it is not a measurement of app connectivity from Mainland China or overseas. Two-physical-device acceptance remains outstanding.

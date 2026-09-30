@@ -99,4 +99,38 @@ class DomainTest {
         assertEquals(listOf(Window(from,until)),TimeEngine.commonWindows(from.minusSeconds(30),until.plusSeconds(30),me,schedule,temp,me,Schedule(partnerRhythm,partnerRhythm)))
         assertEquals("上班",TimeEngine.activityAt(me,schedule,temp,from).label)
     }
+    @Test fun cityTemplatesProvideEditableStudentAndOfficeDayBlocks() {
+        val student=RoutineTemplates.forCity("beijing",RoutineTemplate.STUDENT)
+        val weekday=student.weekday.blocks.map { it.label }
+        assertTrue(weekday.containsAll(listOf("睡觉","早餐","上学通勤","上午上课","午餐","午休","下午上课","晚餐")))
+        assertEquals("学生",student.templateId)
+        assertTrue(Rules.validateRhythm(student.weekday).valid)
+        assertTrue(Rules.validateRhythm(student.rest).valid)
+
+        val office=RoutineTemplates.forCity("paris",RoutineTemplate.OFFICE_WORKER)
+        assertEquals("上班族",office.templateId)
+        assertTrue(office.weekday.blocks.any { it.label=="上午上班" })
+        assertTrue(office.weekday.blocks.any { it.label=="通勤" })
+        assertTrue(Rules.validateRhythm(office.weekday).valid)
+        assertEquals("20:00",office.weekday.blocks.single { it.id=="dinner" }.start)
+    }
+    @Test fun customRoutineBlocksDriveTimelineAndRejectOverlaps() {
+        val blocks=listOf(
+            RoutineBlock("sleep","睡觉","23:00","07:00"),
+            RoutineBlock("breakfast","早餐","07:00","07:30"),
+            RoutineBlock("class","上午上课","08:00","12:00")
+        )
+        val custom=Rhythm(blocks=blocks)
+        val date=instant("2026-09-29T23:15:00Z")
+        assertEquals("早餐",TimeEngine.activityAt(me,Schedule(custom,custom),null,date).label)
+        assertEquals("上午上课",TimeEngine.activityAt(me,Schedule(custom,custom),null,date.plusSeconds(3600)).label)
+        assertFalse(Rules.validateRhythm(custom.copy(blocks=blocks+RoutineBlock("lunch","午餐","11:30","12:30"))).valid)
+        assertFalse(Rules.validateRhythm(custom.copy(blocks=blocks+RoutineBlock("late","晚间活动","22:00","23:30"))).valid)
+    }
+    @Test fun legacyRhythmJsonStillDecodesAndKeepsActivityBehavior() {
+        val legacy=kotlinx.serialization.json.Json.decodeFromString<Schedule>("""{"weekday":{"sleepStart":"23:00","sleepEnd":"07:00","activity":"上课","activityStart":"09:00","activityEnd":"17:00","contactKnown":true,"contactStart":"20:00","contactEnd":"22:00"},"rest":{"sleepStart":"23:00","sleepEnd":"08:00","activity":"休息","activityStart":"10:00","activityEnd":"12:00","contactKnown":true,"contactStart":"20:00","contactEnd":"22:00"}}""")
+        assertTrue(legacy.weekday.blocks.isEmpty())
+        assertEquals("学生",legacy.templateId)
+        assertEquals("上课",legacy.weekday.activity)
+    }
 }

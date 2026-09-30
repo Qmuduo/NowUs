@@ -26,6 +26,10 @@ object TimeEngine {
  fun activityAt(profile: Profile,schedule: Schedule?,temporary: TemporaryStatus?,instant: Instant): Activity {
   val r=rhythm(profile,schedule,instant) ?: return Activity("未安排",ActivitySource.UNKNOWN)
   val m=minute(profile,instant)
+  if(r.blocks.isNotEmpty()) {
+   val block=r.blocks.firstOrNull { contains(m,it.start,it.end) }
+   return Activity(block?.label ?: "未安排",ActivitySource.TEMPLATE)
+  }
   return Activity(when {contains(m,r.sleepStart,r.sleepEnd)->"睡觉"; contains(m,r.activityStart,r.activityEnd)->r.activity; else->"未安排"},ActivitySource.TEMPLATE)
  }
  fun contactAt(profile: Profile,schedule: Schedule?,temporary: TemporaryStatus?,instant: Instant): Boolean? {
@@ -33,7 +37,8 @@ object TimeEngine {
   val r=rhythm(profile,schedule,instant) ?: return null
   if(!r.contactKnown) return null
   val m=minute(profile,instant)
-  return !contains(m,r.sleepStart,r.sleepEnd) && contains(m,r.contactStart,r.contactEnd)
+  val sleep=r.blocks.firstOrNull { it.id=="sleep" }
+  return !(sleep?.let { contains(m,it.start,it.end) } ?: contains(m,r.sleepStart,r.sleepEnd)) && contains(m,r.contactStart,r.contactEnd)
  }
  private fun boundaries(start: Instant,end: Instant,extras: List<Instant> = emptyList()): List<Instant> {
   require(start<=end)

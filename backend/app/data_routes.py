@@ -24,6 +24,7 @@ class ProfileInput(Input):
 class ScheduleInput(Input):
     weekday: dict[str, Any]
     rest: dict[str, Any]
+    templateId: str = "学生"
 
 
 class NoteInput(Input):
@@ -49,6 +50,8 @@ def _error(status: int, code: str, **details):
 
 def _schedule_errors(schedule: dict) -> list[str]:
     errors = rhythm_errors(schedule.get("weekday", {})) + rhythm_errors(schedule.get("rest", {}))
+    if schedule.get("templateId", "学生") not in {"学生", "上班族"}:
+        errors.append("作息模板类型无效")
     return list(dict.fromkeys(errors))
 
 
@@ -131,7 +134,7 @@ def save_profile(body: ProfileInput, request: Request, user: dict = Depends(curr
 def save_rhythm(body: ScheduleInput, request: Request, user: dict = Depends(current_user)):
     from psycopg.types.json import Jsonb
 
-    value = {"weekday": body.weekday, "rest": body.rest}
+    value = {"weekday": body.weekday, "rest": body.rest, "templateId": body.templateId}
     errors = _schedule_errors(value)
     if errors:
         _error(422, "rhythm_invalid", messages=errors)

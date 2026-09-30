@@ -24,3 +24,41 @@ def sample_rhythm(activity: str = "上班") -> dict:
         "contactKnown": True, "contactStart": "20:00", "contactEnd": "22:30",
     }
     return {"weekday": rhythm, "rest": {**rhythm, "activity": "休息", "activityStart": "10:00", "activityEnd": "12:00"}}
+
+
+def sample_segmented_rhythm(activity: str = "上班", template: str = "上班族") -> dict:
+    is_student = template == "学生"
+    main_label = "上午上课" if is_student else "上午上班"
+    afternoon_label = "下午上课" if is_student else "下午上班"
+    weekday_blocks = [
+        {"id": "sleep", "label": "睡觉", "start": "23:00", "end": "07:00"},
+        {"id": "breakfast", "label": "早餐", "start": "07:30", "end": "08:00"},
+        {"id": "commute", "label": "通勤", "start": "08:00", "end": "09:00"},
+        {"id": "morning", "label": main_label, "start": "09:00", "end": "12:00"},
+        {"id": "lunch", "label": "午餐", "start": "12:00", "end": "13:00"},
+        {"id": "nap", "label": "午休", "start": "13:00", "end": "13:30"},
+        {"id": "afternoon", "label": afternoon_label, "start": "13:30", "end": "17:30"},
+        {"id": "commute-home", "label": "返程通勤", "start": "17:30", "end": "18:00"},
+        {"id": "dinner", "label": "晚餐", "start": "18:00", "end": "19:00"},
+    ]
+    rest_blocks = [
+        {"id": "sleep", "label": "睡觉", "start": "23:30", "end": "08:30"},
+        {"id": "breakfast", "label": "早餐", "start": "08:30", "end": "09:00"},
+        {"id": "lunch", "label": "午餐", "start": "12:30", "end": "13:30"},
+        {"id": "free", "label": "自由安排", "start": "14:00", "end": "18:00"},
+        {"id": "dinner", "label": "晚餐", "start": "18:30", "end": "19:30"},
+        {"id": "evening", "label": "晚间休息", "start": "19:30", "end": "22:30"},
+    ]
+    return {
+        "templateId": template,
+        "weekday": {
+            "sleepStart": "23:00", "sleepEnd": "07:00", "activity": activity,
+            "activityStart": "09:00", "activityEnd": "12:00", "contactKnown": True,
+            "contactStart": "20:00", "contactEnd": "22:00", "blocks": weekday_blocks,
+        },
+        "rest": {
+            "sleepStart": "23:30", "sleepEnd": "08:30", "activity": "休息",
+            "activityStart": "10:00", "activityEnd": "12:00", "contactKnown": True,
+            "contactStart": "20:00", "contactEnd": "22:00", "blocks": rest_blocks,
+        },
+    }

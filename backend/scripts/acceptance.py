@@ -74,13 +74,37 @@ def call(method: str, path: str, token: str | None = None, body: dict | None = N
 
 
 def rhythm(activity: str):
+    student = activity == "上课"
     day = {
-        "sleepStart": "23:00", "sleepEnd": "07:00",
-        "activity": activity, "activityStart": "09:00", "activityEnd": "18:00",
-        "contactKnown": True, "contactStart": "20:00", "contactEnd": "22:30",
+        "sleepStart": "23:00", "sleepEnd": "07:00", "activity": activity,
+        "activityStart": "09:00", "activityEnd": "12:00",
+        "contactKnown": True, "contactStart": "20:00", "contactEnd": "22:00",
+        "blocks": [
+            {"id": "sleep", "label": "睡觉", "start": "23:00", "end": "07:00"},
+            {"id": "breakfast", "label": "早餐", "start": "07:30", "end": "08:00"},
+            {"id": "commute", "label": "通勤", "start": "08:00", "end": "09:00"},
+            {"id": "morning", "label": "上午上课" if student else "上午上班", "start": "09:00", "end": "12:00"},
+            {"id": "lunch", "label": "午餐", "start": "12:00", "end": "13:00"},
+            {"id": "nap", "label": "午休", "start": "13:00", "end": "13:30"},
+            {"id": "afternoon", "label": "下午上课" if student else "下午上班", "start": "13:30", "end": "17:30"},
+            {"id": "commute-home", "label": "返程通勤", "start": "17:30", "end": "18:00"},
+            {"id": "dinner", "label": "晚餐", "start": "18:00", "end": "19:00"},
+        ],
     }
-    rest = {**day, "activity": "休息", "activityStart": "10:00", "activityEnd": "12:00"}
-    return {"weekday": day, "rest": rest}
+    rest = {
+        "sleepStart": "23:30", "sleepEnd": "08:30", "activity": "休息",
+        "activityStart": "10:00", "activityEnd": "12:00",
+        "contactKnown": True, "contactStart": "20:00", "contactEnd": "22:00",
+        "blocks": [
+            {"id": "sleep", "label": "睡觉", "start": "23:30", "end": "08:30"},
+            {"id": "breakfast", "label": "早餐", "start": "08:30", "end": "09:00"},
+            {"id": "lunch", "label": "午餐", "start": "12:30", "end": "13:30"},
+            {"id": "free", "label": "自由安排", "start": "14:00", "end": "18:00"},
+            {"id": "dinner", "label": "晚餐", "start": "18:30", "end": "19:30"},
+            {"id": "evening", "label": "晚间休息", "start": "19:30", "end": "22:30"},
+        ],
+    }
+    return {"templateId": "学生" if student else "上班族", "weekday": day, "rest": rest}
 
 
 def main():
@@ -106,6 +130,7 @@ def main():
     bob = call("GET", "/v1/snapshot", bob_token)
     carol = call("GET", "/v1/snapshot", carol_token)
     assert alice["partner"]["schedule"]["weekday"]["activity"] == "上课"
+    assert alice["partner"]["schedule"]["weekday"]["blocks"][3]["label"] == "上午上课"
     assert alice["partner"]["note"]["text"] == "下班一起吃饭"
     assert bob["partner"]["schedule"]["weekday"]["activity"] == "上班"
     assert bob["partner"]["note"]["text"] == "醒来给我说一声 🌙"

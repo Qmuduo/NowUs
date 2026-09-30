@@ -109,7 +109,7 @@ class NowUsApiClient(private val baseUrl: String) : AccountApi {
     }
 
     override suspend fun saveSchedule(token: String, schedule: Schedule) {
-        put("/v1/me/rhythm", token, ScheduleInput(schedule.weekday, schedule.rest))
+        put("/v1/me/rhythm", token, ScheduleInput(schedule.weekday, schedule.rest, schedule.templateId))
     }
 
     override suspend fun saveNote(token: String, text: String) {
@@ -216,7 +216,7 @@ class NowUsApiClient(private val baseUrl: String) : AccountApi {
 
     @Serializable private data class OtpInput(val email: String)
     @Serializable private data class VerifyInput(val email: String, val code: String)
-    @Serializable private data class ScheduleInput(val weekday: app.nowus.android.domain.Rhythm, val rest: app.nowus.android.domain.Rhythm)
+    @Serializable private data class ScheduleInput(val weekday: app.nowus.android.domain.Rhythm, val rest: app.nowus.android.domain.Rhythm, val templateId: String = "学生")
     @Serializable private data class NoteInput(val text: String)
     @Serializable private data class TemporaryInput(val available: Boolean, val minutes: Int)
     @Serializable private data class SetupInput(val complete: Boolean)

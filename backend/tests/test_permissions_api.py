@@ -1,4 +1,4 @@
-from .helpers import bearer, create_user, sample_rhythm, save_profile
+from .helpers import bearer, create_user, sample_rhythm, sample_segmented_rhythm, save_profile
 
 
 def test_pair_members_see_each_others_owned_schedule_and_note_but_third_user_cannot(api):
@@ -11,7 +11,7 @@ def test_pair_members_see_each_others_owned_schedule_and_note_but_third_user_can
     code = client.post("/v1/invites", headers=bearer(alice)).json()["code"]
     client.post("/v1/invites/accept", headers=bearer(bob), json={"code": code}).raise_for_status()
 
-    alice_schedule = sample_rhythm("上班")
+    alice_schedule = sample_segmented_rhythm("上班", "上班族")
     bob_schedule = sample_rhythm("上课")
     client.put("/v1/me/rhythm", headers=bearer(alice), json=alice_schedule).raise_for_status()
     client.put("/v1/me/rhythm", headers=bearer(bob), json=bob_schedule).raise_for_status()
@@ -24,6 +24,8 @@ def test_pair_members_see_each_others_owned_schedule_and_note_but_third_user_can
     assert view_a["partner"]["schedule"]["weekday"]["activity"] == "上课"
     assert view_a["partner"]["note"]["text"] == "下班一起吃饭"
     assert view_b["partner"]["schedule"]["weekday"]["activity"] == "上班"
+    assert view_b["partner"]["schedule"]["templateId"] == "上班族"
+    assert [block["label"] for block in view_b["partner"]["schedule"]["weekday"]["blocks"]][1:6] == ["早餐", "通勤", "上午上班", "午餐", "午休"]
     assert view_b["partner"]["note"]["text"] == "醒来给我说一声 🌙"
 
     carol_view = client.get("/v1/snapshot", headers=bearer(carol)).json()

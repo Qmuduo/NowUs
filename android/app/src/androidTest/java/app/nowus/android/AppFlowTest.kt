@@ -100,6 +100,29 @@ class AppFlowTest {
   compose.onNodeWithText("此刻").assertExists()
   compose.runOnIdle {Assert.assertTrue(repo.data.value.setupComplete);Assert.assertNull(repo.data.value.partner)}
  }
+ @Test fun cityBasedRoutineTemplateCanBeChangedAndSaved(){
+  val repo=MemoryRepository(AppState(Profile("阿青","paris"),setupComplete=true));val vm=AppViewModel(repo)
+  compose.setContent{NowUsTheme{NowUsApp(vm)}}
+  compose.onNodeWithText("我的节奏").performClick()
+  compose.onNodeWithText("上班族模板").performScrollTo().performClick()
+  compose.onNodeWithText("应用模板").performClick()
+  capture("nowus-routine-template.png")
+  compose.onAllNodesWithText("上午上班").onFirst().performScrollTo().assertExists()
+  compose.onAllNodesWithText("午餐").onFirst().performScrollTo().assertExists()
+  compose.onNodeWithTag("rhythm-weekday-dinner-start").performScrollTo().assertTextEquals("20:00")
+  compose.onNodeWithTag("rhythm-weekday-breakfast-label").performScrollTo().performTextReplacement("早饭")
+  compose.onNodeWithText("＋ 添加时段").performScrollTo().performClick()
+  compose.onNodeWithTag("rhythm-weekday-custom-1-label").performScrollTo().performTextReplacement("健身")
+  compose.onNodeWithText("保存我的节奏").performScrollTo().performClick()
+  compose.runOnIdle{
+   val saved=repo.data.value.schedule!!
+   Assert.assertEquals("上班族",saved.templateId)
+   Assert.assertTrue(saved.weekday.blocks.any{it.label=="上午上班"})
+   Assert.assertEquals("早饭",saved.weekday.blocks.single{it.id=="breakfast"}.label)
+   Assert.assertEquals("健身",saved.weekday.blocks.single{it.id=="custom-1"}.label)
+   Assert.assertEquals("20:00",saved.weekday.blocks.single{it.id=="dinner"}.start)
+  }
+ }
  @Test fun unknownPartnerRequiresExplicitSampleAndSavedNote(){
   val repo=MemoryRepository(AppState(Profile("阿青","beijing"),Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息",activityStart="10:00",activityEnd="12:00",contactStart="10:00",contactEnd="22:00")),true,Profile("小雨","new-york")))
   val vm=AppViewModel(repo)

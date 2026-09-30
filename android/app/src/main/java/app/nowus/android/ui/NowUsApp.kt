@@ -38,7 +38,7 @@ import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
-fun defaultSchedule()=Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息",activityStart="10:00",activityEnd="12:00",contactStart="10:00",contactEnd="22:00"))
+fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemplate.STUDENT)=RoutineTemplates.forCity(cityId,template)
 
 @Composable fun NowUsApp(
  vm:AppViewModel,
@@ -309,7 +309,7 @@ fun defaultSchedule()=Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息
  var step by rememberSaveable {mutableIntStateOf(if(state.schedule!=null)2 else if(state.me.name.isNotBlank())1 else 0)}
  var name by rememberSaveable {mutableStateOf(state.me.name)}
  var city by rememberSaveable {mutableStateOf(state.me.cityId)}
- var scheduleJson by rememberSaveable {mutableStateOf(Json.encodeToString(state.schedule?:defaultSchedule()))}
+ var scheduleJson by rememberSaveable {mutableStateOf(Json.encodeToString(state.schedule?:defaultSchedule(city)))}
  val schedule=Json.decodeFromString<Schedule>(scheduleJson)
  BackHandler(enabled=step>0){step--}
  Column(Modifier.fillMaxSize().safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(24.dp),verticalArrangement=Arrangement.spacedBy(18.dp)){
@@ -318,8 +318,8 @@ fun defaultSchedule()=Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息
   Text(if(realAccount)"真实账号 · 资料保存到账号；不导入演示伴侣资料" else "本地体验 · 邀请和对方仅作演示",color=Muted)
   if(error!=null)ErrorText(error)
   when(step){
-   0->{Text("从你的城市开始",style=MaterialTheme.typography.headlineSmall);ProfileFields(name,{name=it},city,{city=it});Button(enabled=!saving,onClick={vm.saveProfile(Profile(name.trim(),city)){step=1}}){Text("下一步：我的节奏")}}
-   1->{Text("让作息替你轻声说明",style=MaterialTheme.typography.headlineSmall);if(realAccount&&state.schedule==null)Text("先用常见作息建议起步，按自己的实际时间调整；点击保存后才会同步。",style=MaterialTheme.typography.bodySmall,color=Muted);RhythmFields(schedule,{scheduleJson=Json.encodeToString(it)});Button(enabled=!saving,onClick={vm.saveSchedule(schedule){step=2}}){Text("保存节奏并继续")}}
+   0->{Text("从你的城市开始",style=MaterialTheme.typography.headlineSmall);ProfileFields(name,{name=it},city,{city=it;if(state.schedule==null)scheduleJson=Json.encodeToString(defaultSchedule(it))});Button(enabled=!saving,onClick={vm.saveProfile(Profile(name.trim(),city)){step=1}}){Text("下一步：我的节奏")}}
+   1->{Text("让作息替你轻声说明",style=MaterialTheme.typography.headlineSmall);if(realAccount&&state.schedule==null)Text("先从按城市提供的可编辑作息建议开始；调整并保存后才会同步。",style=MaterialTheme.typography.bodySmall,color=Muted);RhythmFields(schedule,city,{scheduleJson=Json.encodeToString(it)});Button(enabled=!saving,onClick={vm.saveSchedule(schedule){step=2}}){Text("保存节奏并继续")}}
    2->{SectionCard(if(realAccount)"伴侣邀请" else "演示邀请"){
     if(state.partner==null&&!state.paired)Invitation(vm,state,saving,error,realAccount,pendingInviteCode,onPendingInviteConsumed){step=3}
     else {Text(if(realAccount)"已与 ${state.partner?.name?:"伴侣"} 配对。对方未填写的资料会保持未知。" else "已模拟配对 ${state.partner?.name}，对方作息待补充");Button(onClick={step=3}){Text("继续")}}
@@ -341,8 +341,22 @@ fun defaultSchedule()=Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息
  }
  Text("时间会按城市的真实时区与夏令时计算。",style=MaterialTheme.typography.bodySmall,color=Muted)
 }
-@Composable private fun RhythmFields(schedule:Schedule,onChange:(Schedule)->Unit){
+@Composable private fun RhythmFields(schedule:Schedule,cityId:String,onChange:(Schedule)->Unit){
  var rest by rememberSaveable {mutableStateOf(false)}
+ var pendingTemplate by remember { mutableStateOf<RoutineTemplate?>(null) }
+ Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
+  RoutineTemplate.entries.forEach { template->
+   FilterChip(selected=schedule.templateId==template.id,onClick={pendingTemplate=template},label={Text("${template.title}模板")})
+  }
+ }
+ Text("已按${Cities.byId(cityId)?.name?:"所选城市"}所在地区给出参考时间。模板可逐项修改，不代表每个人的实际作息。切换模板会替换工作日与休息日两张作息表。",style=MaterialTheme.typography.bodySmall,color=Muted)
+ if(pendingTemplate!=null)AlertDialog(
+  onDismissRequest={pendingTemplate=null},
+  title={Text("应用${pendingTemplate!!.title}模板？")},
+  text={Text("这会替换尚未保存的工作日和休息日时段。应用后仍可逐项修改。")},
+  confirmButton={TextButton(onClick={onChange(RoutineTemplates.forCity(cityId,pendingTemplate!!));pendingTemplate=null}){Text("应用模板")}},
+  dismissButton={TextButton(onClick={pendingTemplate=null}){Text("继续编辑")}}
+ )
  Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
   FilterChip(selected=!rest,onClick={rest=false},label={Text("工作日")})
   FilterChip(selected=rest,onClick={rest=true},label={Text("休息日")})
@@ -351,14 +365,40 @@ fun defaultSchedule()=Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息
  val rhythm=if(rest)schedule.rest else schedule.weekday
  val dayKey=if(rest)"rest" else "weekday"
  fun update(value:Rhythm){onChange(if(rest)schedule.copy(rest=value)else schedule.copy(weekday=value))}
- Text("滚动选择时间，睡眠可以跨夜；活动与联系独立，均不得与睡眠重叠。",style=MaterialTheme.typography.bodySmall,color=Muted)
- TimePair("睡眠","rhythm-$dayKey-sleep",rhythm.sleepStart,rhythm.sleepEnd,{update(rhythm.copy(sleepStart=it))},{update(rhythm.copy(sleepEnd=it))})
- OutlinedTextField(rhythm.activity,{update(rhythm.copy(activity=it))},label={Text("活动名称")},modifier=Modifier.fillMaxWidth(),singleLine=true)
- TimePair("活动","rhythm-$dayKey-activity",rhythm.activityStart,rhythm.activityEnd,{update(rhythm.copy(activityStart=it))},{update(rhythm.copy(activityEnd=it))})
+ Text("滚动选择每段时间。睡觉可以跨夜；其他时段按当天安排且不可互相重叠。未安排的空档会显示为“未安排”。",style=MaterialTheme.typography.bodySmall,color=Muted)
+ if(rhythm.blocks.isEmpty()){
+  Text("这份作息来自旧版单段安排。选择另一种模板可补充早餐、通勤、午餐、午休等可编辑时段。",style=MaterialTheme.typography.bodySmall,color=Muted)
+  TimePair("睡眠","rhythm-$dayKey-sleep",rhythm.sleepStart,rhythm.sleepEnd,{update(rhythm.copy(sleepStart=it))},{update(rhythm.copy(sleepEnd=it))})
+  OutlinedTextField(rhythm.activity,{update(rhythm.copy(activity=it))},label={Text("活动名称")},modifier=Modifier.fillMaxWidth(),singleLine=true)
+  TimePair("活动","rhythm-$dayKey-activity",rhythm.activityStart,rhythm.activityEnd,{update(rhythm.copy(activityStart=it))},{update(rhythm.copy(activityEnd=it))})
+ }else{
+  rhythm.blocks.forEach { block->
+   val timeTitle=if(block.id=="sleep")"睡眠" else block.label
+   Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)){
+    OutlinedTextField(block.label,{label->update(updateBlocks(rhythm,rhythm.blocks.map { if(it.id==block.id)it.copy(label=label)else it }))},label={Text("时段名称")},modifier=Modifier.weight(1f).testTag("rhythm-$dayKey-${block.id}-label"),singleLine=true)
+    if(block.id!="sleep")TextButton(onClick={update(updateBlocks(rhythm,rhythm.blocks.filterNot { it.id==block.id }))}){Text("删除")}
+   }
+   TimePair(timeTitle,"rhythm-$dayKey-${block.id}",block.start,block.end,
+    {time->update(updateBlocks(rhythm,rhythm.blocks.map { if(it.id==block.id)it.copy(start=time)else it }))},
+    {time->update(updateBlocks(rhythm,rhythm.blocks.map { if(it.id==block.id)it.copy(end=time)else it }))})
+  }
+  OutlinedButton(enabled=rhythm.blocks.size<20,onClick={
+   val occupied=(0 until 1440).toSet().filter { minute->rhythm.blocks.any { TimeEngine.contains(minute,it.start,it.end) } }.toSet()
+   val start=(0..1380 step 30).firstOrNull { candidate->(candidate until candidate+30).none { it in occupied } }?:1320
+   val id="custom-${(rhythm.blocks.mapNotNull { it.id.substringAfter("custom-","").toIntOrNull() }.maxOrNull()?:0)+1}"
+   update(updateBlocks(rhythm,rhythm.blocks+RoutineBlock(id,"新时段",String.format(Locale.ROOT,"%02d:%02d",start/60,start%60),String.format(Locale.ROOT,"%02d:%02d",(start+30)/60,(start+30)%60))))
+  },modifier=Modifier.fillMaxWidth()){Text(if(rhythm.blocks.size<20)"＋ 添加时段" else "已达到 20 个时段上限")}
+ }
  Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text("通常联系偏好",Modifier.weight(1f));Switch(checked=rhythm.contactKnown,onCheckedChange={update(rhythm.copy(contactKnown=it))})}
  Text(if(rhythm.contactKnown)"以下时段愿意联系，不推断实时状态" else "联系意愿保持未知")
  if(rhythm.contactKnown)TimePair("联系","rhythm-$dayKey-contact",rhythm.contactStart,rhythm.contactEnd,{update(rhythm.copy(contactStart=it))},{update(rhythm.copy(contactEnd=it))})
- Text("保存时同时校验工作日和休息日模板。",style=MaterialTheme.typography.bodySmall,color=Muted)
+ Text("保存时同时校验工作日和休息日模板。联系偏好仍可与上课或工作时段重合，但不能覆盖睡觉时间。",style=MaterialTheme.typography.bodySmall,color=Muted)
+}
+
+private fun updateBlocks(rhythm:Rhythm,blocks:List<RoutineBlock>):Rhythm{
+ val sleep=blocks.first { it.id=="sleep" }
+ val primary=blocks.firstOrNull { it.id.startsWith("morning-") }
+ return rhythm.copy(sleepStart=sleep.start,sleepEnd=sleep.end,activity=primary?.label?:"休息",activityStart=primary?.start?:"10:00",activityEnd=primary?.end?:"12:00",blocks=blocks)
 }
 @Composable private fun TimePair(title:String,tagPrefix:String,start:String,end:String,onStart:(String)->Unit,onEnd:(String)->Unit){
  Column(verticalArrangement=Arrangement.spacedBy(4.dp)){
@@ -448,7 +488,7 @@ fun defaultSchedule()=Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息
  var profileOpen by rememberSaveable {mutableStateOf(false)}
  var name by rememberSaveable {mutableStateOf(state.me.name)}
  var city by rememberSaveable {mutableStateOf(state.me.cityId)}
- var draft by rememberSaveable {mutableStateOf(Json.encodeToString(state.schedule?:defaultSchedule()))}
+ var draft by rememberSaveable {mutableStateOf(Json.encodeToString(state.schedule?:defaultSchedule(state.me.cityId)))}
  var rhythmSaved by rememberSaveable {mutableStateOf(false)}
  Text("我的节奏",style=MaterialTheme.typography.headlineSmall)
  SectionCard("${state.me.name} · ${state.me.cityName()}"){
@@ -458,7 +498,7 @@ fun defaultSchedule()=Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息
  SectionCard("通常作息"){
    if(realAccount&&state.schedule==null)Text("以下是可编辑的常见作息建议；修改并点击保存后才会同步给账号。",style=MaterialTheme.typography.bodySmall,color=Muted)
   val schedule=Json.decodeFromString<Schedule>(draft)
-  RhythmFields(schedule,{draft=Json.encodeToString(it);rhythmSaved=false})
+  RhythmFields(schedule,state.me.cityId,{draft=Json.encodeToString(it);rhythmSaved=false})
   Button(enabled=!saving,onClick={rhythmSaved=false;vm.saveSchedule(schedule){rhythmSaved=true}}){Text("保存我的节奏")}
   if(error!=null)ErrorText(error)
    if(rhythmSaved)Text(if(realAccount)"已保存并同步" else "已保存到本机",color=Forest)
