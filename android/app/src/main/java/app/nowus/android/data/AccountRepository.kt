@@ -23,6 +23,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicLong
 
 
 class AccountRepository(
@@ -33,6 +34,7 @@ class AccountRepository(
     private val pollIntervalMillis: Long = 30_000,
 ) : StateRepository {
     private val mutex = Mutex()
+    private val permissionRevision = AtomicLong(0)
     private val current = MutableStateFlow<AppState?>(null)
     private var activeInviteCode: String? = null
 
@@ -123,14 +125,47 @@ class AccountRepository(
     }
 
     override suspend fun setSharing(enabled: Boolean): Unit = mutex.withLock {
+        val before = current.value ?: loadFresh()
+        permissionRevision.incrementAndGet()
         api.setSharing(session.accessToken, enabled)
+        permissionRevision.incrementAndGet()
+        if (!enabled) activeInviteCode = null
+        val latest = current.value ?: before
+        val acknowledged = latest.copy(
+            partner = null,
+            partnerSchedule = null,
+            partnerNote = null,
+            partnerTemporary = null,
+            invite = if (enabled) latest.invite else null,
+            sharingEnabled = enabled,
+            sharingPaused = latest.paired && !enabled,
+            syncStale = true,
+        )
+        current.value = acknowledged
+        runCatching { cache.save(session.userId, acknowledged) }
         refresh()
         Unit
     }
 
     override suspend fun unpair(): Unit = mutex.withLock {
+        val before = current.value ?: loadFresh()
+        permissionRevision.incrementAndGet()
         api.unpair(session.accessToken)
+        permissionRevision.incrementAndGet()
         activeInviteCode = null
+        val latest = current.value ?: before
+        val acknowledged = latest.copy(
+            partner = null,
+            partnerSchedule = null,
+            partnerNote = null,
+            partnerTemporary = null,
+            invite = null,
+            paired = false,
+            sharingPaused = false,
+            syncStale = true,
+        )
+        current.value = acknowledged
+        runCatching { cache.save(session.userId, acknowledged) }
         refresh()
         Unit
     }
@@ -148,6 +183,7 @@ class AccountRepository(
     private suspend fun loadFresh(): AppState = refresh()
 
     private suspend fun refresh(): AppState {
+        val observedPermissionRevision = permissionRevision.get()
         val response = try {
             api.snapshot(session.accessToken)
         } catch (error: ApiException) {
@@ -157,6 +193,9 @@ class AccountRepository(
                 throw CancellationException("登录会话已失效", error)
             }
             throw error
+        }
+        if (observedPermissionRevision != permissionRevision.get()) {
+            return current.value ?: throw IllegalStateException("Account refresh was superseded before initial state loaded")
         }
         val timestamp = Instant.parse(response.serverTime).toEpochMilli()
         val invite = response.invitation?.let {

@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: nowus
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-only-change-for-shared-host}
     ports:
-      - "${NOWUS_DB_PORT:-5432}:5432"
+      - "127.0.0.1:${NOWUS_DB_PORT:-5432}:5432"
     volumes:
       - nowus-postgres:/var/lib/postgresql
     healthcheck:
@@ -33,8 +33,8 @@ services:
   mailpit:
     image: axllent/mailpit:v1.31.1
     ports:
-      - "${NOWUS_SMTP_PORT:-1025}:1025"
-      - "${NOWUS_MAILPIT_PORT:-8025}:8025"
+      - "127.0.0.1:${NOWUS_SMTP_PORT:-1025}:1025"
+      - "127.0.0.1:${NOWUS_MAILPIT_PORT:-8025}:8025"
 
   api:
     build:
@@ -49,7 +49,7 @@ services:
       NOWUS_SMTP_PORT_INTERNAL: 1025
       NOWUS_SMTP_FROM: ${NOWUS_SMTP_FROM:-login@nowus.local}
     ports:
-      - "${NOWUS_API_PORT:-8000}:8000"
+      - "${NOWUS_API_BIND_ADDRESS:-127.0.0.1}:${NOWUS_API_PORT:-8000}:8000"
     depends_on:
       db:
         condition: service_healthy

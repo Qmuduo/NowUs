@@ -66,7 +66,7 @@
 - [x] Document Compose startup, migrations, Mailpit, Android API URL settings, tests and production SMTP variables.
 - [x] Run A/B/C API acceptance using SMTP-to-Mailpit OTP delivery; verify two-way schedule/note sync, C denial, pause/resume and unpair revocation.
 - [x] Run the final Android unit/build/device tests, backend PostgreSQL suite, and A/B/C API acceptance.
-- [ ] Inspect the full diff and secret boundary, commit, and push `codex/nowus-real-sync` for review.
+- [x] Inspect the full diff and secret boundary, complete read-only code review, commit, and push `codex/nowus-real-sync` for review.
 
 ### Follow-up outside this local implementation
 

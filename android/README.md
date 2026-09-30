@@ -19,6 +19,8 @@ docker compose ps
 
 The API applies versioned SQL migrations in `backend/migrations/` on startup. The first launch applies `0001_initial.sql` and `0002_setup_complete.sql`. PostgreSQL data stays in the `nowus-postgres` Docker volume. Check `http://localhost:8000/health`; Mailpit's local inbox is `http://localhost:8025` and accepts SMTP on port 1025. The local-only values in `.env.example` are not deployment secrets.
 
+Published development ports bind to `127.0.0.1` by default, including API, PostgreSQL, and Mailpit SMTP/inbox. To connect a physical Android phone on the same LAN, explicitly change `NOWUS_API_BIND_ADDRESS` in the private `.env` to `0.0.0.0`, restart Compose, and use the development computer's LAN address in `NOWUS_API_BASE_URL`. PostgreSQL and Mailpit remain loopback-only.
+
 For live logs and shutdown:
 
 ```powershell
@@ -100,7 +102,7 @@ Invite links use `nowus://invite/{CODE}`. Android stores the pending code encryp
 
 - `docker compose --profile test run --rm tests`: 23 backend tests passed against PostgreSQL.
 - `python backend/scripts/acceptance.py`: A/B/C OTP and Mailpit flow passed, including two-way schedule/note visibility, C access denial, pause/resume, and unpair revocation.
-- `:app:testDebugUnitTest`: 25 Android unit tests passed; `:app:assembleDebug` built the debug APK.
+- `:app:testDebugUnitTest`: 28 Android unit tests passed; `:app:assembleDebug` built the debug APK.
 - `:app:connectedDebugAndroidTest`: 13 Compose instrumentation tests passed on one connected physical Android device.
 
 Android builds were run with `--init-script .\gradle-mirror.init.gradle` because this development network failed TLS requests to Google Maven. This is a local dependency-fetch workaround; it is not a measurement of app connectivity from Mainland China or overseas. Two-physical-device acceptance remains outstanding.
