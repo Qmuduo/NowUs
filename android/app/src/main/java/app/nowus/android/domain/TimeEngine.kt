@@ -23,6 +23,16 @@ object TimeEngine {
   val b=parseMinute(end) ?: return false
   return if(a<b) minute>=a && minute<b else a!=b && (minute>=a || minute<b)
  }
+ internal fun intervalsOverlap(firstStart:Int,firstEnd:Int,secondStart:Int,secondEnd:Int):Boolean {
+  if(firstStart !in 0 until 1440 || firstEnd !in 0 until 1440 ||
+   secondStart !in 0 until 1440 || secondEnd !in 0 until 1440 ||
+   firstStart==firstEnd || secondStart==secondEnd) return false
+  fun pieces(start:Int,end:Int):List<Pair<Int,Int>> =
+   if(start<end) listOf(start to end) else listOf(start to 1440,0 to end)
+  return pieces(firstStart,firstEnd).any { first->
+   pieces(secondStart,secondEnd).any { second->first.first<second.second && second.first<first.second }
+  }
+ }
  fun activityAt(profile: Profile,schedule: Schedule?,temporary: TemporaryStatus?,instant: Instant): Activity {
   val r=rhythm(profile,schedule,instant) ?: return Activity("未安排",ActivitySource.UNKNOWN)
   val m=minute(profile,instant)

@@ -9,14 +9,17 @@ object Rules {
  }
  fun validateRhythm(rhythm: Rhythm): ValidationResult {
   if(rhythm.blocks.isNotEmpty()) return validateRoutineBlocks(rhythm)
-  val pairs=mutableListOf(rhythm.sleepStart to rhythm.sleepEnd,rhythm.activityStart to rhythm.activityEnd)
-  if(rhythm.contactKnown) pairs.add(rhythm.contactStart to rhythm.contactEnd)
   val errors=mutableListOf<String>()
-  if(pairs.any {TimeEngine.parseMinute(it.first)==null || TimeEngine.parseMinute(it.second)==null || it.first==it.second}) errors.add("时间格式应为 HH:mm，起止不得相同")
+  val sleepStart=TimeEngine.parseMinute(rhythm.sleepStart);val sleepEnd=TimeEngine.parseMinute(rhythm.sleepEnd)
+  val activityStart=TimeEngine.parseMinute(rhythm.activityStart);val activityEnd=TimeEngine.parseMinute(rhythm.activityEnd)
+  val contactStart=if(rhythm.contactKnown)TimeEngine.parseMinute(rhythm.contactStart) else null
+  val contactEnd=if(rhythm.contactKnown)TimeEngine.parseMinute(rhythm.contactEnd) else null
+  if(sleepStart==null || sleepEnd==null || activityStart==null || activityEnd==null || sleepStart==sleepEnd || activityStart==activityEnd ||
+   (rhythm.contactKnown && (contactStart==null || contactEnd==null || contactStart==contactEnd))) errors.add("时间格式应为 HH:mm，起止不得相同")
   if(errors.isEmpty()) {
-   if(TimeEngine.parseMinute(rhythm.activityStart)!!>=TimeEngine.parseMinute(rhythm.activityEnd)!!) errors.add("活动时段不可跨日")
-   if((0 until 1440).any {TimeEngine.contains(it,rhythm.sleepStart,rhythm.sleepEnd) && TimeEngine.contains(it,rhythm.activityStart,rhythm.activityEnd)}) errors.add("活动不可与睡眠重叠")
-   if(rhythm.contactKnown && (0 until 1440).any {TimeEngine.contains(it,rhythm.sleepStart,rhythm.sleepEnd) && TimeEngine.contains(it,rhythm.contactStart,rhythm.contactEnd)}) errors.add("联系不可与睡眠重叠")
+   if(activityStart!!>=activityEnd!!) errors.add("活动时段不可跨日")
+   else if(TimeEngine.intervalsOverlap(sleepStart!!,sleepEnd!!,activityStart,activityEnd)) errors.add("活动不可与睡眠重叠")
+   if(rhythm.contactKnown && contactStart!=null && contactEnd!=null && TimeEngine.intervalsOverlap(sleepStart!!,sleepEnd!!,contactStart,contactEnd)) errors.add("联系不可与睡眠重叠")
   }
   if(rhythm.activity.isBlank()) errors.add("请填写活动名称")
   return ValidationResult(errors.isEmpty(),errors)
@@ -28,23 +31,26 @@ object Rules {
    errors.add("日常时段列表无效")
   }
   if(blocks.any { it.label.isBlank() || it.label.codePointCount(0,it.label.length)>20 }) errors.add("时段名称应为 1–20 个字符")
-  val invalid=blocks.any {
-   val start=TimeEngine.parseMinute(it.start);val end=TimeEngine.parseMinute(it.end)
-   start==null || end==null || start==end || (it.id!="sleep" && start>=end)
+  val parsed=blocks.map { block->ParsedRoutineBlock(block,TimeEngine.parseMinute(block.start),TimeEngine.parseMinute(block.end)) }
+  val invalid=parsed.any { item->
+   val start=item.start;val end=item.end
+   start==null || end==null || start==end || (item.block.id!="sleep" && start>=end)
   }
   if(invalid) errors.add("时段时间格式无效，睡觉以外的时段不可跨日")
   if(!invalid && blocks.size<=20) {
-   if(blocks.indices.any { i->(i+1 until blocks.size).any { j->
-    (0 until 1440).any { minute->TimeEngine.contains(minute,blocks[i].start,blocks[i].end) && TimeEngine.contains(minute,blocks[j].start,blocks[j].end) }
-   }}) errors.add("日常时段不能重叠")
-   if(rhythm.contactKnown && (0 until 1440).any { minute->
-    val sleep=blocks.firstOrNull { it.id=="sleep" }
-    sleep!=null && TimeEngine.contains(minute,sleep.start,sleep.end) && TimeEngine.contains(minute,rhythm.contactStart,rhythm.contactEnd)
-   }) errors.add("联系不可与睡眠重叠")
+   val overlap=parsed.indices.any { i->(i+1 until parsed.size).any { j->
+    val first=parsed[i];val second=parsed[j]
+    TimeEngine.intervalsOverlap(first.start!!,first.end!!,second.start!!,second.end!!)
+   }}
+   if(overlap) errors.add("日常时段不能重叠")
   }
   if(rhythm.contactKnown) {
    val start=TimeEngine.parseMinute(rhythm.contactStart);val end=TimeEngine.parseMinute(rhythm.contactEnd)
    if(start==null || end==null || start==end) errors.add("时间格式应为 HH:mm，起止不得相同")
+   else if(!invalid && blocks.size<=20) {
+    val sleep=parsed.firstOrNull { it.block.id=="sleep" }
+    if(sleep?.start!=null && sleep.end!=null && TimeEngine.intervalsOverlap(sleep.start,sleep.end,start,end)) errors.add("联系不可与睡眠重叠")
+   }
   }
   return ValidationResult(errors.isEmpty(),errors.distinct())
  }
@@ -68,3 +74,5 @@ object Rules {
   return if(error!=null) RuleResult(state,error) else RuleResult(state.copy(partner=partner,partnerSchedule=null,invite=null))
  }
 }
+
+private data class ParsedRoutineBlock(val block:RoutineBlock,val start:Int?,val end:Int?)

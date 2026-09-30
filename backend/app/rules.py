@@ -26,13 +26,20 @@ def _parse_minute(value: object) -> int | None:
     return int(value[:2]) * 60 + int(value[3:])
 
 
-def _contains(minute: int, start: str, end: str) -> bool:
-    left, right = _parse_minute(start), _parse_minute(end)
-    if left is None or right is None or left == right:
+def _intervals_overlap(first_start: int, first_end: int, second_start: int, second_end: int) -> bool:
+    if any(value < 0 or value >= 1440 for value in (first_start, first_end, second_start, second_end)):
         return False
-    if left < right:
-        return left <= minute < right
-    return minute >= left or minute < right
+    if first_start == first_end or second_start == second_end:
+        return False
+
+    def pieces(start: int, end: int) -> tuple[tuple[int, int], ...]:
+        return ((start, end),) if start < end else ((start, 1440), (0, end))
+
+    return any(
+        first_left < second_right and second_left < first_right
+        for first_left, first_right in pieces(first_start, first_end)
+        for second_left, second_right in pieces(second_start, second_end)
+    )
 
 
 def rhythm_errors(rhythm: dict) -> list[str]:
@@ -56,16 +63,14 @@ def rhythm_errors(rhythm: dict) -> list[str]:
     elif parsed["activityStart"] >= parsed["activityEnd"]:
         errors.append("活动时段不可跨日")
     else:
-        if any(
-            _contains(minute, rhythm["sleepStart"], rhythm["sleepEnd"])
-            and _contains(minute, rhythm["activityStart"], rhythm["activityEnd"])
-            for minute in range(1440)
+        if _intervals_overlap(
+            parsed["sleepStart"], parsed["sleepEnd"],
+            parsed["activityStart"], parsed["activityEnd"],
         ):
             errors.append("活动不可与睡眠重叠")
-        if rhythm.get("contactKnown") is True and any(
-            _contains(minute, rhythm["sleepStart"], rhythm["sleepEnd"])
-            and _contains(minute, rhythm["contactStart"], rhythm["contactEnd"])
-            for minute in range(1440)
+        if rhythm.get("contactKnown") is True and _intervals_overlap(
+            parsed["sleepStart"], parsed["sleepEnd"],
+            parsed["contactStart"], parsed["contactEnd"],
         ):
             errors.append("联系不可与睡眠重叠")
     if rhythm.get("contactKnown") not in (True, False):
@@ -104,12 +109,10 @@ def _routine_block_errors(rhythm: dict) -> list[str]:
     if invalid_times:
         errors.append("时段时间格式无效，睡觉以外的时段不可跨日")
     elif not any(error == "日常时段列表无效" for error in errors):
-        for index, (left, _, _) in enumerate(parsed):
+        for index, (_, left_start, left_end) in enumerate(parsed):
             if any(
-                _contains(minute, left["start"], left["end"])
-                and _contains(minute, right["start"], right["end"])
-                for right, _, _ in parsed[index + 1 :]
-                for minute in range(1440)
+                _intervals_overlap(left_start, left_end, right_start, right_end)
+                for _, right_start, right_end in parsed[index + 1 :]
             ):
                 errors.append("日常时段不能重叠")
                 break
@@ -123,11 +126,9 @@ def _routine_block_errors(rhythm: dict) -> list[str]:
         if contact_start is None or contact_end is None or contact_start == contact_end:
             errors.append("时间格式应为 HH:mm，起止不得相同")
         else:
-            sleep = next((block for block in blocks if block.get("id") == "sleep"), None)
-            if sleep and any(
-                _contains(minute, sleep["start"], sleep["end"])
-                and _contains(minute, rhythm["contactStart"], rhythm["contactEnd"])
-                for minute in range(1440)
+            sleep = next((entry for entry in parsed if entry[0].get("id") == "sleep"), None)
+            if sleep and not invalid_times and _intervals_overlap(
+                sleep[1], sleep[2], contact_start, contact_end,
             ):
                 errors.append("联系不可与睡眠重叠")
     return list(dict.fromkeys(errors))

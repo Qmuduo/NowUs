@@ -53,6 +53,12 @@ class DomainTest {
         assertFalse(Rules.validateRhythm(Rhythm(contactStart="23:30",contactEnd="00:30")).valid)
         assertTrue(Rules.validateRhythm(Rhythm(contactStart="10:00",contactEnd="11:00")).valid)
     }
+    @Test fun intervalOverlapUsesHalfOpenRangesAcrossMidnight() {
+        assertTrue(TimeEngine.intervalsOverlap(23 * 60, 7 * 60, 6 * 60 + 30, 7 * 60 + 30))
+        assertFalse(TimeEngine.intervalsOverlap(23 * 60, 7 * 60, 7 * 60, 7 * 60 + 30))
+        assertFalse(TimeEngine.intervalsOverlap(7 * 60, 8 * 60, 8 * 60, 9 * 60))
+        assertTrue(TimeEngine.intervalsOverlap(8 * 60, 10 * 60, 9 * 60, 11 * 60))
+    }
     @Test fun unknownContactPreferenceIgnoresHiddenContactTimes() {
         assertFalse(Rules.validateRhythm(Rhythm(contactKnown=true,contactStart="bad")).valid)
         assertTrue(Rules.validateRhythm(Rhythm(contactKnown=false,contactStart="bad",contactEnd="")).valid)
@@ -126,6 +132,20 @@ class DomainTest {
         assertEquals("上午上课",TimeEngine.activityAt(me,Schedule(custom,custom),null,date.plusSeconds(3600)).label)
         assertFalse(Rules.validateRhythm(custom.copy(blocks=blocks+RoutineBlock("lunch","午餐","11:30","12:30"))).valid)
         assertFalse(Rules.validateRhythm(custom.copy(blocks=blocks+RoutineBlock("late","晚间活动","22:00","23:30"))).valid)
+    }
+    @Test fun segmentedRoutineTreatsWakeTimeAsSleepBoundary() {
+        val blocks=listOf(
+            RoutineBlock("sleep","睡觉","23:00","07:00"),
+            RoutineBlock("breakfast","早餐","07:00","08:00"),
+        )
+        val adjacentContact=Rhythm(blocks=blocks,contactKnown=true,contactStart="07:00",contactEnd="08:00")
+        assertTrue(Rules.validateRhythm(adjacentContact).valid)
+
+        val sleepContact=adjacentContact.copy(contactStart="06:30",contactEnd="07:30")
+        assertTrue(Rules.validateRhythm(sleepContact).errors.contains("联系不可与睡眠重叠"))
+
+        val overlappingBlock=adjacentContact.copy(blocks=blocks+RoutineBlock("early","出门准备","06:30","07:30"))
+        assertTrue(Rules.validateRhythm(overlappingBlock).errors.contains("日常时段不能重叠"))
     }
     @Test fun legacyRhythmJsonStillDecodesAndKeepsActivityBehavior() {
         val legacy=kotlinx.serialization.json.Json.decodeFromString<Schedule>("""{"weekday":{"sleepStart":"23:00","sleepEnd":"07:00","activity":"上课","activityStart":"09:00","activityEnd":"17:00","contactKnown":true,"contactStart":"20:00","contactEnd":"22:00"},"rest":{"sleepStart":"23:00","sleepEnd":"08:00","activity":"休息","activityStart":"10:00","activityEnd":"12:00","contactKnown":true,"contactStart":"20:00","contactEnd":"22:00"}}""")

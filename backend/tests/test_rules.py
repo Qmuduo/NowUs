@@ -1,6 +1,13 @@
 from backend.app import rules
 
 
+def test_interval_overlap_uses_half_open_ranges_across_midnight():
+    assert rules._intervals_overlap(23 * 60, 7 * 60, 6 * 60 + 30, 7 * 60 + 30)
+    assert not rules._intervals_overlap(23 * 60, 7 * 60, 7 * 60, 7 * 60 + 30)
+    assert not rules._intervals_overlap(7 * 60, 8 * 60, 8 * 60, 9 * 60)
+    assert rules._intervals_overlap(8 * 60, 10 * 60, 9 * 60, 11 * 60)
+
+
 def test_profile_validation_accepts_supported_city_and_rejects_invalid_fields():
     assert rules.profile_errors({"name": "阿青", "cityId": "beijing"}) == []
     assert "昵称应为 1–20 个字符" in rules.profile_errors({"name": "  ", "cityId": "beijing"})
@@ -45,3 +52,18 @@ def test_routine_blocks_validate_all_local_activities_and_overlaps():
     assert "日常时段不能重叠" in rules.rhythm_errors(overlap)
     crosses_midnight = {**rhythm, "blocks": [*rhythm["blocks"], {"id": "study", "label": "晚间学习", "start": "22:00", "end": "01:00"}]}
     assert "时段时间格式无效，睡觉以外的时段不可跨日" in rules.rhythm_errors(crosses_midnight)
+
+
+def test_routine_blocks_allow_wake_boundary_and_reject_sleep_overlap():
+    rhythm = {
+        "contactKnown": True,
+        "contactStart": "07:00", "contactEnd": "08:00",
+        "blocks": [
+            {"id": "sleep", "label": "睡觉", "start": "23:00", "end": "07:00"},
+            {"id": "breakfast", "label": "早餐", "start": "07:00", "end": "08:00"},
+        ],
+    }
+    assert rules.rhythm_errors(rhythm) == []
+    assert "联系不可与睡眠重叠" in rules.rhythm_errors({**rhythm, "contactStart": "06:30", "contactEnd": "07:30"})
+    overlapping = {**rhythm, "blocks": [*rhythm["blocks"], {"id": "early", "label": "出门准备", "start": "06:30", "end": "07:30"}]}
+    assert "日常时段不能重叠" in rules.rhythm_errors(overlapping)
