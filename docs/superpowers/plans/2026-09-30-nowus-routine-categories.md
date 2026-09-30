@@ -89,4 +89,4 @@
 - [x] Document category colors, template defaults, optional activities, and old-data behavior.
 - [x] Run all Android unit tests, the full backend Docker suite, and the physical-device template/category flow.
 - [x] Build and install the debug APK with the existing LAN API URL; app opened on the connected device.
-- [ ] Commit and push the review branch after final diff verification.
+- [x] Commit and push the review branch after final diff verification.
