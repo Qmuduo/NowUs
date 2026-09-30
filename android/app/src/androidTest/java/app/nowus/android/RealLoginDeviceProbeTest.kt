@@ -24,8 +24,9 @@ import java.util.UUID
 @RunWith(AndroidJUnit4::class)
 class RealLoginDeviceProbeTest {
     @Test fun randomMailpitOtpCanBeVerifiedAndStoredOnDevice() = runBlocking {
-        assumeTrue("Requires local API and Mailpit with adb reverse on ports 8000 and 8025", portOpen(8000) && portOpen(8025))
-        val api = NowUsApiClient("http://127.0.0.1:8000")
+        val apiUrl = URL(BuildConfig.NOWUS_API_BASE_URL)
+        assumeTrue("Requires the configured API endpoint and Mailpit with adb reverse on port 8025", portOpen(apiUrl.host, apiUrl.port) && portOpen("127.0.0.1", 8025))
+        val api = NowUsApiClient(BuildConfig.NOWUS_API_BASE_URL)
         val email = "device-probe-${UUID.randomUUID().toString().take(12)}@example.net"
         val store = EncryptedSessionStore(InstrumentationRegistry.getInstrumentation().targetContext)
         var accessToken: String? = null
@@ -44,8 +45,8 @@ class RealLoginDeviceProbeTest {
         }
     }
 
-    private fun portOpen(port: Int) = runCatching {
-        Socket().use { it.connect(InetSocketAddress("127.0.0.1", port), 500) }
+    private fun portOpen(host: String, port: Int) = runCatching {
+        Socket().use { it.connect(InetSocketAddress(host, port), 500) }
         true
     }.getOrDefault(false)
 
