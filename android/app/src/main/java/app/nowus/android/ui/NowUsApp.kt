@@ -59,6 +59,7 @@ fun defaultSchedule()=Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息
   Column(Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets).imePadding().verticalScroll(rememberScrollState()).padding(horizontal=20.dp,vertical=18.dp),verticalArrangement=Arrangement.spacedBy(18.dp)){
    Text("NowUs",style=MaterialTheme.typography.titleLarge,color=Forest)
    Text("本地体验 · 演示配对，无账号同步",style=MaterialTheme.typography.bodySmall,color=Muted)
+   if(demo){ErrorText("固定演示时间 · 2026/9/29 · 不代表此刻");Button(onClick={vm.setDemo(false)}){Text("退出固定演示")}}
    if(error!=null)ErrorText(error!!)
    if(readFailed)Button(onClick=vm::retry){Text("重试加载")}
    when(tab){0->Home(vm,current,now,demo,error,saving);1->Timeline(current,now);else->MyRhythm(vm,current,error,saving,demo)}
@@ -93,7 +94,6 @@ fun defaultSchedule()=Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息
 }
 @Composable private fun Home(vm:AppViewModel,state:AppState,now:Instant,demo:Boolean,error:String?,saving:Boolean){
  Text("不同的时间，同一份惦念",style=MaterialTheme.typography.headlineSmall)
- if(demo){ErrorText("固定演示时间 · 2026/9/29 · 不代表此刻");Button(onClick={vm.setDemo(false)}){Text("退出固定演示")}}
  val partner=state.partner
  BoxWithConstraints(Modifier.fillMaxWidth()){
   if(partner!=null && maxWidth>=320.dp && LocalDensity.current.fontScale<=1.3f){

@@ -8,7 +8,8 @@ object Rules {
   return ValidationResult(errors.isEmpty(),errors)
  }
  fun validateRhythm(rhythm: Rhythm): ValidationResult {
-  val pairs=listOf(rhythm.sleepStart to rhythm.sleepEnd,rhythm.activityStart to rhythm.activityEnd,rhythm.contactStart to rhythm.contactEnd)
+  val pairs=mutableListOf(rhythm.sleepStart to rhythm.sleepEnd,rhythm.activityStart to rhythm.activityEnd)
+  if(rhythm.contactKnown) pairs.add(rhythm.contactStart to rhythm.contactEnd)
   val errors=mutableListOf<String>()
   if(pairs.any {TimeEngine.parseMinute(it.first)==null || TimeEngine.parseMinute(it.second)==null || it.first==it.second}) errors.add("时间格式应为 HH:mm，起止不得相同")
   if(errors.isEmpty()) {

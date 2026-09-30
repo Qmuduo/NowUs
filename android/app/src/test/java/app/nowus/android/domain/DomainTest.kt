@@ -53,6 +53,10 @@ class DomainTest {
         assertFalse(Rules.validateRhythm(Rhythm(contactStart="23:30",contactEnd="00:30")).valid)
         assertTrue(Rules.validateRhythm(Rhythm(contactStart="10:00",contactEnd="11:00")).valid)
     }
+    @Test fun unknownContactPreferenceIgnoresHiddenContactTimes() {
+        assertFalse(Rules.validateRhythm(Rhythm(contactKnown=true,contactStart="bad")).valid)
+        assertTrue(Rules.validateRhythm(Rhythm(contactKnown=false,contactStart="bad",contactEnd="")).valid)
+    }
     @Test fun invitationAndNoteMutationsPreserveStateOnError() {
         val state=AppState(me,setupComplete=true)
         val created=Rules.createInvite(state,"unique",1000).state

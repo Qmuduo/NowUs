@@ -63,6 +63,7 @@ class AppFlowTest {
   capture("nowus-home.png")
   compose.onNodeWithText("我们的一天").performClick()
   compose.waitUntil(10000){compose.onAllNodesWithText("每一段的详情").fetchSemanticsNodes().isNotEmpty()}
+  compose.onNodeWithText("固定演示时间 · 2026/9/29 · 不代表此刻").assertExists()
   capture("nowus-timeline.png")
  }
  @Test fun largeFontsKeepProfileAndRhythmReachable(){

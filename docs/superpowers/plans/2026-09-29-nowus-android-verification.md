@@ -4,7 +4,7 @@
 
 ## 已核验
 
-- `:app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug` 构建成功；18 项 JVM 测试通过，Lint 无错误。
+- `:app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug` 构建成功；19 项 JVM 测试通过，Lint 无错误。
 - 在 Android 11 真机上安装应用 APK 与测试 APK，使用 AndroidJUnitRunner 直接执行设备测试：`OK (9 tests)`，包含首次使用、时间轴、留言、本地数据更新与重启读取。
 - 原有网页原型的 `node --test prototype/model.test.mjs prototype/pairing-model.test.mjs` 通过 16 项。
 - 检视了首页、时间轴与大字体页面截图，检查双日期、同一瞬间对齐、时间窗口、当前线与可滚动输入。
@@ -13,7 +13,7 @@
 
 ## 交付物与边界
 
-- Debug APK：`artifacts/NowUs-android-0.1.0-local-debug.apk`，仅用于安装试用；SHA-256 `D4A88E88A11C6896342D2A94B3CF4A43A7A977A964877EB6B6909B0EC2B337B8`。
+- Debug APK：`artifacts/NowUs-android-0.1.0-local-debug.apk`，仅用于安装试用；SHA-256 `D1A657F7B92289F99EC64C8C1BA072C186A707CAA1E186AB9C418C571FB9F8C7`。
 - 截图：`artifacts/nowus-home.png`、`artifacts/nowus-timeline.png`、`artifacts/nowus-large-font.png`。构建产物与截图被 Git 忽略，源代码和文档在仓库中。
 - 邀请是单机演示，短留言和作息仅保存在本机。固定日期只属于明确标出的演示模式，正常使用读取真实时间。
 - 下一阶段实现邮箱验证码、真实双账号配对和跨设备同步，并在中国大陆与海外两台手机上进行端到端验证。
