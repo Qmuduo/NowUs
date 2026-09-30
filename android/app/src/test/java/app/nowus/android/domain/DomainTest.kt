@@ -147,6 +147,41 @@ class DomainTest {
         val overlappingBlock=adjacentContact.copy(blocks=blocks+RoutineBlock("early","出门准备","06:30","07:30"))
         assertTrue(Rules.validateRhythm(overlappingBlock).errors.contains("日常时段不能重叠"))
     }
+    @Test fun routineCategoriesDecodeOldBlocksAndReachTimelineActivities() {
+        val oldBlock=kotlinx.serialization.json.Json.decodeFromString<RoutineBlock>(
+            """{"id":"walk","label":"散步","start":"10:00","end":"11:00"}"""
+        )
+        assertEquals(RoutineCategory.OTHER,oldBlock.category)
+
+        val blocks=listOf(
+            RoutineBlock("sleep","睡觉","23:00","07:00"),
+            RoutineBlock("workout","运动","10:00","11:00",RoutineCategory.EXERCISE),
+        )
+        val json=kotlinx.serialization.json.Json { encodeDefaults=true }
+        val roundTrip=json.decodeFromString<RoutineBlock>(json.encodeToString(blocks[1]))
+        assertEquals(RoutineCategory.EXERCISE,roundTrip.category)
+        val timeline=Schedule(Rhythm(blocks=blocks),Rhythm(blocks=blocks))
+        assertEquals(RoutineCategory.EXERCISE,TimeEngine.activityAt(me,timeline,null,instant("2026-09-29T02:30:00Z")).category)
+        assertEquals(RoutineCategory.UNSCHEDULED,TimeEngine.activityAt(me,timeline,null,instant("2026-09-29T01:00:00Z")).category)
+    }
+    @Test fun studentAndOfficeTemplatesAssignCategoriesAndPreparation() {
+        val student=RoutineTemplates.forCity("beijing",RoutineTemplate.STUDENT)
+        assertEquals(RoutineCategory.PREPARATION,student.weekday.blocks.single { it.id=="preparation" }.category)
+        assertEquals(RoutineCategory.MEAL,student.weekday.blocks.single { it.id=="breakfast" }.category)
+        assertEquals(RoutineCategory.STUDY_WORK,student.weekday.blocks.single { it.id=="morning-class" }.category)
+        assertEquals(RoutineCategory.COMMUTE,student.weekday.blocks.single { it.id=="commute-morning" }.category)
+        assertEquals("08:45",student.rest.blocks.single { it.id=="preparation" }.end)
+        assertEquals(RoutineCategory.OTHER,student.rest.blocks.single { it.id=="afternoon-free" }.category)
+        assertFalse((student.weekday.blocks+student.rest.blocks).any { it.category==RoutineCategory.SOCIAL || it.category==RoutineCategory.LIFE_ADMIN || it.category==RoutineCategory.EXERCISE })
+
+        val office=RoutineTemplates.forCity("paris",RoutineTemplate.OFFICE_WORKER)
+        assertEquals(RoutineCategory.STUDY_WORK,office.weekday.blocks.single { it.id=="morning-work" }.category)
+        assertEquals(RoutineCategory.REST,office.weekday.blocks.single { it.id=="evening-free" }.category)
+        assertEquals(RoutineCategory.OTHER,office.rest.blocks.single { it.id=="afternoon-free" }.category)
+        assertTrue(Rules.validateRhythm(student.weekday).valid)
+        assertTrue(Rules.validateRhythm(student.rest).valid)
+        assertTrue(Rules.validateRhythm(office.weekday).valid)
+    }
     @Test fun legacyRhythmJsonStillDecodesAndKeepsActivityBehavior() {
         val legacy=kotlinx.serialization.json.Json.decodeFromString<Schedule>("""{"weekday":{"sleepStart":"23:00","sleepEnd":"07:00","activity":"上课","activityStart":"09:00","activityEnd":"17:00","contactKnown":true,"contactStart":"20:00","contactEnd":"22:00"},"rest":{"sleepStart":"23:00","sleepEnd":"08:00","activity":"休息","activityStart":"10:00","activityEnd":"12:00","contactKnown":true,"contactStart":"20:00","contactEnd":"22:00"}}""")
         assertTrue(legacy.weekday.blocks.isEmpty())

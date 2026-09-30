@@ -31,23 +31,25 @@ def sample_segmented_rhythm(activity: str = "上班", template: str = "上班族
     main_label = "上午上课" if is_student else "上午上班"
     afternoon_label = "下午上课" if is_student else "下午上班"
     weekday_blocks = [
-        {"id": "sleep", "label": "睡觉", "start": "23:00", "end": "07:00"},
-        {"id": "breakfast", "label": "早餐", "start": "07:30", "end": "08:00"},
-        {"id": "commute", "label": "通勤", "start": "08:00", "end": "09:00"},
-        {"id": "morning", "label": main_label, "start": "09:00", "end": "12:00"},
-        {"id": "lunch", "label": "午餐", "start": "12:00", "end": "13:00"},
-        {"id": "nap", "label": "午休", "start": "13:00", "end": "13:30"},
-        {"id": "afternoon", "label": afternoon_label, "start": "13:30", "end": "17:30"},
-        {"id": "commute-home", "label": "返程通勤", "start": "17:30", "end": "18:00"},
-        {"id": "dinner", "label": "晚餐", "start": "18:00", "end": "19:00"},
+        {"id": "sleep", "label": "睡觉", "start": "23:00", "end": "07:00", "category": "SLEEP"},
+        {"id": "preparation", "label": "起床准备", "start": "07:00", "end": "07:30", "category": "PREPARATION"},
+        {"id": "breakfast", "label": "早餐", "start": "07:30", "end": "08:00", "category": "MEAL"},
+        {"id": "commute", "label": "通勤", "start": "08:00", "end": "09:00", "category": "COMMUTE"},
+        {"id": "morning", "label": main_label, "start": "09:00", "end": "12:00", "category": "STUDY_WORK"},
+        {"id": "lunch", "label": "午餐", "start": "12:00", "end": "13:00", "category": "MEAL"},
+        {"id": "nap", "label": "午休", "start": "13:00", "end": "13:30", "category": "REST"},
+        {"id": "afternoon", "label": afternoon_label, "start": "13:30", "end": "17:30", "category": "STUDY_WORK"},
+        {"id": "commute-home", "label": "返程通勤", "start": "17:30", "end": "18:00", "category": "COMMUTE"},
+        {"id": "dinner", "label": "晚餐", "start": "18:00", "end": "19:00", "category": "MEAL"},
     ]
     rest_blocks = [
-        {"id": "sleep", "label": "睡觉", "start": "23:30", "end": "08:30"},
-        {"id": "breakfast", "label": "早餐", "start": "08:30", "end": "09:00"},
-        {"id": "lunch", "label": "午餐", "start": "12:30", "end": "13:30"},
-        {"id": "free", "label": "自由安排", "start": "14:00", "end": "18:00"},
-        {"id": "dinner", "label": "晚餐", "start": "18:30", "end": "19:30"},
-        {"id": "evening", "label": "晚间休息", "start": "19:30", "end": "22:30"},
+        {"id": "sleep", "label": "睡觉", "start": "23:30", "end": "08:30", "category": "SLEEP"},
+        {"id": "preparation", "label": "起床准备", "start": "08:30", "end": "08:45", "category": "PREPARATION"},
+        {"id": "breakfast", "label": "早餐", "start": "08:45", "end": "09:15", "category": "MEAL"},
+        {"id": "lunch", "label": "午餐", "start": "12:30", "end": "13:30", "category": "MEAL"},
+        {"id": "free", "label": "自由安排", "start": "14:00", "end": "18:00", "category": "SOCIAL"},
+        {"id": "dinner", "label": "晚餐", "start": "18:30", "end": "19:30", "category": "MEAL"},
+        {"id": "evening", "label": "晚间休息", "start": "19:30", "end": "22:30", "category": "SOCIAL"},
     ]
     return {
         "templateId": template,

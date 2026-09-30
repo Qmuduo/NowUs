@@ -5,7 +5,11 @@ import java.time.Instant
 import java.time.ZoneId
 
 @Serializable data class Profile(val name: String, val cityId: String)
-@Serializable data class RoutineBlock(val id: String, val label: String, val start: String, val end: String)
+@Serializable enum class RoutineCategory(val title:String) {
+ SLEEP("睡眠"),PREPARATION("起床准备"),MEAL("用餐"),COMMUTE("通勤"),STUDY_WORK("学习／工作"),REST("休息／午睡"),
+ EXERCISE("运动"),LIFE_ADMIN("家务／办事"),SOCIAL("社交／娱乐"),OTHER("其他"),UNSCHEDULED("未安排")
+}
+@Serializable data class RoutineBlock(val id: String, val label: String, val start: String, val end: String,val category:RoutineCategory=RoutineCategory.OTHER)
 @Serializable data class Rhythm(val sleepStart: String="23:00", val sleepEnd: String="07:00", val activity: String="上班", val activityStart: String="09:00", val activityEnd: String="18:00", val contactKnown: Boolean=true, val contactStart: String="20:00", val contactEnd: String="22:30", val blocks: List<RoutineBlock> = emptyList())
 @Serializable data class Schedule(val weekday: Rhythm, val rest: Rhythm, val templateId: String="学生")
 @Serializable data class TemporaryStatus(val available: Boolean, val untilMillis: Long, val fromMillis: Long=0)
@@ -36,7 +40,7 @@ object Cities {
 }
 data class Window(val start: Instant,val end: Instant)
 enum class ActivitySource { TEMPLATE,TEMPORARY,UNKNOWN }
-data class Activity(val label: String,val source: ActivitySource)
+data class Activity(val label: String,val source: ActivitySource,val category:RoutineCategory=RoutineCategory.OTHER)
 data class Segment(val start: Instant,val end: Instant,val activity: Activity)
 data class ValidationResult(val valid: Boolean,val errors: List<String> = emptyList())
 data class RuleResult(val state: AppState,val error: String?=null)

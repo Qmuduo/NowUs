@@ -34,13 +34,15 @@ object TimeEngine {
   }
  }
  fun activityAt(profile: Profile,schedule: Schedule?,temporary: TemporaryStatus?,instant: Instant): Activity {
-  val r=rhythm(profile,schedule,instant) ?: return Activity("未安排",ActivitySource.UNKNOWN)
+  val r=rhythm(profile,schedule,instant) ?: return Activity("未安排",ActivitySource.UNKNOWN,RoutineCategory.UNSCHEDULED)
   val m=minute(profile,instant)
   if(r.blocks.isNotEmpty()) {
    val block=r.blocks.firstOrNull { contains(m,it.start,it.end) }
-   return Activity(block?.label ?: "未安排",ActivitySource.TEMPLATE)
+   return Activity(block?.label ?: "未安排",ActivitySource.TEMPLATE,block?.category?:RoutineCategory.UNSCHEDULED)
   }
-  return Activity(when {contains(m,r.sleepStart,r.sleepEnd)->"睡觉"; contains(m,r.activityStart,r.activityEnd)->r.activity; else->"未安排"},ActivitySource.TEMPLATE)
+  val label=when {contains(m,r.sleepStart,r.sleepEnd)->"睡觉"; contains(m,r.activityStart,r.activityEnd)->r.activity; else->"未安排"}
+  val category=when {contains(m,r.sleepStart,r.sleepEnd)->RoutineCategory.SLEEP; contains(m,r.activityStart,r.activityEnd)->RoutineCategory.OTHER; else->RoutineCategory.UNSCHEDULED}
+  return Activity(label,ActivitySource.TEMPLATE,category)
  }
  fun contactAt(profile: Profile,schedule: Schedule?,temporary: TemporaryStatus?,instant: Instant): Boolean? {
   if(temporary!=null && instant.toEpochMilli()>=temporary.fromMillis && instant.toEpochMilli()<temporary.untilMillis) return temporary.available

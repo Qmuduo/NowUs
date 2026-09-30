@@ -2,7 +2,10 @@ package app.nowus.android.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -36,7 +39,7 @@ private data class DayData(val bounds:Window,val me:List<Segment>,val partner:Li
   value=withContext(Dispatchers.Default){DayData(nearby,TimeEngine.segments(nearby.start,nearby.end,state.me,state.schedule),state.partner?.let{TimeEngine.segments(nearby.start,nearby.end,it,state.partnerSchedule)}?:emptyList(),state.partner?.let{TimeEngine.commonWindows(nearby.start,nearby.end,state.me,state.schedule,state.temporary,it,state.partnerSchedule)}?:emptyList())}
  }
  Text("我们的一天",style=MaterialTheme.typography.headlineSmall)
- Text("同一高度，是同一个瞬间。活动各自连续；绿色带表示共同联系窗口。",color=Muted)
+ Text("同一高度，是同一个瞬间。颜色区分时段类别；绿色带表示共同联系窗口。",color=Muted)
  Text(date.toString(),modifier=Modifier.fillMaxWidth(),textAlign=TextAlign.Center,style=MaterialTheme.typography.titleMedium)
  Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)){
   TextButton(onClick={dateText=date.minusDays(1).toString()},modifier=Modifier.weight(1f),contentPadding=PaddingValues(horizontal=4.dp)){Text("前一天")}
@@ -55,6 +58,7 @@ private data class DayData(val bounds:Window,val me:List<Segment>,val partner:Li
    Column(Modifier.weight(1f)){Text(state.partner?.let{"${it.name} · ${it.cityName()}"}?:"对方尚未加入",style=MaterialTheme.typography.titleMedium);Text(state.partner?.let{localDate(current.bounds.start,it)}?:"作息未知",style=MaterialTheme.typography.bodySmall)}
   }
   AlignedTracks(current,state,now){profile,segment->detail=profile to segment}
+  RoutineCategoryLegend((current.me+current.partner).map { it.activity.category }.distinct())
   if(current.windows.isEmpty())Text("这段时间暂无可确认的共同窗口",style=MaterialTheme.typography.bodySmall,color=Muted)
   else current.windows.forEach{window->
    SectionCard("共同联系窗口"){
@@ -83,6 +87,20 @@ private data class DayData(val bounds:Window,val me:List<Segment>,val partner:Li
   }},confirmButton={TextButton(onClick={detail=null}){Text("知道了")}})
  }
 }
+@Composable private fun RoutineCategoryLegend(categories:List<RoutineCategory>){
+ if(categories.isEmpty())return
+ Row(
+  Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).semantics { contentDescription="时间轴类别颜色图例" },
+  horizontalArrangement=Arrangement.spacedBy(14.dp),verticalAlignment=Alignment.CenterVertically
+ ){
+  categories.forEach { category->
+   Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(5.dp)){
+    Box(Modifier.size(11.dp).background(routineCategoryColor(category),CircleShape))
+    Text(category.title,style=MaterialTheme.typography.labelSmall,color=Muted)
+   }
+  }
+ }
+}
 @Composable private fun AlignedTracks(data:DayData,state:AppState,now:Instant,onSegment:(Profile,Segment)->Unit){
  val seconds=Duration.between(data.bounds.start,data.bounds.end).seconds.toFloat()
  val height=max(420f,seconds/3600f*76f).dp
@@ -105,13 +123,11 @@ private data class DayData(val bounds:Window,val me:List<Segment>,val partner:Li
    Text(state.partner?.let{shortDateTime(time,it).replace(" ","\n")}?:"未知",modifier=Modifier.offset(x=maxWidth-gutter,y=labelPosition).width(gutter).padding(start=4.dp),style=MaterialTheme.typography.bodySmall,color=Muted)
    tick=tick.plusSeconds(3600)
   }
-  fun segmentColor(segment:Segment)=when{segment.activity.source==ActivitySource.UNKNOWN->Color(0xFFE9ECE8);segment.activity.label=="睡觉"->Night;else->Sage}
   @Composable fun Track(profile:Profile,segments:List<Segment>,x:androidx.compose.ui.unit.Dp){
    segments.forEach{segment->
     val segmentHeight=height*(fraction(segment.end)-fraction(segment.start))
-    val night=segment.activity.label=="睡觉"
-    Box(Modifier.offset(x=x,y=height*fraction(segment.start)).width(trackWidth).height(segmentHeight).padding(vertical=1.dp).background(segmentColor(segment),RoundedCornerShape(9.dp)).clickable{onSegment(profile,segment)}.semantics{contentDescription="${profile.name} ${segment.activity.label} ${shortDateTime(segment.start,profile)} 至 ${shortDateTime(segment.end,profile)} ${sourceText(segment.activity.source)}"}.padding(8.dp)){
-     if(segmentHeight>46.dp)Text(segment.activity.label,color=if(night)Color.White else Ink,style=MaterialTheme.typography.bodyMedium)
+    Box(Modifier.offset(x=x,y=height*fraction(segment.start)).width(trackWidth).height(segmentHeight).padding(vertical=1.dp).background(routineCategoryColor(segment.activity.category),RoundedCornerShape(9.dp)).clickable{onSegment(profile,segment)}.semantics{contentDescription="${profile.name} ${segment.activity.label} · ${segment.activity.category.title} · ${shortDateTime(segment.start,profile)} 至 ${shortDateTime(segment.end,profile)} ${sourceText(segment.activity.source)}"}.padding(8.dp)){
+     if(segmentHeight>46.dp)Text(segment.activity.label,color=Ink,style=MaterialTheme.typography.bodyMedium)
     }
    }
   }

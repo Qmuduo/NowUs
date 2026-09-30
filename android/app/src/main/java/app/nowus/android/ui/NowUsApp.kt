@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -378,6 +379,12 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
     OutlinedTextField(block.label,{label->update(updateBlocks(rhythm,rhythm.blocks.map { if(it.id==block.id)it.copy(label=label)else it }))},label={Text("时段名称")},modifier=Modifier.weight(1f).testTag("rhythm-$dayKey-${block.id}-label"),singleLine=true)
     if(block.id!="sleep")TextButton(onClick={update(updateBlocks(rhythm,rhythm.blocks.filterNot { it.id==block.id }))}){Text("删除")}
    }
+   Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween){
+    Text("类别",style=MaterialTheme.typography.bodySmall,color=Muted)
+    RoutineCategoryPicker(block.category,"rhythm-$dayKey-${block.id}-category"){category->
+     update(updateBlocks(rhythm,rhythm.blocks.map { if(it.id==block.id)it.copy(category=category)else it }))
+    }
+   }
    TimePair(timeTitle,"rhythm-$dayKey-${block.id}",block.start,block.end,
     {time->update(updateBlocks(rhythm,rhythm.blocks.map { if(it.id==block.id)it.copy(start=time)else it }))},
     {time->update(updateBlocks(rhythm,rhythm.blocks.map { if(it.id==block.id)it.copy(end=time)else it }))})
@@ -393,6 +400,34 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
  Text(if(rhythm.contactKnown)"以下时段愿意联系，不推断实时状态" else "联系意愿保持未知")
  if(rhythm.contactKnown)TimePair("联系","rhythm-$dayKey-contact",rhythm.contactStart,rhythm.contactEnd,{update(rhythm.copy(contactStart=it))},{update(rhythm.copy(contactEnd=it))})
  Text("保存时同时校验工作日和休息日模板。联系偏好仍可与上课或工作时段重合，但不能覆盖睡觉时间。",style=MaterialTheme.typography.bodySmall,color=Muted)
+}
+
+@Composable private fun RoutineCategoryPicker(category:RoutineCategory,testTag:String,onCategoryChange:(RoutineCategory)->Unit){
+ var expanded by rememberSaveable(testTag){mutableStateOf(false)}
+ Box {
+  AssistChip(
+   onClick={expanded=true},
+   label={Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)){
+    Box(Modifier.size(13.dp).background(routineCategoryColor(category),CircleShape))
+    Text(category.title,color=Ink)
+   }},
+   colors=AssistChipDefaults.assistChipColors(containerColor=routineCategoryColor(category).copy(alpha=.68f),labelColor=Ink),
+   modifier=Modifier.testTag(testTag)
+  )
+  DropdownMenu(expanded=expanded,onDismissRequest={expanded=false}){
+   RoutineCategory.entries.filter { it!=RoutineCategory.UNSCHEDULED }.forEach { option->
+    DropdownMenuItem(
+     text={Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)){
+      RadioButton(selected=option==category,onClick=null)
+      Box(Modifier.size(13.dp).background(routineCategoryColor(option),CircleShape))
+      Text(option.title)
+     }},
+     onClick={onCategoryChange(option);expanded=false},
+     modifier=Modifier.testTag("routine-category-${option.name.lowercase(Locale.ROOT)}")
+    )
+   }
+  }
+ }
 }
 
 private fun updateBlocks(rhythm:Rhythm,blocks:List<RoutineBlock>):Rhythm{

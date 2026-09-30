@@ -123,6 +123,26 @@ class AppFlowTest {
    Assert.assertEquals("20:00",saved.weekday.blocks.single{it.id=="dinner"}.start)
   }
  }
+ @Test fun routineCategoryMenuSavesExerciseAndCategoriesHaveDistinctColors(){
+  val persistedCategories=RoutineCategory.entries.filter { it!=RoutineCategory.UNSCHEDULED }
+  Assert.assertEquals(persistedCategories.size,persistedCategories.map(::routineCategoryColor).distinct().size)
+
+  val schedule=RoutineTemplates.forCity("beijing")
+  val repo=MemoryRepository(AppState(Profile("阿青","beijing"),schedule,true));val vm=AppViewModel(repo)
+  compose.setContent{NowUsTheme{NowUsApp(vm)}}
+  compose.onNodeWithText("我的节奏").performClick()
+  compose.onNodeWithTag("rhythm-weekday-breakfast-category").performScrollTo().performClick()
+  compose.onNodeWithText("运动").performClick()
+  compose.onNodeWithText("保存我的节奏").performScrollTo().performClick()
+  compose.runOnIdle{
+   Assert.assertEquals(RoutineCategory.EXERCISE,repo.data.value.schedule!!.weekday.blocks.single { it.id=="breakfast" }.category)
+  }
+  compose.waitUntil(5_000){vm.state.value?.schedule?.weekday?.blocks?.singleOrNull { it.id=="breakfast" }?.category==RoutineCategory.EXERCISE}
+  compose.onNodeWithText("我们的一天").performClick()
+  compose.onNodeWithText("查看全天").performClick()
+  compose.waitUntil(10_000){compose.onAllNodesWithContentDescription("早餐 · 运动",substring=true).fetchSemanticsNodes().isNotEmpty()}
+  compose.onAllNodesWithContentDescription("早餐 · 运动",substring=true).onFirst().assertExists()
+ }
  @Test fun unknownPartnerRequiresExplicitSampleAndSavedNote(){
   val repo=MemoryRepository(AppState(Profile("阿青","beijing"),Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息",activityStart="10:00",activityEnd="12:00",contactStart="10:00",contactEnd="22:00")),true,Profile("小雨","new-york")))
   val vm=AppViewModel(repo)

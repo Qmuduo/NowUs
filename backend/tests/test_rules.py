@@ -67,3 +67,23 @@ def test_routine_blocks_allow_wake_boundary_and_reject_sleep_overlap():
     assert "联系不可与睡眠重叠" in rules.rhythm_errors({**rhythm, "contactStart": "06:30", "contactEnd": "07:30"})
     overlapping = {**rhythm, "blocks": [*rhythm["blocks"], {"id": "early", "label": "出门准备", "start": "06:30", "end": "07:30"}]}
     assert "日常时段不能重叠" in rules.rhythm_errors(overlapping)
+
+
+def test_routine_categories_are_optional_for_old_clients_and_validated_when_present():
+    rhythm = {
+        "contactKnown": False,
+        "blocks": [
+            {"id": "sleep", "label": "睡觉", "start": "23:00", "end": "07:00", "category": "SLEEP"},
+            {"id": "breakfast", "label": "早餐", "start": "07:00", "end": "07:30", "category": "MEAL"},
+        ],
+    }
+    assert rules.rhythm_errors(rhythm) == []
+    for category in rules.ROUTINE_CATEGORIES:
+        categorized = {**rhythm, "blocks": [dict(rhythm["blocks"][0]), {**rhythm["blocks"][1], "category": category}]}
+        assert rules.rhythm_errors(categorized) == []
+    old_client = {**rhythm, "blocks": [{key: value for key, value in block.items() if key != "category"} for block in rhythm["blocks"]]}
+    assert rules.rhythm_errors(old_client) == []
+    invalid = {**rhythm, "blocks": [dict(rhythm["blocks"][0]), {**rhythm["blocks"][1], "category": "UNSCHEDULED"}]}
+    assert "时段类别无效" in rules.rhythm_errors(invalid)
+    invalid_string = {**rhythm, "blocks": [dict(rhythm["blocks"][0]), {**rhythm["blocks"][1], "category": "NOT_A_CATEGORY"}]}
+    assert "时段类别无效" in rules.rhythm_errors(invalid_string)

@@ -34,28 +34,28 @@ object RoutineTemplates {
 
     private fun studentDay(region: Region, sleep: RoutineBlock): List<RoutineBlock> = when (region) {
         Region.EAST_ASIA -> listOf(
-            sleep, block("breakfast", "早餐", "07:15", "07:45"), block("commute-morning", "上学通勤", "07:45", "08:30"),
+            sleep, block("preparation", "起床准备", "07:00", "07:15"), block("breakfast", "早餐", "07:15", "07:45"), block("commute-morning", "上学通勤", "07:45", "08:30"),
             block("morning-class", "上午上课", "08:30", "12:00"), block("lunch", "午餐", "12:00", "12:45"),
             block("nap", "午休", "12:45", "13:30"), block("afternoon-class", "下午上课", "13:30", "17:00"),
             block("commute-evening", "返程通勤", "17:00", "17:30"), block("dinner", "晚餐", "18:00", "19:00"),
             block("evening-study", "晚间学习", "19:00", "22:00"),
         )
         Region.SOUTH_ASIA -> listOf(
-            sleep, block("breakfast", "早餐", "07:30", "08:00"), block("commute-morning", "上学通勤", "08:00", "09:00"),
+            sleep, block("preparation", "起床准备", "07:00", "07:30"), block("breakfast", "早餐", "07:30", "08:00"), block("commute-morning", "上学通勤", "08:00", "09:00"),
             block("morning-class", "上午上课", "09:00", "12:30"), block("lunch", "午餐", "12:30", "13:30"),
             block("midday-rest", "午间休息", "13:30", "14:00"), block("afternoon-class", "下午上课", "14:00", "17:00"),
             block("commute-evening", "返程通勤", "17:00", "18:00"), block("dinner", "晚餐", "19:00", "20:00"),
             block("evening-study", "晚间学习", "20:00", "22:00"),
         )
         Region.WESTERN_EUROPE -> listOf(
-            sleep, block("breakfast", "早餐", "07:30", "08:00"), block("commute-morning", "上学通勤", "08:00", "08:30"),
+            sleep, block("preparation", "起床准备", "07:00", "07:30"), block("breakfast", "早餐", "07:30", "08:00"), block("commute-morning", "上学通勤", "08:00", "08:30"),
             block("morning-class", "上午上课", "08:30", "12:30"), block("lunch", "午餐", "12:30", "13:30"),
             block("midday-rest", "午间休息", "13:30", "14:00"), block("afternoon-class", "下午上课", "14:00", "17:00"),
             block("commute-evening", "返程通勤", "17:00", "18:00"), block("free-before-dinner", "自由时间", "18:00", "20:00"),
             block("dinner", "晚餐", "20:00", "21:00"), block("evening-study", "晚间学习", "21:00", "22:30"),
         )
         Region.OTHER_WEST -> listOf(
-            sleep, block("breakfast", "早餐", "07:30", "08:00"), block("commute-morning", "上学通勤", "08:00", "09:00"),
+            sleep, block("preparation", "起床准备", "07:00", "07:30"), block("breakfast", "早餐", "07:30", "08:00"), block("commute-morning", "上学通勤", "08:00", "09:00"),
             block("morning-class", "上午上课", "09:00", "12:30"), block("lunch", "午餐", "12:30", "13:30"),
             block("midday-rest", "午间休息", "13:30", "14:00"), block("afternoon-class", "下午上课", "14:00", "17:00"),
             block("commute-evening", "返程通勤", "17:00", "18:00"), block("dinner", "晚餐", "18:30", "19:30"),
@@ -65,28 +65,28 @@ object RoutineTemplates {
 
     private fun officeDay(region: Region, sleep: RoutineBlock): List<RoutineBlock> = when (region) {
         Region.EAST_ASIA -> listOf(
-            sleep, block("breakfast", "早餐", "07:15", "07:45"), block("commute-morning", "通勤", "08:00", "09:00"),
+            sleep, block("preparation", "起床准备", "07:00", "07:15"), block("breakfast", "早餐", "07:15", "07:45"), block("commute-morning", "通勤", "08:00", "09:00"),
             block("morning-work", "上午上班", "09:00", "12:00"), block("lunch", "午餐", "12:00", "13:00"),
             block("nap", "午休", "13:00", "13:30"), block("afternoon-work", "下午上班", "13:30", "18:00"),
             block("commute-evening", "返程通勤", "18:00", "19:00"), block("dinner", "晚餐", "19:00", "20:00"),
             block("evening-free", "晚间休息", "20:00", "22:00"),
         )
         Region.SOUTH_ASIA -> listOf(
-            sleep, block("breakfast", "早餐", "07:30", "08:00"), block("commute-morning", "通勤", "08:00", "09:00"),
+            sleep, block("preparation", "起床准备", "07:00", "07:30"), block("breakfast", "早餐", "07:30", "08:00"), block("commute-morning", "通勤", "08:00", "09:00"),
             block("morning-work", "上午上班", "09:00", "12:30"), block("lunch", "午餐", "12:30", "13:30"),
             block("midday-rest", "午间休息", "13:30", "14:00"), block("afternoon-work", "下午上班", "14:00", "18:00"),
             block("commute-evening", "返程通勤", "18:00", "19:00"), block("dinner", "晚餐", "19:00", "20:00"),
             block("evening-free", "晚间休息", "20:00", "22:00"),
         )
         Region.WESTERN_EUROPE -> listOf(
-            sleep, block("breakfast", "早餐", "07:30", "08:00"), block("commute-morning", "通勤", "08:00", "09:00"),
+            sleep, block("preparation", "起床准备", "07:00", "07:30"), block("breakfast", "早餐", "07:30", "08:00"), block("commute-morning", "通勤", "08:00", "09:00"),
             block("morning-work", "上午上班", "09:00", "12:30"), block("lunch", "午餐", "12:30", "13:30"),
             block("midday-rest", "午间休息", "13:30", "14:00"), block("afternoon-work", "下午上班", "14:00", "17:30"),
             block("commute-evening", "返程通勤", "17:30", "18:30"), block("free-before-dinner", "自由时间", "18:30", "20:00"),
             block("dinner", "晚餐", "20:00", "21:00"), block("evening-free", "晚间休息", "21:00", "22:30"),
         )
         Region.OTHER_WEST -> listOf(
-            sleep, block("breakfast", "早餐", "07:30", "08:00"), block("commute-morning", "通勤", "08:00", "09:00"),
+            sleep, block("preparation", "起床准备", "07:00", "07:30"), block("breakfast", "早餐", "07:30", "08:00"), block("commute-morning", "通勤", "08:00", "09:00"),
             block("morning-work", "上午上班", "09:00", "12:30"), block("lunch", "午餐", "12:30", "13:30"),
             block("midday-rest", "午间休息", "13:30", "14:00"), block("afternoon-work", "下午上班", "14:00", "17:30"),
             block("commute-evening", "返程通勤", "17:30", "18:30"), block("dinner", "晚餐", "18:30", "19:30"),
@@ -107,7 +107,8 @@ object RoutineTemplates {
         }
         val blocks = mutableListOf(
             sleep,
-            block("breakfast", "早餐", "08:30", "09:00"),
+            block("preparation", "起床准备", "08:30", "08:45"),
+            block("breakfast", "早餐", "08:45", "09:15"),
             block("lunch", "午餐", lunch.first, lunch.second),
             block("afternoon-free", "自由安排", "14:00", "18:00"),
         )
@@ -130,5 +131,15 @@ object RoutineTemplates {
         )
     }
 
-    private fun block(id: String, label: String, start: String, end: String) = RoutineBlock(id, label, start, end)
+    private fun block(id: String, label: String, start: String, end: String) = RoutineBlock(id, label, start, end, categoryFor(id))
+
+    private fun categoryFor(id: String): RoutineCategory = when (id) {
+        "sleep" -> RoutineCategory.SLEEP
+        "preparation" -> RoutineCategory.PREPARATION
+        "breakfast", "lunch", "dinner" -> RoutineCategory.MEAL
+        "commute-morning", "commute-evening" -> RoutineCategory.COMMUTE
+        "morning-class", "afternoon-class", "morning-work", "afternoon-work", "evening-study" -> RoutineCategory.STUDY_WORK
+        "nap", "midday-rest", "evening-free" -> RoutineCategory.REST
+        else -> RoutineCategory.OTHER
+    }
 }

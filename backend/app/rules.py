@@ -6,6 +6,10 @@ import re
 CITY_IDS = {
     "beijing", "shanghai", "new-york", "london", "paris", "tokyo", "sydney", "kathmandu",
 }
+ROUTINE_CATEGORIES = {
+    "SLEEP", "PREPARATION", "MEAL", "COMMUTE", "STUDY_WORK", "REST",
+    "EXERCISE", "LIFE_ADMIN", "SOCIAL", "OTHER",
+}
 _TIME = re.compile(r"(?:[01][0-9]|2[0-3]):[0-5][0-9]\Z")
 
 
@@ -100,6 +104,12 @@ def _routine_block_errors(rhythm: dict) -> list[str]:
         for block in blocks
     ):
         errors.append("时段名称应为 1–20 个字符")
+    if any(
+        "category" in block
+        and (not isinstance(block["category"], str) or block["category"] not in ROUTINE_CATEGORIES)
+        for block in blocks
+    ):
+        errors.append("时段类别无效")
 
     parsed = [(block, _parse_minute(block.get("start")), _parse_minute(block.get("end"))) for block in blocks]
     invalid_times = any(

@@ -25,7 +25,10 @@ def test_pair_members_see_each_others_owned_schedule_and_note_but_third_user_can
     assert view_a["partner"]["note"]["text"] == "下班一起吃饭"
     assert view_b["partner"]["schedule"]["weekday"]["activity"] == "上班"
     assert view_b["partner"]["schedule"]["templateId"] == "上班族"
-    assert [block["label"] for block in view_b["partner"]["schedule"]["weekday"]["blocks"]][1:6] == ["早餐", "通勤", "上午上班", "午餐", "午休"]
+    shared_blocks = view_b["partner"]["schedule"]["weekday"]["blocks"]
+    assert [block["label"] for block in shared_blocks if block["id"] in {"breakfast", "commute", "morning", "lunch", "nap"}] == ["早餐", "通勤", "上午上班", "午餐", "午休"]
+    assert next(block for block in shared_blocks if block["id"] == "morning")["category"] == "STUDY_WORK"
+    assert next(block for block in shared_blocks if block["id"] == "preparation")["category"] == "PREPARATION"
     assert view_b["partner"]["note"]["text"] == "醒来给我说一声 🌙"
 
     carol_view = client.get("/v1/snapshot", headers=bearer(carol)).json()
