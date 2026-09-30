@@ -3,6 +3,12 @@ package app.nowus.android.ui
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -11,12 +17,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -26,11 +30,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.nowus.android.AppViewModel
 import app.nowus.android.domain.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.time.Instant
 import java.util.Locale
-import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
@@ -347,7 +351,7 @@ fun defaultSchedule()=Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息
  val rhythm=if(rest)schedule.rest else schedule.weekday
  val dayKey=if(rest)"rest" else "weekday"
  fun update(value:Rhythm){onChange(if(rest)schedule.copy(rest=value)else schedule.copy(weekday=value))}
- Text("拖动滑块设置时间，睡眠可以跨夜；活动与联系独立，均不得与睡眠重叠。",style=MaterialTheme.typography.bodySmall,color=Muted)
+ Text("滚动选择时间，睡眠可以跨夜；活动与联系独立，均不得与睡眠重叠。",style=MaterialTheme.typography.bodySmall,color=Muted)
  TimePair("睡眠","rhythm-$dayKey-sleep",rhythm.sleepStart,rhythm.sleepEnd,{update(rhythm.copy(sleepStart=it))},{update(rhythm.copy(sleepEnd=it))})
  OutlinedTextField(rhythm.activity,{update(rhythm.copy(activity=it))},label={Text("活动名称")},modifier=Modifier.fillMaxWidth(),singleLine=true)
  TimePair("活动","rhythm-$dayKey-activity",rhythm.activityStart,rhythm.activityEnd,{update(rhythm.copy(activityStart=it))},{update(rhythm.copy(activityEnd=it))})
@@ -359,30 +363,84 @@ fun defaultSchedule()=Schedule(Rhythm(),Rhythm(sleepEnd="08:00",activity="休息
 @Composable private fun TimePair(title:String,tagPrefix:String,start:String,end:String,onStart:(String)->Unit,onEnd:(String)->Unit){
  Column(verticalArrangement=Arrangement.spacedBy(4.dp)){
   Text(title,style=MaterialTheme.typography.titleSmall)
-  TimeSlider("${title}开始",start,"$tagPrefix-start",onStart)
-  TimeSlider("${title}结束",end,"$tagPrefix-end",onEnd)
+  Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(12.dp)){
+   TimeWheelField("${title}开始",start,"$tagPrefix-start",onStart,Modifier.weight(1f))
+   TimeWheelField("${title}结束",end,"$tagPrefix-end",onEnd,Modifier.weight(1f))
+  }
  }
 }
-@Composable private fun TimeSlider(label:String,time:String,testTag:String,onTimeChange:(String)->Unit){
+@Composable private fun TimeWheelField(label:String,time:String,testTag:String,onTimeChange:(String)->Unit,modifier:Modifier=Modifier){
  val minute=TimeEngine.parseMinute(time)?.coerceIn(0,1439)?:0
  val displayedTime=String.format(Locale.ROOT,"%02d:%02d",minute/60,minute%60)
- Column(Modifier.fillMaxWidth()){
-  Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){
-   Text(label,style=MaterialTheme.typography.bodyMedium,color=Muted)
-   Text(displayedTime,style=MaterialTheme.typography.titleSmall)
+ var showPicker by rememberSaveable { mutableStateOf(false) }
+ Column(modifier){
+  Text(label,style=MaterialTheme.typography.bodySmall,color=Muted)
+  OutlinedButton(onClick={showPicker=true},modifier=Modifier.fillMaxWidth().testTag(testTag)){
+   Text(displayedTime,style=MaterialTheme.typography.titleMedium)
   }
-  Slider(
-   value=minute.toFloat(),
-   onValueChange={raw->
-    val selected=raw.roundToInt().coerceIn(0,1439)
-    onTimeChange(String.format(Locale.ROOT,"%02d:%02d",selected/60,selected%60))
-   },
-   valueRange=0f..1439f,
-   modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag(testTag).semantics{
-    contentDescription=label
-    stateDescription=displayedTime
+ }
+ if(showPicker)TimeWheelDialog(label,displayedTime,{onTimeChange(it);showPicker=false},{showPicker=false})
+}
+
+@Composable private fun TimeWheelDialog(label:String,initialTime:String,onConfirm:(String)->Unit,onDismiss:()->Unit){
+ val initialMinute=TimeEngine.parseMinute(initialTime)?.coerceIn(0,1439)?:0
+ var hour by rememberSaveable(initialTime){mutableIntStateOf(initialMinute/60)}
+ var minute by rememberSaveable(initialTime){mutableIntStateOf(initialMinute%60)}
+ val displayedTime=String.format(Locale.ROOT,"%02d:%02d",hour,minute)
+ AlertDialog(
+  onDismissRequest=onDismiss,
+  title={Text("设置$label")},
+  text={
+   Column(horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(12.dp)){
+    Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.Center,verticalAlignment=Alignment.CenterVertically){
+     TimeWheelColumn("小时",24,hour,"time-wheel-hour"){hour=it}
+     Text(":",style=MaterialTheme.typography.headlineMedium,modifier=Modifier.padding(horizontal=8.dp))
+     TimeWheelColumn("分钟",60,minute,"time-wheel-minute"){minute=it}
+    }
+    Text(displayedTime,style=MaterialTheme.typography.titleLarge,color=MaterialTheme.colorScheme.primary)
    }
-  )
+  },
+  confirmButton={TextButton(onClick={onConfirm(displayedTime)}){Text("确定")} },
+  dismissButton={TextButton(onClick=onDismiss){Text("取消")} }
+ )
+}
+
+@Composable private fun TimeWheelColumn(label:String,count:Int,selected:Int,testTag:String,onSelected:(Int)->Unit){
+ val listState=rememberLazyListState(initialFirstVisibleItemIndex=selected.coerceIn(0,count-1))
+ val flingBehavior=rememberSnapFlingBehavior(listState,snapPosition=SnapPosition.Center)
+ LaunchedEffect(listState,count){
+  snapshotFlow{listState.firstVisibleItemIndex}.distinctUntilChanged().collect{index->
+   onSelected(index.coerceIn(0,count-1))
+  }
+ }
+ Column(horizontalAlignment=Alignment.CenterHorizontally){
+  Text(label,style=MaterialTheme.typography.labelMedium,color=Muted)
+  Box(Modifier.width(88.dp).height(240.dp)){
+   LazyColumn(
+    state=listState,
+    flingBehavior=flingBehavior,
+    modifier=Modifier.fillMaxSize().testTag(testTag),
+    horizontalAlignment=Alignment.CenterHorizontally
+   ){
+    items(count+4){itemIndex->
+     val value=itemIndex-2
+     Box(Modifier.fillMaxWidth().height(48.dp),contentAlignment=Alignment.Center){
+      if(value in 0 until count){
+       val isSelected=value==selected
+       Text(
+        String.format(Locale.ROOT,"%02d",value),
+        style=if(isSelected)MaterialTheme.typography.titleLarge else MaterialTheme.typography.bodyLarge,
+        color=if(isSelected)MaterialTheme.colorScheme.primary else Muted
+       )
+      }
+     }
+    }
+   }
+   Box(
+    Modifier.align(Alignment.Center).fillMaxWidth().height(48.dp)
+     .border(1.dp,MaterialTheme.colorScheme.primary,RoundedCornerShape(8.dp))
+   )
+  }
  }
 }
 

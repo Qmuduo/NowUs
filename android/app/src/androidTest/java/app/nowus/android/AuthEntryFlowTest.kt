@@ -1,7 +1,6 @@
 package app.nowus.android
 
 import androidx.compose.ui.test.*
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -104,17 +103,20 @@ class AuthEntryFlowTest {
         compose.onNodeWithText("08:00").assertExists()
         compose.onNodeWithTag("rhythm-rest-sleep-end").assertExists()
         compose.onNodeWithText("工作日").performClick()
-        val sleepStartSlider=compose.onNodeWithTag("rhythm-weekday-sleep-start")
-        val sliderSize=sleepStartSlider.fetchSemanticsNode().size
-        sleepStartSlider.performTouchInput { swipe(start=Offset(sliderSize.width*0.96f,sliderSize.height/2f),end=Offset(sliderSize.width*0.1f,sliderSize.height/2f),durationMillis=1000) }
-        compose.onNodeWithText("23:00").assertDoesNotExist()
+        compose.onNodeWithTag("rhythm-weekday-sleep-start").performClick()
+        compose.onNodeWithText("设置睡眠开始").assertExists()
+        compose.onNodeWithTag("time-wheel-hour").performScrollToIndex(0)
+        compose.onNodeWithTag("time-wheel-minute").performScrollToIndex(5)
+        compose.onNodeWithText("00:05").assertExists()
+        compose.onNodeWithText("确定").performClick()
+        compose.onNodeWithText("00:05").assertExists()
         compose.runOnIdle { assertEquals(0, api.savedScheduleCount) }
 
         compose.onNodeWithText("保存节奏并继续").performScrollTo().performClick()
         compose.waitUntil(10_000) { api.savedScheduleCount == 1 }
         compose.runOnIdle {
             assertEquals(1, api.savedScheduleCount)
-            org.junit.Assert.assertNotEquals("23:00", api.savedSchedule!!.weekday.sleepStart)
+            org.junit.Assert.assertEquals("00:05", api.savedSchedule!!.weekday.sleepStart)
             org.junit.Assert.assertTrue(Rules.validateRhythm(api.savedSchedule!!.weekday).valid)
             org.junit.Assert.assertTrue(Rules.validateRhythm(api.savedSchedule!!.rest).valid)
         }
