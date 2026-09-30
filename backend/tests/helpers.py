@@ -47,9 +47,9 @@ def sample_segmented_rhythm(activity: str = "上班", template: str = "上班族
         {"id": "preparation", "label": "起床准备", "start": "08:30", "end": "08:45", "category": "PREPARATION"},
         {"id": "breakfast", "label": "早餐", "start": "08:45", "end": "09:15", "category": "MEAL"},
         {"id": "lunch", "label": "午餐", "start": "12:30", "end": "13:30", "category": "MEAL"},
-        {"id": "free", "label": "自由安排", "start": "14:00", "end": "18:00", "category": "SOCIAL"},
+        {"id": "free", "label": "自由安排", "start": "14:00", "end": "18:00", "category": "OTHER"},
         {"id": "dinner", "label": "晚餐", "start": "18:30", "end": "19:30", "category": "MEAL"},
-        {"id": "evening", "label": "晚间休息", "start": "19:30", "end": "22:30", "category": "SOCIAL"},
+        {"id": "evening", "label": "晚间休息", "start": "19:30", "end": "22:30", "category": "REST"},
     ]
     return {
         "templateId": template,
