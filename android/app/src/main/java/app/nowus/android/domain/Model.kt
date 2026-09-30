@@ -10,7 +10,24 @@ import java.time.ZoneId
 @Serializable data class TemporaryStatus(val available: Boolean, val untilMillis: Long, val fromMillis: Long=0)
 @Serializable data class Note(val text: String, val updatedMillis: Long)
 @Serializable data class Invite(val code: String, val expiresMillis: Long, val revoked: Boolean=false)
-@Serializable data class AppState(val me: Profile, val schedule: Schedule?=null, val setupComplete: Boolean=false, val partner: Profile?=null, val partnerSchedule: Schedule?=null, val note: Note?=null, val invite: Invite?=null, val temporary: TemporaryStatus?=null)
+@Serializable data class InvitePreview(val code: String, val inviter: Profile, val scope: List<String>, val expiresMillis: Long)
+@Serializable data class AppState(
+ val me: Profile,
+ val schedule: Schedule?=null,
+ val setupComplete: Boolean=false,
+ val partner: Profile?=null,
+ val partnerSchedule: Schedule?=null,
+ val note: Note?=null,
+ val invite: Invite?=null,
+ val temporary: TemporaryStatus?=null,
+ val partnerNote: Note?=null,
+ val partnerTemporary: TemporaryStatus?=null,
+ val paired: Boolean=false,
+ val sharingEnabled: Boolean=true,
+ val sharingPaused: Boolean=false,
+ val syncStale: Boolean=false,
+ val lastSyncMillis: Long?=null,
+)
 data class City(val id: String,val name: String,val zoneId: String) { val zone: ZoneId get()=ZoneId.of(zoneId) }
 object Cities {
  val all=listOf(City("beijing","北京","Asia/Shanghai"),City("shanghai","上海","Asia/Shanghai"),City("new-york","纽约","America/New_York"),City("london","伦敦","Europe/London"),City("paris","巴黎","Europe/Paris"),City("tokyo","东京","Asia/Tokyo"),City("sydney","悉尼","Australia/Sydney"),City("kathmandu","加德满都","Asia/Kathmandu"))

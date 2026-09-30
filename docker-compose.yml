@@ -1,0 +1,76 @@
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: nowus
+      POSTGRES_USER: nowus
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-only-change-for-shared-host}
+    ports:
+      - "${NOWUS_DB_PORT:-5432}:5432"
+    volumes:
+      - nowus-postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nowus -d nowus"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  db-test:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: nowus_test
+      POSTGRES_USER: nowus
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-only-change-for-shared-host}
+    volumes:
+      - nowus-postgres-test:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nowus -d nowus_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    profiles: ["test"]
+
+  mailpit:
+    image: axllent/mailpit:v1.31.1
+    ports:
+      - "${NOWUS_SMTP_PORT:-1025}:1025"
+      - "${NOWUS_MAILPIT_PORT:-8025}:8025"
+
+  api:
+    build:
+      context: ./backend
+      target: runtime
+    environment:
+      NOWUS_ENV: development
+      NOWUS_DEV_MAILBOX: "true"
+      NOWUS_DATABASE_URL: postgresql://nowus:${POSTGRES_PASSWORD:-local-only-change-for-shared-host}@db:5432/nowus
+      NOWUS_APP_SECRET: ${NOWUS_APP_SECRET:-local-development-secret-change-this-before-deploy-32-chars}
+      NOWUS_SMTP_HOST: mailpit
+      NOWUS_SMTP_PORT_INTERNAL: 1025
+      NOWUS_SMTP_FROM: ${NOWUS_SMTP_FROM:-login@nowus.local}
+    ports:
+      - "${NOWUS_API_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  tests:
+    build:
+      context: ./backend
+      target: test
+    environment:
+      NOWUS_ENV: test
+      NOWUS_DATABASE_URL: postgresql://nowus:${POSTGRES_PASSWORD:-local-only-change-for-shared-host}@db-test:5432/nowus_test
+      NOWUS_APP_SECRET: test-only-secret-not-used-outside-the-test-container
+      NOWUS_SMTP_HOST: test-sink
+      NOWUS_SMTP_FROM: test@nowus.invalid
+    depends_on:
+      db-test:
+        condition: service_healthy
+    profiles: ["test"]
+
+volumes:
+  nowus-postgres:
+  nowus-postgres-test:

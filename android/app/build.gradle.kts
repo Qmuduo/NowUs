@@ -5,6 +5,11 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
+val configuredApiBaseUrl = providers.gradleProperty("nowusApiBaseUrl")
+    .orElse(providers.environmentVariable("NOWUS_API_BASE_URL"))
+    .getOrElse("")
+fun quoteBuildConfig(value: String) = "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
+
 android {
     namespace = "app.nowus.android"
     compileSdk = 36
@@ -16,13 +21,22 @@ android {
         versionCode = 1
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "NOWUS_API_BASE_URL", quoteBuildConfig(configuredApiBaseUrl))
     }
     buildTypes {
-        debug { applicationIdSuffix = ".debug"; versionNameSuffix = "-local" }
-        release { isMinifyEnabled = true; proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro") }
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-local"
+            if (configuredApiBaseUrl.isBlank()) buildConfigField("String", "NOWUS_API_BASE_URL", quoteBuildConfig("http://10.0.2.2:8000"))
+        }
+        release {
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            buildConfigField("String", "NOWUS_API_BASE_URL", quoteBuildConfig(configuredApiBaseUrl))
+        }
     }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
-    buildFeatures { compose = true }
+    buildFeatures { compose = true; buildConfig = true }
     packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
     testOptions { animationsDisabled = true }
 }

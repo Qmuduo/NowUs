@@ -14,6 +14,38 @@ import java.io.IOException
 interface StateRepository {
     val states: Flow<AppState>
     suspend fun update(transform: (AppState) -> AppState)
+
+    suspend fun createInvitation(code: String, nowMillis: Long): Invite {
+        var created: Invite? = null
+        update { state ->
+            val result = Rules.createInvite(state, code, nowMillis)
+            require(result.error == null) { result.error.orEmpty() }
+            created = result.state.invite
+            result.state
+        }
+        return requireNotNull(created)
+    }
+
+    suspend fun revokeInvitation() = update { Rules.revokeInvite(it).state }
+
+    suspend fun previewInvitation(code: String, nowMillis: Long): InvitePreview {
+        throw UnsupportedOperationException("当前资料来源不支持真实邀请预览")
+    }
+
+    suspend fun acceptInvitation(code: String, partner: Profile?, nowMillis: Long) {
+        requireNotNull(partner) { "演示配对需要明确填写模拟对方资料" }
+        update { state ->
+            val result = Rules.acceptInvite(state, code.trim().uppercase(), partner, nowMillis)
+            require(result.error == null) { result.error.orEmpty() }
+            result.state
+        }
+    }
+
+    suspend fun setSharing(enabled: Boolean) = update { it.copy(sharingEnabled = enabled) }
+
+    suspend fun unpair() = update { it.copy(partner=null, partnerSchedule=null, partnerNote=null, partnerTemporary=null, paired=false, sharingPaused=false) }
+
+    suspend fun logout() = Unit
 }
 
 class LocalRepository(private val store: DataStore<Preferences>) : StateRepository {

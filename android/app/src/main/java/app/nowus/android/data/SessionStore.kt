@@ -1,0 +1,158 @@
+package app.nowus.android.data
+
+import android.content.Context
+import android.content.SharedPreferences
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import android.util.Base64
+import app.nowus.android.domain.AppState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.nio.ByteBuffer
+import java.security.KeyStore
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
+import javax.crypto.spec.GCMParameterSpec
+
+
+interface SessionStore {
+    val current: StateFlow<AccountSession?>
+    suspend fun save(session: AccountSession)
+    suspend fun clear()
+}
+
+interface AccountSnapshotStore {
+    suspend fun load(userId: String): AppState?
+    suspend fun save(userId: String, state: AppState)
+    suspend fun clear()
+}
+
+interface PendingInviteStore {
+    val code: StateFlow<String?>
+    suspend fun save(code: String)
+    suspend fun clear()
+}
+
+class EncryptedPendingInviteStore(context: Context) : PendingInviteStore {
+    private val preferences = context.applicationContext.getSharedPreferences("nowus_pending_invite", Context.MODE_PRIVATE)
+    private val _code = MutableStateFlow(readCode())
+    override val code: StateFlow<String?> = _code.asStateFlow()
+
+    override suspend fun save(code: String) {
+        val normalized = code.trim().uppercase().filter(Char::isLetterOrDigit).take(10)
+        require(normalized.length == 10) { "邀请码无效" }
+        val encrypted = SecureBlob.encrypt("nowus_invite_key_v1", normalized)
+        check(withContext(Dispatchers.IO) { preferences.edit().putString("code", encrypted).commit() }) { "无法安全保存邀请" }
+        _code.value = normalized
+    }
+
+    override suspend fun clear() {
+        withContext(Dispatchers.IO) { preferences.edit().remove("code").commit() }
+        _code.value = null
+    }
+
+    private fun readCode(): String? = try {
+        preferences.getString("code", null)?.let { SecureBlob.decrypt("nowus_invite_key_v1", it) }
+    } catch (_: Exception) {
+        preferences.edit().remove("code").commit()
+        null
+    }
+}
+
+class EncryptedSessionStore(context: Context) : SessionStore {
+    private val preferences = context.applicationContext.getSharedPreferences("nowus_secure_session", Context.MODE_PRIVATE)
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+    private val _current = MutableStateFlow(readSession())
+    override val current: StateFlow<AccountSession?> = _current.asStateFlow()
+
+    override suspend fun save(session: AccountSession) {
+        val encrypted = SecureBlob.encrypt("nowus_session_key_v1", json.encodeToString(session))
+        val saved = withContext(Dispatchers.IO) { preferences.edit().putString("session", encrypted).commit() }
+        check(saved) { "无法安全保存登录会话" }
+        _current.value = session
+    }
+
+    override suspend fun clear() {
+        withContext(Dispatchers.IO) { preferences.edit().remove("session").commit() }
+        _current.value = null
+    }
+
+    private fun readSession(): AccountSession? = try {
+        val encoded = preferences.getString("session", null) ?: return null
+        json.decodeFromString(SecureBlob.decrypt("nowus_session_key_v1", encoded))
+    } catch (_: Exception) {
+        preferences.edit().remove("session").commit()
+        null
+    }
+}
+
+class EncryptedAccountSnapshotStore(context: Context) : AccountSnapshotStore {
+    private val preferences = context.applicationContext.getSharedPreferences("nowus_secure_snapshot", Context.MODE_PRIVATE)
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+
+    override suspend fun load(userId: String): AppState? = withContext(Dispatchers.IO) {
+        try {
+            val encoded = preferences.getString("snapshot", null) ?: return@withContext null
+            val record = json.decodeFromString<SnapshotRecord>(SecureBlob.decrypt("nowus_snapshot_key_v1", encoded))
+            record.state.takeIf { record.userId == userId }
+        } catch (_: Exception) {
+            preferences.edit().remove("snapshot").commit()
+            null
+        }
+    }
+
+    override suspend fun save(userId: String, state: AppState) = withContext(Dispatchers.IO) {
+        val encrypted = SecureBlob.encrypt("nowus_snapshot_key_v1", json.encodeToString(SnapshotRecord(userId, state)))
+        check(preferences.edit().putString("snapshot", encrypted).commit()) { "无法安全保存同步快照" }
+    }
+
+    override suspend fun clear() {
+        withContext(Dispatchers.IO) { preferences.edit().remove("snapshot").commit() }
+    }
+}
+
+@Serializable private data class SnapshotRecord(val userId: String, val state: AppState)
+
+private object SecureBlob {
+    private const val TRANSFORMATION = "AES/GCM/NoPadding"
+
+    fun encrypt(alias: String, value: String): String {
+        val cipher = Cipher.getInstance(TRANSFORMATION)
+        cipher.init(Cipher.ENCRYPT_MODE, key(alias))
+        val encrypted = cipher.doFinal(value.toByteArray(Charsets.UTF_8))
+        val iv = cipher.iv
+        val bytes = ByteBuffer.allocate(4 + iv.size + encrypted.size).putInt(iv.size).put(iv).put(encrypted).array()
+        return Base64.encodeToString(bytes, Base64.NO_WRAP)
+    }
+
+    fun decrypt(alias: String, value: String): String {
+        val bytes = ByteBuffer.wrap(Base64.decode(value, Base64.NO_WRAP))
+        val iv = ByteArray(bytes.int).also(bytes::get)
+        val encrypted = ByteArray(bytes.remaining()).also(bytes::get)
+        val cipher = Cipher.getInstance(TRANSFORMATION)
+        cipher.init(Cipher.DECRYPT_MODE, key(alias), GCMParameterSpec(128, iv))
+        return cipher.doFinal(encrypted).toString(Charsets.UTF_8)
+    }
+
+    private fun key(alias: String): SecretKey {
+        val store = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
+        (store.getKey(alias, null) as? SecretKey)?.let { return it }
+        val generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
+        generator.init(
+            KeyGenParameterSpec.Builder(
+                alias,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
+            ).setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setRandomizedEncryptionRequired(true)
+                .build(),
+        )
+        return generator.generateKey()
+    }
+}

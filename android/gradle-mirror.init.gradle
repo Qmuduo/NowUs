@@ -1,0 +1,9 @@
+// Optional for environments where dl.google.com cannot complete TLS.
+// Use this with --init-script; normal builds continue using the canonical repositories.
+settingsEvaluated { settings ->
+    def repositories = settings.dependencyResolutionManagement.repositories
+    repositories.clear()
+    repositories.maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
+    repositories.maven { url 'https://maven.aliyun.com/repository/google/' }
+    repositories.maven { url 'https://maven.aliyun.com/repository/central/' }
+}

@@ -6,7 +6,7 @@
 
 ## 当前阶段
 
-已完成网页交互原型，正在验证 Android 本地体验版。原型仍可用于快速比较信息呈现；Android 工程位于 [android/](android/README.md)。
+已完成网页交互原型和 Android 本地体验版。本地开发后端已接入邮箱 OTP、两账号配对与资料同步；Android 构建和 13 项 Compose 仪器测试已在一台实体设备上通过。跨境网络、生产邮件与两台实体手机仍待外部资源和真实环境验证。Android 工程位于 [android/](android/README.md)。
 
 - 首页优先「看见你的生活」，共同联系时间紧随其后。
 - 区分通常作息、主动分享的当前状态和联系意愿。
@@ -37,7 +37,7 @@ python -m http.server 8765 --bind 127.0.0.1
 
 首页更早展示对方留言预览，联系窗口说明信息来源；今天没有后续交集时可查看未来七天的下一段窗口。资料不足时保持未知。
 
-演示采用固定评审时间，伙伴作息使用示例数据。首次使用的昵称、城市、两套简化作息、当前留言和配对状态保存在当前浏览器，与原双人示例的作息／留言分开。邀请代码只用于同一浏览器模拟，无真实链接或邀请发送；提醒不会发送通知。账号、真实配对、双方同步与完整活动编辑尚未实现。
+网页演示采用固定评审时间，伙伴作息使用示例数据。首次使用的昵称、城市、两套简化作息、当前留言和配对状态保存在当前浏览器，与原双人示例的作息／留言分开。网页演示邀请仍只在浏览器内模拟，不发送真实邀请或提醒。真实账号功能在 Android 工程中开发。
 
 运行时间逻辑验证：
 
@@ -49,8 +49,8 @@ node --test prototype/model.test.mjs prototype/pairing-model.test.mjs
 
 [正式 MVP 功能与验收清单](docs/superpowers/specs/2026-09-29-nowus-mvp-acceptance.md)明确真实配对、时间规则、分享控制、同步失败与首版取舍；[首次使用设计](docs/superpowers/specs/2026-09-29-nowus-onboarding-design.md)说明本轮流程。
 
-原型已试用，第一步先做 Android 本地体验，iOS 后续；下一步接入真实邮箱登录和两账号／两设备同步，再邀请 3–5 对情侣内测。
+原型已试用。Android 本地版本继续作为清晰隔离的演示入口；真实账号使用独立数据，不会自动上传演示人物、作息或邀请。
 
-首批地区已确认「中国大陆一方 + 海外一方」。用户选择 **原生 App + 邮箱验证码登录，Android 优先、iOS 后续，Android 使用 Kotlin + Jetpack Compose**。[首发平台与登录方案](docs/superpowers/specs/2026-09-29-nowus-launch-auth-design.md)包含安装、国内外访问、邮件送达与邀请接续的要求。[Android 起步方案](docs/superpowers/specs/2026-09-29-nowus-android-start-design.md)列出已确定框架与阶段边界。
+首批地区已确认「中国大陆一方 + 海外一方」。用户选择 **邮箱 + 6 位一次性验证码，Android 优先、iOS 后续；Android 使用 Kotlin + Jetpack Compose**。当前本地服务选用 FastAPI + PostgreSQL + Mailpit，方案取舍见[真实账号同步架构](docs/superpowers/specs/2026-09-30-nowus-real-sync-architecture.md)。
 
-Android 第一阶段是本地体验，可安装、使用真实时间、调整节奏并保存一条留言，配对仅为同机演示。与伴侣实际同步、邮箱验证码和远端邀请属于第二阶段。构建、安装和测试见 [Android 工程说明](android/README.md)。
+本地闭环覆盖 OTP、邀请预览与接受、双方作息／留言同步、C 账号权限拒绝、暂停分享和解除配对。它验证本地逻辑和 Mailpit 收件，不代表生产邮件或跨境可达。Compose 启动、数据库迁移、Android 构建与测试见 [Android 工程说明](android/README.md)。

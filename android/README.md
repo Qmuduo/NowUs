@@ -1,54 +1,106 @@
 # NowUs Android
 
-Kotlin + Jetpack Compose 原生 Android 本地体验版，最低 Android 8.0（API 26）。开发安装包使用 `app.nowus.android.debug`。
+Android first release candidate: Kotlin + Jetpack Compose, minimum Android 8.0 (API 26). The app has two deliberately separate entry paths:
 
-此阶段用于验证页面、时间与本地资料。邮箱验证码、服务端配对、对方真实资料同步尚未接入；应用内邀请仅用于同一台手机的配对演示，不会发送给伴侣。
+- **Email account** uses the FastAPI service for six-digit email OTP, pairing, and server-synced personal data.
+- **Local experience** keeps demo people, demo invitations, and example schedules in a separate local DataStore. Nothing is uploaded from that path. Importing the signed-in user's own local profile, schedule, and note requires an explicit review and confirmation.
 
-## 构建
+The local environment proves the feature flow only. It does not prove that a deployed service is reachable from Mainland China or a particular overseas network, or that production email reaches inboxes.
 
-Android Studio 打开本目录，或使用命令行。需要 JDK 17 或 21、Android SDK platform 36 / build-tools 36.0.0、可访问 Google Maven 和 Maven Central。
+## Start the local server
 
-在 `local.properties` 填写本机 SDK 目录（不要提交此文件）：
+From the repository root, copy the development template and start PostgreSQL, Mailpit, and the API:
+
+```powershell
+Copy-Item .env.example .env
+docker compose up --build -d db mailpit api
+docker compose ps
+```
+
+The API applies versioned SQL migrations in `backend/migrations/` on startup. The first launch applies `0001_initial.sql` and `0002_setup_complete.sql`. PostgreSQL data stays in the `nowus-postgres` Docker volume. Check `http://localhost:8000/health`; Mailpit's local inbox is `http://localhost:8025` and accepts SMTP on port 1025. The local-only values in `.env.example` are not deployment secrets.
+
+For live logs and shutdown:
+
+```powershell
+docker compose logs -f api
+docker compose down
+```
+
+`docker compose down` keeps the database volume. To reset local accounts and mail data, use `docker compose down -v` (this deletes the local development database).
+
+### API and A/B/C acceptance
+
+Run the isolated backend tests in a disposable PostgreSQL test container:
+
+```powershell
+docker compose --profile test run --rm tests
+```
+
+With the API and Mailpit running, this script requests real random OTPs from the service, reads the messages from the local Mailpit API, and checks two-way schedule/note sharing, invitation preview/accept, C's denied access, pause/resume, and unpair revocation:
+
+```powershell
+python backend/scripts/acceptance.py
+```
+
+The test inbox is intentionally local. The server does not expose a fixed OTP or a bypass login.
+
+### Real SMTP configuration
+
+For a private deployment environment, set `NOWUS_ENV=production`, `NOWUS_DEV_MAILBOX=false`, a unique `NOWUS_APP_SECRET` of at least 32 characters, `NOWUS_DATABASE_URL`, and the `NOWUS_SMTP_HOST`, `NOWUS_SMTP_PORT_INTERNAL`, `NOWUS_SMTP_FROM`, `NOWUS_SMTP_USERNAME`, and `NOWUS_SMTP_PASSWORD` values in a secret store or private `.env`. Set `NOWUS_SMTP_STARTTLS=true` for a submission service that supports STARTTLS. Never commit `.env` or credentials. Production also needs an HTTPS origin and real network/mailbox checks; Compose is only the single-machine development setup.
+
+OTP requests expire after 10 minutes, can be resent after 60 seconds, allow five requests per email per hour and 30 requests per source IP per hour, and permit at most five verification attempts. A request accepted by the API is not proof the message reached an inbox.
+
+## Android setup and build
+
+Use JDK 17 or 21, Android SDK platform 36 and build-tools 36.0.0. Android Studio can open `android/`, or run the wrapper commands below. Set `android/local.properties` to the installed SDK and do not commit it:
 
 ```properties
 sdk.dir=C\:/Android
 ```
 
+The debug emulator build defaults to `http://10.0.2.2:8000`, which reaches the host API from the Android emulator. For a physical phone on the same LAN, point the app at the development computer's LAN address; the debug variant alone permits local HTTP:
+
 ```powershell
-.\gradlew.bat :app:testDebugUnitTest :app:assembleDebug :app:lintDebug
-# 手机启用 USB 调试且 adb devices 显示 device 后：
+$env:NOWUS_API_BASE_URL = "http://192.168.1.20:8000"
+.\gradlew.bat :app:testDebugUnitTest :app:assembleDebug
+```
+
+Replace the example LAN address with the address reachable from the phone. The release variant has no API URL unless `NOWUS_API_BASE_URL` or `-PnowusApiBaseUrl=...` is set; use HTTPS for a deployed server. Main/release manifest does not allow cleartext HTTP.
+
+```powershell
+.\gradlew.bat :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest
 .\gradlew.bat :app:connectedDebugAndroidTest
 ```
 
-如果 Gradle 的设备测试运行器依赖暂时无法从 Google Maven 下载，可先生成测试 APK，再通过 AndroidJUnitRunner 直接运行同一套真机测试：
+If the current network cannot complete TLS to `dl.google.com`, an optional Gradle init script uses Tencent/Aliyun mirrors (not the default dependency sources):
 
 ```powershell
-.\gradlew.bat :app:assembleDebugAndroidTest
-adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-adb shell am instrument -w -r app.nowus.android.debug.test/androidx.test.runner.AndroidJUnitRunner
+.\gradlew.bat --init-script .\gradle-mirror.init.gradle :app:testDebugUnitTest :app:assembleDebug :app:connectedDebugAndroidTest
 ```
 
-看到 `OK (9 tests)` 表示当前设备测试全部通过。
-
-APK：`app/build/outputs/apk/debug/app-debug.apk`。安装：
+Install the debug APK with:
 
 ```powershell
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n app.nowus.android.debug/app.nowus.android.MainActivity
 ```
 
-固定依赖版本：Gradle 8.13、AGP 8.13.2、Kotlin 2.3.21、Compose BOM 2026.06.01。Wrapper 配置验证官方分发包 SHA-256。[Compose BOM 官方说明](https://developer.android.com/develop/ui/compose/bom)解释界面库版本管理方式。
+Invite links use `nowus://invite/{CODE}`. Android stores the pending code encrypted with an Android Keystore key so login or app restart does not lose the invitation context. The link is an invitation token, not a login credential; the app previews it after login and still requires explicit acceptance. A manual code entry is also available.
 
-## 数据与时间
+## Data and time model
 
-- `domain/`：IANA 时区、工作日/休息日、连续活动、联系窗口与本地邀请规则，纯 Kotlin 单元测试。
-- `data/`：DataStore 保存本机 JSON；原子更新、读取或保存失败可见。未启用云备份，卸载会清除本地资料。
-- `AppViewModel`：单向状态与保存事件，真实时间在前台更新。
-- `ui/`：森林绿主题、首次引导、此刻、双方时间轴、作息编辑。
+- `domain/` keeps the existing Kotlin IANA timezone calculations, weekday/rest-day schedules, timeline, temporary contact preference, and common contact windows.
+- `backend/` owns accounts, OTPs, hashed sessions, invitations, pair membership, and each user's own profile, schedule, temporary preference, and current note.
+- The server returns partner data only while both members are sharing and the current pair exists. Pause and unpair checks apply on each read. A/B synchronization refreshes while the app is open (30-second poll) and when a request succeeds; offline UI shows the last server timestamp.
+- Unknown partner fields remain absent. There are no demo defaults sent to the server. The editor's suggested schedule is not uploaded until the user saves it.
+- Android encrypts its session, pending invite, and last account snapshot with Android Keystore-backed AES-GCM. Account snapshots are tagged with the owning account ID.
+- The development API and Mailpit are single-host tools without production availability, automated backups, or tested cross-border routing. iOS, HTTPS deployment, real SMTP deliverability, and two-physical-device acceptance remain outstanding.
 
-通常作息是推测，联系意愿独立；未知不能推导为有空。临时联系状态在设定时刻开始并在到期时恢复。工作日按每个人所在地的星期计算；跨午夜区间按查询时刻当地日期所对应的模板解释。夏令时依据手机系统 IANA 数据库。
+## Verification completed for this branch
 
-当前仅提供八个城市：北京、上海、纽约、伦敦、巴黎、东京、悉尼、加德满都；正式版本再扩充城市搜索。示例伴侣资料通过显式演示操作填入。固定时间演示与正常真实时间明确区分，重启回到真实时间。
+- `docker compose --profile test run --rm tests`: 23 backend tests passed against PostgreSQL.
+- `python backend/scripts/acceptance.py`: A/B/C OTP and Mailpit flow passed, including two-way schedule/note visibility, C access denial, pause/resume, and unpair revocation.
+- `:app:testDebugUnitTest`: 25 Android unit tests passed; `:app:assembleDebug` built the debug APK.
+- `:app:connectedDebugAndroidTest`: 13 Compose instrumentation tests passed on one connected physical Android device.
 
-后续阶段：邮箱验证码、真实唯一邀请、两账号配对和资料同步，再用两台手机验收。
+Android builds were run with `--init-script .\gradle-mirror.init.gradle` because this development network failed TLS requests to Google Maven. This is a local dependency-fetch workaround; it is not a measurement of app connectivity from Mainland China or overseas. Two-physical-device acceptance remains outstanding.

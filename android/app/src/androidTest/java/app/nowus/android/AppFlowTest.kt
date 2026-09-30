@@ -123,6 +123,17 @@ class AppFlowTest {
   compose.onNodeWithTag("noteDraft").assertTextContains("保留草稿")
   compose.onAllNodesWithText("保存失败，请重试").onFirst().assertExists()
  }
+ @Test fun failedAccountSaveKeepsDraftAndDoesNotShowSuccess(){
+  val repo=MemoryRepository(AppState(Profile("阿青","beijing"),setupComplete=true));repo.fail=true
+  val vm=AppViewModel(repo)
+  compose.setContent{NowUsTheme{NowUsApp(vm,realAccount=true)}}
+  compose.onNodeWithText("写留言").performScrollTo().performClick()
+  compose.onNodeWithTag("noteDraft").performTextInput("真实账号离线草稿")
+  compose.onNodeWithText("保存留言").performClick()
+  compose.onNodeWithTag("noteDraft").assertTextContains("真实账号离线草稿")
+  compose.onAllNodesWithText("保存失败，请重试").onFirst().assertExists()
+  compose.runOnIdle{Assert.assertNull(repo.data.value.note)}
+ }
  private class MemoryRepository(initial:AppState):StateRepository{
   val data=MutableStateFlow(initial);var fail=false;var failAfterEmission=false
   override val states:Flow<AppState> get()=flow{if(failAfterEmission){emit(data.value);error("read failed after cached state")};emitAll(data)}

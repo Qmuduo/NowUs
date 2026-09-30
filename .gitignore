@@ -7,3 +7,8 @@ android/**/build/
 android/local.properties
 android/.idea/
 *.iml
+backend/.venv/
+backend/.pytest_cache/
+backend/**/__pycache__/
+backend/**/*.py[cod]
+.env
