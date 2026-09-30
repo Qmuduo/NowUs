@@ -69,6 +69,14 @@ $env:NOWUS_API_BASE_URL = "http://192.168.1.20:8000"
 
 Replace the example LAN address with the address reachable from the phone. The release variant has no API URL unless `NOWUS_API_BASE_URL` or `-PnowusApiBaseUrl=...` is set; use HTTPS for a deployed server. Main/release manifest does not allow cleartext HTTP.
 
+For a USB-connected physical phone using the host's loopback-only development services, build with `-PnowusApiBaseUrl=http://127.0.0.1:8000` and reverse the API port before starting the app:
+
+```powershell
+adb reverse tcp:8000 tcp:8000
+```
+
+The local email OTP is visible in the host browser at `http://127.0.0.1:8025`. The device-level API + Mailpit instrumentation probe also needs `adb reverse tcp:8025 tcp:8025`.
+
 ```powershell
 .\gradlew.bat :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest
 .\gradlew.bat :app:connectedDebugAndroidTest
@@ -102,7 +110,7 @@ Invite links use `nowus://invite/{CODE}`. Android stores the pending code encryp
 
 - `docker compose --profile test run --rm tests`: 23 backend tests passed against PostgreSQL.
 - `python backend/scripts/acceptance.py`: A/B/C OTP and Mailpit flow passed, including two-way schedule/note visibility, C access denial, pause/resume, and unpair revocation.
-- `:app:testDebugUnitTest`: 28 Android unit tests passed; `:app:assembleDebug` built the debug APK.
-- `:app:connectedDebugAndroidTest`: 13 Compose instrumentation tests passed on one connected physical Android device.
+- `:app:testDebugUnitTest`: 30 Android unit tests passed; `:app:assembleDebug` built the debug APK.
+- `:app:connectedDebugAndroidTest`: all 15 instrumentation tests passed on one connected physical Android device with the local API and Mailpit available over ADB reverse (ports 8000 and 8025). The real random OTP probe is skipped when those local services are unreachable.
 
 Android builds were run with `--init-script .\gradle-mirror.init.gradle` because this development network failed TLS requests to Google Maven. This is a local dependency-fetch workaround; it is not a measurement of app connectivity from Mainland China or overseas. Two-physical-device acceptance remains outstanding.

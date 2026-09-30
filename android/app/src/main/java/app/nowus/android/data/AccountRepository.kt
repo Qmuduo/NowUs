@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.time.Instant
 import java.util.concurrent.atomic.AtomicLong
 
 
@@ -197,9 +196,9 @@ class AccountRepository(
         if (observedPermissionRevision != permissionRevision.get()) {
             return current.value ?: throw IllegalStateException("Account refresh was superseded before initial state loaded")
         }
-        val timestamp = Instant.parse(response.serverTime).toEpochMilli()
+        val timestamp = parseApiTimestamp(response.serverTime).toEpochMilli()
         val invite = response.invitation?.let {
-            val expiry = Instant.parse(it.expiresAt).toEpochMilli()
+            val expiry = parseApiTimestamp(it.expiresAt).toEpochMilli()
             Invite(activeInviteCode.orEmpty(), expiry)
         }
         val next = AppState(
@@ -208,10 +207,10 @@ class AccountRepository(
             setupComplete = response.me.setupComplete,
             partner = response.partner?.profile,
             partnerSchedule = response.partner?.schedule,
-            note = response.me.note?.let { Note(it.text, Instant.parse(it.updatedAt).toEpochMilli()) },
+            note = response.me.note?.let { Note(it.text, parseApiTimestamp(it.updatedAt).toEpochMilli()) },
             invite = invite,
             temporary = response.me.temporary,
-            partnerNote = response.partner?.note?.let { Note(it.text, Instant.parse(it.updatedAt).toEpochMilli()) },
+            partnerNote = response.partner?.note?.let { Note(it.text, parseApiTimestamp(it.updatedAt).toEpochMilli()) },
             partnerTemporary = response.partner?.temporary,
             paired = response.paired,
             sharingEnabled = response.sharingEnabled,

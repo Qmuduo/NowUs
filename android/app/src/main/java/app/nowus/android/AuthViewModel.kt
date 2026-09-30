@@ -104,7 +104,10 @@ class AuthViewModel(
         else -> when (error) {
             is ApiException -> "服务请求失败，请稍后重试"
             is IOException -> "网络连接失败，请检查网络后重试"
-            else -> "无法安全保存登录状态，请重试"
+            is java.time.DateTimeException -> "登录信息的时间格式不兼容，请重新发送验证码后重试"
+            is java.security.GeneralSecurityException -> "手机安全存储不可用，请重启应用后重试"
+            is IllegalStateException -> "手机未能保存登录会话，请重新发送验证码后重试"
+            else -> "登录处理失败，请重新发送验证码后重试"
         }
     }
 }

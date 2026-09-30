@@ -50,6 +50,21 @@ class AuthViewModelTest {
         assertNull(vm.error.value)
     }
 
+    @Test fun responseTimestampFailureExplainsThatTheConsumedCodeMustBeResent() = runTest(dispatcher) {
+        val api = FakeAuthenticationApi().apply {
+            verifyFailure = java.time.format.DateTimeParseException("invalid timestamp", "2026-10-30T07:36:18+00:00", 19)
+        }
+        val sessions = MemorySessionStore()
+        val vm = AuthViewModel(api, sessions)
+        vm.setEmail("pair@example.net")
+        vm.requestOtp(); runCurrent()
+        vm.setCode("135790")
+        vm.verifyOtp(); runCurrent()
+
+        assertEquals("登录信息的时间格式不兼容，请重新发送验证码后重试", vm.error.value)
+        assertNull(sessions.current.value)
+    }
+
     private class FakeAuthenticationApi : AuthenticationApi {
         var verifyFailure: Exception? = null
         var verifiedSession = AccountSession("token", "user", 1_800_000_000_000L)

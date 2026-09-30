@@ -17,6 +17,10 @@ import java.net.HttpURLConnection
 import java.net.URLEncoder
 import java.net.URL
 import java.time.Instant
+import java.time.OffsetDateTime
+
+
+internal fun parseApiTimestamp(value: String): Instant = OffsetDateTime.parse(value).toInstant()
 
 
 @Serializable data class AccountSession(val accessToken: String, val userId: String, val expiresAtMillis: Long)
@@ -94,7 +98,7 @@ class NowUsApiClient(private val baseUrl: String) : AccountApi {
     override suspend fun verifyOtp(email: String, code: String): AccountSession {
         val response = post("/v1/auth/verify", null, VerifyInput(email.trim().lowercase(), code))
         val result = json.decodeFromString<ApiSessionPayload>(response)
-        return AccountSession(result.accessToken, result.userId, Instant.parse(result.expiresAt).toEpochMilli())
+        return AccountSession(result.accessToken, result.userId, parseApiTimestamp(result.expiresAt).toEpochMilli())
     }
 
     override suspend fun snapshot(token: String): ApiSnapshot =
@@ -138,7 +142,7 @@ class NowUsApiClient(private val baseUrl: String) : AccountApi {
 
     override suspend fun createInvitation(token: String): Invite {
         val created = json.decodeFromString<ApiInviteCreated>(request("POST", "/v1/invites", token))
-        return Invite(created.code, Instant.parse(created.expiresAt).toEpochMilli())
+        return Invite(created.code, parseApiTimestamp(created.expiresAt).toEpochMilli())
     }
 
     override suspend fun revokeInvitation(token: String) {
@@ -152,7 +156,7 @@ class NowUsApiClient(private val baseUrl: String) : AccountApi {
             code = code.trim(),
             inviter = Profile(created.inviter.name, created.inviter.cityId),
             scope = created.scope,
-            expiresMillis = Instant.parse(created.expiresAt).toEpochMilli(),
+            expiresMillis = parseApiTimestamp(created.expiresAt).toEpochMilli(),
         )
     }
 
