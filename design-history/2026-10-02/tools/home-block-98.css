@@ -1,0 +1,53 @@
+/* ── Home ────────────────────────────────────────────────────────────────────
+   一屏画出一条共同时间轴：两个人各一条轨道，横坐标是同一个真实时间。
+   「现在」的圆点与共同时间的绿段在两条轨道上落在同一位置，所以「同一刻、两地读法」
+   是看出来的，不需要心算；轨道底色是各自当地的昼夜。
+   字体只有两种角色：衬线 = 时间与留言；无衬线 = 标签、状态与操作。 */
+.view#home-view { display: flex; flex-direction: column; justify-content: flex-start; min-height: 100%; padding-top: 6px; }
+.home-stack { display: flex; flex-direction: column; }
+
+.track-board { display: flex; flex-direction: column; }
+.board-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.board-label { color: var(--muted); font-size: 11.5px; font-weight: 600; letter-spacing: .14em; }
+.board-when { color: var(--muted); font-size: 11.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.track-row { margin-top: 22px; }
+.track-head { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.track-head .avatar { width: 27px; height: 27px; font-size: 11.5px; }
+.track-head strong { color: var(--ink); font-size: 14px; font-weight: 700; letter-spacing: -.1px; }
+.track-place { color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.track-labels { position: relative; height: 26px; margin-top: 8px; }
+.track-labels time { position: absolute; bottom: 0; transform: translateX(-50%); white-space: nowrap; }
+.now-time { color: var(--muted); font: 400 16px/1 var(--font-serif); font-variant-numeric: tabular-nums; }
+.window-time { color: var(--ink); font: 400 21px/1 var(--font-serif); letter-spacing: -.6px; }
+
+.track { position: relative; height: 7px; border-radius: 4px; }
+.track.day { background: var(--day); }
+.track.night { background: var(--night); }
+.track-now { position: absolute; top: 50%; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 3px var(--page); }
+.track-window { position: absolute; top: 50%; height: 17px; margin-top: -8.5px; border-radius: 5px; background: var(--accent); }
+.track-state { margin-top: 9px; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+
+.board-foot { display: flex; align-items: center; gap: 10px; margin-top: 20px; padding-top: 10px; border-top: 1px solid var(--border); }
+.foot-key { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 11.5px; white-space: nowrap; }
+.foot-key i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: var(--ink); }
+.foot-key i.key-window { width: 15px; height: 8px; border-radius: 4px; background: var(--accent); margin-left: 5px; }
+.foot-note { color: var(--muted); font-size: 11.5px; line-height: 1.5; margin-right: auto; }
+.foot-action { display: inline-flex; align-items: center; gap: 3px; min-height: 44px; padding: 0; color: var(--accent); font-size: 12.5px; font-weight: 650; white-space: nowrap; }
+.foot-action svg { width: 14px; height: 14px; }
+
+.board-solo { padding-top: 22px; }
+.board-solo-title { color: var(--ink); font-size: 19px; font-weight: 650; }
+.board-solo-text { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.board-solo-action { display: inline-flex; align-items: center; gap: 5px; margin-top: 16px; min-height: 44px; color: var(--accent); font-size: 13.5px; font-weight: 650; }
+.board-solo-action svg { width: 15px; height: 15px; }
+
+.note-block { display: flex; flex-direction: column; margin-top: 52px; }
+.note-meta { display: flex; align-items: center; gap: 9px; }
+.note-meta .avatar { width: 27px; height: 27px; font-size: 11.5px; }
+.note-author { color: var(--ink); font-size: 14.5px; font-weight: 700; letter-spacing: -.1px; }
+.note-time { color: var(--muted); font: 12px var(--font-time); font-variant-numeric: tabular-nums; }
+.note-text { max-width: 16em; margin-top: 13px; color: var(--ink); font: 400 20px/1.85 var(--font-serif); letter-spacing: .1px; }
+.reply-field { display: flex; align-items: center; width: 100%; min-height: 54px; margin-top: 20px; padding: 0 15px; border: 1px solid var(--border); border-radius: 13px; background: var(--panel); color: var(--muted); text-align: left; }
+.reply-hint { font-size: 14.5px; }

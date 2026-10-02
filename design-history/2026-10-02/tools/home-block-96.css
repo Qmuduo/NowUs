@@ -1,0 +1,52 @@
+/* ── Home ────────────────────────────────────────────────────────────────────
+   两个人在这一页各有一个自己的记号（昼夜配色的首字头像），从上到下只出现一次：
+   上面是「此刻」的读数，下面是装在同一个色块里的「下一段共同时间」。
+   色块内部按人排两行，同一段真实时间在两个城市的不同读法并排可读。
+   字体只有两种角色：衬线 = 时间与留言；无衬线 = 标签、状态与操作。 */
+.view#home-view { display: flex; flex-direction: column; justify-content: flex-start; min-height: 100%; padding-top: 6px; }
+.home-stack { display: flex; flex-direction: column; }
+
+.now-strip { display: flex; flex-direction: column; }
+.strip-label { color: var(--muted); font-size: 11.5px; font-weight: 600; letter-spacing: .14em; }
+.now-row { display: grid; grid-template-columns: 30px minmax(0, 1fr); grid-template-areas: "avatar identity" "avatar line"; column-gap: 10px; row-gap: 4px; align-items: center; margin-top: 15px; }
+.now-row + .now-row { margin-top: 17px; }
+.now-row .avatar { grid-area: avatar; width: 30px; height: 30px; font-size: 12px; }
+.avatar.day { background: var(--day); color: var(--day-ink); }
+.avatar.night { background: var(--night); color: var(--night-ink); }
+.row-identity { grid-area: identity; display: flex; align-items: baseline; gap: 7px; min-width: 0; }
+.row-identity strong { color: var(--ink); font-size: 14px; font-weight: 700; letter-spacing: -.1px; }
+.row-place { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+.row-line { grid-area: line; display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.now-time { color: var(--ink); font: 400 22px/1.1 var(--font-serif); font-variant-numeric: tabular-nums; letter-spacing: -.4px; }
+.row-state { color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+
+.window-band { margin-top: 27px; padding: 15px 14px 13px; border-radius: 18px; background: var(--band); color: var(--band-ink); }
+.band-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.band-label { font-size: 12.5px; font-weight: 650; letter-spacing: .02em; }
+.band-when { color: var(--band-soft); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.band-rows { margin-top: 12px; }
+.band-row { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; column-gap: 10px; padding: 8px 0; }
+.band-row + .band-row { border-top: 1px solid var(--band-line); }
+.band-row .avatar { width: 30px; height: 30px; font-size: 12px; }
+.band-city { color: var(--band-soft); font-size: 12.5px; }
+.window-time { color: var(--band-ink); font: 400 30px/1.05 var(--font-serif); font-variant-numeric: tabular-nums; letter-spacing: -1.4px; white-space: nowrap; }
+.band-empty-text { margin-top: 10px; color: var(--band-soft); font-size: 13px; line-height: 1.6; }
+
+.board-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--border); }
+.foot-note { color: var(--muted); font-size: 11.5px; line-height: 1.5; }
+.foot-action { display: inline-flex; align-items: center; gap: 3px; min-height: 44px; padding: 0; color: var(--accent); font-size: 12.5px; font-weight: 650; white-space: nowrap; }
+.foot-action svg { width: 14px; height: 14px; }
+
+.board-solo { padding-top: 22px; }
+.board-solo-title { color: var(--ink); font-size: 19px; font-weight: 650; }
+.board-solo-text { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.board-solo-action { display: inline-flex; align-items: center; gap: 5px; margin-top: 16px; min-height: 44px; color: var(--accent); font-size: 13.5px; font-weight: 650; }
+.board-solo-action svg { width: 15px; height: 15px; }
+
+.note-block { display: flex; flex-direction: column; margin-top: 40px; }
+.note-meta { display: flex; align-items: baseline; gap: 9px; }
+.note-author { color: var(--ink); font-size: 14.5px; font-weight: 700; letter-spacing: -.1px; }
+.note-time { color: var(--muted); font: 12px var(--font-time); font-variant-numeric: tabular-nums; }
+.note-text { max-width: 16em; margin-top: 12px; color: var(--ink); font: 400 19px/1.8 var(--font-serif); letter-spacing: .1px; }
+.reply-field { display: flex; align-items: center; width: 100%; min-height: 52px; margin-top: 18px; padding: 0 15px; border: 1px solid var(--border); border-radius: 13px; background: var(--panel); color: var(--muted); text-align: left; }
+.reply-hint { font-size: 14.5px; }

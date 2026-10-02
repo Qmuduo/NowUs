@@ -1,0 +1,132 @@
+{
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "dpr": 1,
+    "zoom": 1
+  },
+  "styles": [
+    "http://127.0.0.1:8765/prototype/styles.css?v=122"
+  ],
+  "text": "阿远 · 纽约\n我 · 北京\n9/29 · 周二\n08:00\n通常在通勤路上\n09:00\n开始上课\n9/29 · 周二\n20:00\n晚间休息\n共同空闲\n设置提醒\n2小时\n后都方便联系\n纽约\n10:00–10:30\n北京\n22:00–22:30\n阿远\n15分钟前\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n回阿远一句",
+  "scroll": {
+    "width": 375,
+    "appHeight": 736,
+    "appScrollHeight": 736,
+    "appScrollTop": 0
+  },
+  "rects": [
+    {
+      "selector": ".app-header",
+      "rect": {
+        "x": 0,
+        "y": 30,
+        "width": 375,
+        "height": 46,
+        "top": 30,
+        "right": 375,
+        "bottom": 76,
+        "left": 0
+      }
+    },
+    {
+      "selector": ".home-thesis",
+      "rect": {
+        "x": 22,
+        "y": 81,
+        "width": 331,
+        "height": 22.421875,
+        "top": 81,
+        "right": 353,
+        "bottom": 103.421875,
+        "left": 22
+      }
+    },
+    {
+      "selector": ".time-pair",
+      "rect": {
+        "x": 22,
+        "y": 107.421875,
+        "width": 331,
+        "height": 116.796875,
+        "top": 107.421875,
+        "right": 353,
+        "bottom": 224.21875,
+        "left": 22
+      }
+    },
+    {
+      "selector": ".connection-panel",
+      "rect": {
+        "x": 22,
+        "y": 284.21875,
+        "width": 331,
+        "height": 145,
+        "top": 284.21875,
+        "right": 353,
+        "bottom": 429.21875,
+        "left": 22
+      }
+    },
+    {
+      "selector": ".note-section",
+      "rect": {
+        "x": 22,
+        "y": 484.21875,
+        "width": 331,
+        "height": 170.46875,
+        "top": 484.21875,
+        "right": 353,
+        "bottom": 654.6875,
+        "left": 22
+      }
+    },
+    {
+      "selector": ".tabbar",
+      "rect": {
+        "x": 0,
+        "y": 732,
+        "width": 375,
+        "height": 64,
+        "top": 732,
+        "right": 375,
+        "bottom": 796,
+        "left": 0
+      }
+    },
+    {
+      "selector": ".note-compose",
+      "rect": {
+        "x": 22,
+        "y": 606.6875,
+        "width": 331,
+        "height": 48,
+        "top": 606.6875,
+        "right": 353,
+        "bottom": 654.6875,
+        "left": 22
+      }
+    },
+    {
+      "selector": ".common-card",
+      "rect": {
+        "x": 22,
+        "y": 284.21875,
+        "width": 331,
+        "height": 145,
+        "top": 284.21875,
+        "right": 353,
+        "bottom": 429.21875,
+        "left": 22
+      }
+    }
+  ],
+  "fonts": [
+    "\"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", system-ui, sans-serif",
+    "Georgia, \"Times New Roman\", serif",
+    "\"Segoe UI\", Arial, sans-serif",
+    "\"Noto Serif SC\", \"Songti SC\", STSong, serif"
+  ],
+  "label": "baseline88",
+  "errors": []
+}
