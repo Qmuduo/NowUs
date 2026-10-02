@@ -1,0 +1,72 @@
+{
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "dpr": 1,
+    "zoom": 1
+  },
+  "styles": [
+    "http://127.0.0.1:8765/prototype/styles.css?v=review92"
+  ],
+  "text": "阿远 · 纽约\n我 · 北京\n9/29 · 周二\n08\n:\n00\n通常作息 · 通勤\n09:00\n开始上课\n9/29 · 周二\n20\n:\n00\n通常作息 · 晚间休息\n调整状态\n\n北京比纽约快 12 小时\n\n下一段共同时间 · 30分钟\n设置提醒\n2小时后，都方便联系\n纽约\n10:00–10:30\n北京\n22:00–22:30\n\n按双方联系偏好估计 · 尚未约定\n\n阿远\n15分钟前\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n回阿远一句",
+  "scroll": {
+    "width": 375,
+    "appHeight": 736,
+    "appScrollHeight": 747
+  },
+  "rects": [
+    {
+      "selector": ".time-pair",
+      "rect": {
+        "x": 22,
+        "y": 105.796875,
+        "width": 331,
+        "height": 204,
+        "top": 105.796875,
+        "right": 353,
+        "bottom": 309.796875,
+        "left": 22
+      }
+    },
+    {
+      "selector": ".connection-panel",
+      "rect": {
+        "x": 22,
+        "y": 341.59375,
+        "width": 331,
+        "height": 194.734375,
+        "top": 341.59375,
+        "right": 353,
+        "bottom": 536.328125,
+        "left": 22
+      }
+    },
+    {
+      "selector": ".note-section",
+      "rect": {
+        "x": 22,
+        "y": 550.328125,
+        "width": 331,
+        "height": 158.875,
+        "top": 550.328125,
+        "right": 353,
+        "bottom": 709.203125,
+        "left": 22
+      }
+    },
+    {
+      "selector": ".tabbar",
+      "rect": {
+        "x": 0,
+        "y": 732,
+        "width": 375,
+        "height": 64,
+        "top": 732,
+        "right": 375,
+        "bottom": 796,
+        "left": 0
+      }
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,77 @@
+[
+  {
+    "file": "app.mjs",
+    "equal": true,
+    "hash": "6FA2753A76C84926A84BF7D92F69BE5ABB58CF2BCEE08DB8879F9EB02AB14DC0"
+  },
+  {
+    "file": "index.html",
+    "equal": true,
+    "hash": "7F4744C2C7BDFF34ED702C529E440C805C30AEDB21BE8F29AB9C7CC0FA0EFDBA"
+  },
+  {
+    "file": "model.mjs",
+    "equal": true,
+    "hash": "4801CD7597BDCC1DC4CA2CD16F0B81E03BD158DC145C35C15DC819CA5652C458"
+  },
+  {
+    "file": "model.test.mjs",
+    "equal": true,
+    "hash": "8B79F7F79A3663993E3FF8A98D95E428E7DE692D6531D0836BD4B405829FA7DB"
+  },
+  {
+    "file": "onboarding.mjs",
+    "equal": true,
+    "hash": "F8A7DE7CB891CB43A55F897CB596014AD55D488C60FBF29D3B70F970AED806AE"
+  },
+  {
+    "file": "pairing-model.mjs",
+    "equal": true,
+    "hash": "97D6750F06B4208EB976B6403AE3EE644C9E74DD70BB1B34A8F472BC21B41AA0"
+  },
+  {
+    "file": "pairing-model.test.mjs",
+    "equal": true,
+    "hash": "647C695EB7A5C91D906A2DC47F07C24A105C0A5D1D8C8AA955308D3F9701CA45"
+  },
+  {
+    "file": "preview-day.png",
+    "equal": true,
+    "hash": "1C4F88261C4C10908428284DF430C22FC43FAD1AA3E45ED2153D116BE41F82B9"
+  },
+  {
+    "file": "preview-home.png",
+    "equal": true,
+    "hash": "7B31D9659431308C48186F6ABCC44EF65ED50724AC7071795AB9F863005B0F1D"
+  },
+  {
+    "file": "preview-invite.png",
+    "equal": true,
+    "hash": "06CE6D591769E69692C7491B24B22769A561E5A3CE01D66B36AF39D9A1CAFF44"
+  },
+  {
+    "file": "preview-pairing.png",
+    "equal": true,
+    "hash": "D44061240E578C47ECDFBC964338B82E3DAA1BA513EAC9A54687A6603EE86769"
+  },
+  {
+    "file": "preview-rhythm.png",
+    "equal": true,
+    "hash": "1B22074D1341435B338AD6AEA790B85671A19D072A3D1ED3B60DA9E9E913E52C"
+  },
+  {
+    "file": "preview-setup.png",
+    "equal": true,
+    "hash": "72D1F47B4693FE79612C9964A464E583D90C60EA11BAAC66FC43C80E801CD2AF"
+  },
+  {
+    "file": "rhythm.mjs",
+    "equal": true,
+    "hash": "A7627B04763058ADDC67B0F59463BD32B19BE8739E7570FBA99B994116D789B6"
+  },
+  {
+    "file": "styles.css",
+    "equal": true,
+    "hash": "BB29AF695F3DCA25997AF8D9D61FD653A9472F69A9C3E26527C1F629D101CB66"
+  }
+]

@@ -1,2 +1,5 @@
 android/gradlew text eol=lf
 *.bat text eol=crlf
+
+# Preserve reviewed snapshots and their SHA256 manifests byte-for-byte.
+design-history/** -text whitespace=cr-at-eol,-blank-at-eof

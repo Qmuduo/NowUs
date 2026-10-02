@@ -25,7 +25,7 @@ const paths = {
   message: '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-4-.8L3 21l1.8-5A8.3 8.3 0 0 1 3 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/>'
 };
 const icon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.clock}</svg>`;
-const initialNote = { text: '今天看到一只小猫，趴在书店门口晒太阳。\n等你有空，想讲给你听。', time: Date.parse('2026-09-29T11:45:00Z') };
+const initialNote = { text: '我找到你说的那家唱片店了，地址发你，周末一起去？', time: Date.parse('2026-09-29T11:45:00Z') };
 const samplePeople = structuredClone(PEOPLE);
 const state = { scenario: 'normal', tab: 'home', dayOffset: 0, dayMode:'nearby', override: null, ownNote: null, reminder: null, rhythm:loadRhythm(), connection:loadConnection(),setupOpen:false };
 try { const saved = JSON.parse(localStorage.getItem('nowus.prototype.note.v1') || 'null'); if (saved && typeof saved.text === 'string' && Number.isFinite(saved.time)) state.ownNote = saved; } catch { /* Local storage is optional for the demo. */ }
@@ -52,6 +52,17 @@ const canContact = (person, instant, scenario = state.scenario, active = overrid
 const commonWindows = (range, scenario = state.scenario, active = overrides()) => modelWindows(range,dataScenario(scenario),active,state.rhythm);
 const dateText = (time, zone) => { const p = parts(time, zone); return `${Number(p.month)}月${Number(p.day)}日`; };
 const fullDateText = (time, zone) => `${dateText(time, zone)} ${parts(time, zone).time}`;
+function relativeNoteTime(time) {
+  const minutes = Math.max(0, Math.floor((now() - time) / 60000));
+  if (minutes < 1) return '刚刚';
+  if (minutes < 60) return `${minutes}分钟前`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}小时前`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return '昨天';
+  if (days < 7) return `${days}天前`;
+  return fullDateText(time, PEOPLE.me.zone);
+}
 const minutesText = ms => {
   const minutes = Math.round(ms/60000), hours = Math.floor(minutes/60), remainder = minutes % 60;
   return hours ? `${hours} 小时${remainder ? ` ${remainder} 分钟` : ''}` : `${minutes} 分钟`;
@@ -72,15 +83,35 @@ function scenarioButtons() {
 function timePerson(person) {
   if (person === 'partner' && !partnerJoined()) return '<div class="time-person waiting-person"><div class="person-label"><span class="avatar">?</span><span>等待对方加入</span></div><div class="local-time">—:—</div><p class="local-date">加入后显示城市、日期与时间</p></div>';
   const p = PEOPLE[person], local = parts(now(), p.zone), period = stage(now(), person);
-  return `<div class="time-person ${period.kind}"><div class="person-label"><span class="avatar">${esc(p.short)}</span><span>${person === 'me' ? '我' : esc(p.name)} · ${p.city}</span></div><div class="time-weather"><span>${period.label}</span>${icon(period.icon)}</div><div class="local-time">${local.time}</div><div class="local-date">${dateText(now(), p.zone)} · ${new Intl.DateTimeFormat('zh-CN', { timeZone: p.zone, weekday: 'short' }).format(now())}</div></div>`;
+  const sameLocalDate = person === 'me' && partnerJoined() && local.date === parts(now(), PEOPLE.partner.zone).date;
+  const activity = routineAt(person, now(), state.scenario, overrides());
+  const next = person === 'partner' && activity.source === '按通常作息' ? nextStage('partner') : null;
+  const usualLabel = ({ '早餐': '吃早餐', '晚餐': '吃晚餐' })[activity.label] || activity.label;
+  const activityText = activity.source === '按通常作息' ? (activity.label === '通勤' ? '通常在通勤路上' : `平时在${usualLabel}`) : activity.source === '未知' ? '此刻安排未分享' : `此刻 · ${activity.label}`;
+  const stateLine = person === 'partner'
+    ? `<div class="partner-state"><div class="partner-state-current"><strong>${esc(activityText)}</strong></div>${next ? `<div class="partner-state-next"><time>${next.time}</time><span>开始${esc(next.label)}</span></div>` : ''}</div><div class="routine-source">${activity.source === '未知' ? '<span>尚未分享此刻安排</span>' : source(activity)}${activity.end ? `<span>持续到 ${p.city} ${parts(activity.end, p.zone).time}</span>` : ''}</div>`
+    : `<div class="time-weather"><strong class="self-activity">${esc(activity.source === '未知' ? period.label : activity.label)}</strong></div><div class="person-routine self-routine"><strong>${esc(activity.label)}</strong><button type="button" data-action="status">调整</button></div><div class="routine-source">${activity.source === '主动设置' ? source(activity) : ''}</div>`;
+  const role = person === 'me' ? 'self' : 'partner';
+  const localDate = parts(now(), p.zone);
+  const weekday = new Intl.DateTimeFormat('zh-CN', { timeZone: p.zone, weekday: 'short' }).format(now());
+  const compactDate = `${Number(localDate.date.slice(5, 7))}/${Number(localDate.date.slice(8, 10))}`;
+  return `<div class="time-person ${period.kind} ${role}-person${sameLocalDate ? ' same-date' : ''}"><div class="person-label"><span class="person-name">${person === 'me' ? '我' : esc(p.name)}</span><span class="person-city">· ${p.city}</span></div><div class="person-date">${compactDate} · ${weekday}</div><div class="local-time">${local.time.replace(':', '<span class="time-colon" aria-hidden="true">:</span>')}</div>${stateLine}</div>`;
 }
 function nextStage(person) {
   const current = routineAt(person, now(), state.scenario, overrides());
   for (let t = now() + 60000; t <= now() + 12 * 3600000; t += 60000) {
     const later = routineAt(person, t, state.scenario, overrides());
-    if (later.label !== current.label) return `下一阶段：${later.label} · 当地 ${parts(t, PEOPLE[person].zone).time}`;
+    if (later.label !== current.label) return { label: later.label, time: parts(t, PEOPLE[person].zone).time };
   }
-  return '以平时的生活安排为参考';
+  return null;
+}
+function localDayRelation(instant, person) {
+  const zone = PEOPLE[person].zone;
+  const dayOffset = Math.round((dayBounds(instant, zone).start - dayBounds(now(), zone).start) / 86400000);
+  if (dayOffset === 0) return '今天';
+  if (dayOffset === 1) return '明天';
+  if (dayOffset === -1) return '昨天';
+  return dateText(instant, zone);
 }
 function upcomingWindow() {
   return nextWindow(now(),dataScenario(),overrides(),state.rhythm);
@@ -93,26 +124,39 @@ function commonCard() {
   if (!window) return `<div class="common-card no-common"><div class="common-label">${icon('heart')}我们的时间</div><h3 class="common-title">${ownUnknown ? '我的联系时间还未设置' : '接下来七天，暂时没有交集'}</h3><p>${ownUnknown ? '未知时间不作推荐。可以补充通常愿意联系的时间，也可以先留句话。' : '按目前的联系偏好，没有找到共同窗口。留句话，等彼此方便时再聊。'}</p><button type="button" class="text-button" data-action="${ownUnknown ? 'open-rhythm' : 'edit-note'}">${ownUnknown ? '设置我的节奏' : '留一句关心'} ${icon('arrow')}</button></div>`;
   const start = Math.max(now(), window.start);
   const laterDay = parts(start, PEOPLE.me.zone).date !== parts(now(), PEOPLE.me.zone).date;
-  const title = window.start <= now() ? '现在处于共同可联系时段' : laterDay ? '今天接下来暂时错开' : `${minutesText(start - now())}后，可以联系`;
-  const times = Object.keys(PEOPLE).map(person => `<div><small>${person === 'me' ? '我' : esc(PEOPLE[person].name)} · ${dateText(start, PEOPLE[person].zone)}</small><strong>${parts(start, PEOPLE[person].zone).time}–${parts(window.end, PEOPLE[person].zone).time}</strong></div>`).join('');
-  const busy = ['me','partner'].filter(person => routineAt(person,start).kind === 'busy').map(person => person === 'me' ? '我' : PEOPLE[person].name);
-  return `<div class="common-card"><div class="common-top"><span class="common-label">${icon('heart')}${window.start <= now() ? '当前共同窗口' : '下一段共同时间'}</span><span>${minutesText(window.end - start)}</span></div><h3 class="common-title">${title}</h3><div class="common-times">${times}</div>${busy.length ? `<p class="contact-context">${esc(busy.join('、'))}通常有活动安排，但这段时间单独设为可联系。</p>` : ''}${ownUnknown ? '<p class="contact-context">今天的联系偏好尚未设置，以下来自已设置的未来安排。</p>' : ''}<div class="common-footer"><span>按双方联系偏好 · 尚未约定</span><button type="button" data-action="window-detail">${state.reminder === window.start ? '已保存提醒' : '查看时段'}</button></div></div>`;
+  const titleLead = window.start <= now()
+    ? '<strong class="common-emphasis">现在</strong><span class="common-result-suffix">可以联系</span>'
+    : laterDay
+      ? `<strong class="common-emphasis">${localDayRelation(start, 'me')}</strong><span class="common-result-suffix">可以联系</span>`
+      : `<strong class="common-emphasis">${esc(minutesText(start - now()).replace(/\s+/g, ''))}</strong><span class="common-result-suffix">后都方便联系</span>`;
+  const times = ['partner', 'me'].map(person => {
+    const zone = PEOPLE[person].zone;
+    const day = localDayRelation(start, person);
+    const startLocal = parts(start, zone), endLocal = parts(window.end, zone);
+    const nextDay = startLocal.date !== endLocal.date ? '<span class="end-next-day">次日</span>' : '';
+    return `<span class="local-window ${person}"><small>${esc(PEOPLE[person].city)}${day === '今天' ? '' : ` · ${day}`}</small><strong>${startLocal.time}–${endLocal.time}${nextDay}</strong></span>`;
+  }).join('');
+  return `<div class="common-card"><div class="common-top"><span class="common-label">共同空闲</span><button type="button" class="common-action" data-action="window-detail">${state.reminder === window.start ? '提醒已设' : '设置提醒'} ${icon('arrow')}</button></div><div class="common-mainline"><h3 class="common-title"><span class="common-lead">${titleLead}</span></h3></div><div class="common-times" role="group" aria-label="双方当地的联系时段">${times}</div></div>`;
 }
 function noteMarkup(note, person) {
   if (!note) return `<p class="note-empty">留一句今天想告诉${esc(PEOPLE.partner.name)}的话。</p>`;
   return `<div class="note-head"><span class="avatar">${esc(PEOPLE[person].short)}</span><span>${person === 'me' ? '我留给你' : `${esc(PEOPLE[person].name)}留给我`}</span><time>${dateText(note.time, PEOPLE.me.zone)} ${parts(note.time, PEOPLE.me.zone).time}</time></div><p class="note-body">${esc(note.text)}</p>`;
 }
 function renderHome() {
-  const other = routineAt('partner', now(), state.scenario, overrides());
-  const me = routineAt('me', now(), state.scenario, overrides());
   const joined = partnerJoined();
   const ownDate = parts(now(),PEOPLE.me.zone).date, otherDate = parts(now(),PEOPLE.partner.zone).date;
   const differentDate = joined && ownDate !== otherDate;
-  const difference = offsetDifference(now());
-  const offset = joined ? difference === 0 ? `${PEOPLE.partner.name}和我没有时差` : `${PEOPLE.partner.name}比我${difference > 0 ? '慢' : '快'} ${Math.abs(difference)} 小时` : '对方加入后，显示双方时差';
-  const heading = !joined ? '先安顿好自己的一天' : differentDate ? '日期不同，彼此都在' : `我的${stage(now(),'me').label}，你的${stage(now(),'partner').label}`;
-  const note = !state.connection ? `<button type="button" class="note-preview" data-action="read-note"><span class="note-preview-head">${icon('message')}${esc(PEOPLE.partner.name)}留给我的一句话 <span>${dateText(initialNote.time,PEOPLE.me.zone)} ${parts(initialNote.time,PEOPLE.me.zone).time}</span></span><span class="note-preview-text">${esc(initialNote.text)}</span><span class="note-preview-more">展开留言 ${icon('arrow')}</span></button>` : `<div class="note-preview note-empty-state"><span class="note-preview-head">${icon('message')}${joined ? '还没有收到对方的留言' : '等彼此方便时，再留一句关心'}</span><p>${joined ? '对方可以在方便时留一句话。' : '对方尚未加入，你可以先记下一句想说的话。'}</p></div>`;
-  $('#home-view').innerHTML = `<h1 class="screen-title">${heading}</h1><div class="time-pair">${timePerson('me')}${timePerson('partner')}</div><p class="offset-caption">${icon('link')}${esc(offset)}${differentDate ? ` · 那里${otherDate < ownDate ? '还是昨天' : '已经是明天'}` : ''}</p><div class="section-heading"><h2>${joined ? `${esc(PEOPLE.partner.name)}的一天，走到这里` : '等待对方的一天'}</h2><button type="button" class="text-button" data-action="open-day">看时间轴 ${icon('arrow')}</button></div><div class="life-card"><div class="life-row"><div class="activity-symbol">${icon(other.icon)}</div><div class="life-content"><div class="life-line"><strong>${!joined ? '对方还没有加入' : esc(other.source === '按通常作息' ? `这个时段通常在${other.label}` : other.label)}</strong></div><div class="life-source">${joined ? source(other) : '<span class="source">等待配对</span>'}</div><p class="life-description">${esc(!joined ? '只有对方加入后，才会显示其主动分享的信息。' : other.source === '未知' ? '等对方填写后再显示，不作活动推测。' : other.end ? `主动设置持续到${PEOPLE.partner.city} ${parts(other.end, PEOPLE.partner.zone).time}` : nextStage('partner'))}</p></div></div><div class="my-life">${icon(me.icon)}<span>我 · ${esc(me.label)}</span>${me.source === '主动设置' ? '<span class="source active">主动设置</span>' : ''}<button type="button" class="text-button" data-action="status">调整状态</button></div></div>${note}<div class="section-heading"><h2>我们可以聊聊的时间</h2></div>${commonCard()}<div class="section-heading"><h2>我留给你的话</h2><button type="button" class="text-button" data-action="edit-note">${icon('edit')}${state.ownNote ? '编辑留言' : '写一句'}</button></div><div class="notes">${state.ownNote ? noteMarkup(state.ownNote,'me') : `<p class="note-empty">把今天的一点小事留给${esc(PEOPLE.partner.name)}，不必等到同时在线。</p>`}</div><p class="quiet-footnote">生活有各自的节奏，关心可以慢慢抵达。</p>`;
+  const partnerMoment = stage(now(),'partner'), myMoment = stage(now(),'me');
+  const partnerPeriod = partnerMoment.label, myPeriod = myMoment.label;
+  const heading = !joined ? '先安顿好自己的一天' : differentDate ? '日期不同，彼此都在' : partnerPeriod === myPeriod ? `我们都在${partnerPeriod}` : `你的${partnerPeriod}，我的${myPeriod}`;
+  const headingMarkup = joined
+    ? `<h1 class="home-thesis home-thesis-pair"><span><strong>${esc(PEOPLE.partner.name)}</strong><small> · ${esc(PEOPLE.partner.city)}</small></span><span><strong>我</strong><small> · ${esc(PEOPLE.me.city)}</small></span></h1>`
+    : `<h1 class="home-thesis">${heading}</h1>`;
+  const partnerNote = partnerJoined() ? `<button type="button" class="note-preview" data-action="read-note"><span class="note-preview-head"><span class="note-from"><span class="note-author">${esc(PEOPLE.partner.name)}</span><time datetime="${new Date(initialNote.time).toISOString()}">${relativeNoteTime(initialNote.time)}</time></span></span><span class="note-preview-text">${esc(initialNote.text).replace('，', '，<br>')}</span><span class="note-preview-more">展开留言 ${icon('arrow')}</span></button>` : '';
+  const momentSection = `<div class="home-stack"><div class="moment-group">${headingMarkup}<div class="time-pair ${partnerMoment.kind}-pair}${joined ? ' identity-heading' : ''}">${timePerson('partner')}${timePerson('me')}</div></div></div>`;
+  const connectionSection = `<div class="connection-panel"><div class="home-contact">${commonCard()}</div></div>`;
+  const noteSection = `<div class="note-section">${partnerNote}<button type="button" class="note-compose" data-action="edit-note"><span class="note-compose-placeholder">回${esc(PEOPLE.partner.name)}一句</span>${icon('arrow')}</button></div>`;
+  $('#home-view').innerHTML = `${momentSection}${connectionSection}${noteSection}`;
 }
 function renderDay() {
   if (!partnerJoined()) {
@@ -155,6 +199,7 @@ function renderRhythm() {
   },{city:PEOPLE.me.city});
 }
 function render() {
+  clock();
   const savedScroll = $('#app').scrollTop;
   renderHome(); renderDay(); renderRhythm();
   $('#desktop-scenarios').innerHTML = scenarioButtons();
@@ -297,8 +342,8 @@ document.addEventListener('keydown', event => {
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   }
 });
-function clock() { $('#device-clock').textContent = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }); }
-clock(); setInterval(clock, 30000);
+function clock() { $('#device-clock').textContent = parts(now(), PEOPLE.me.zone).time; }
+clock();
 $('#home-tab-icon').innerHTML = icon('heart'); $('#day-tab-icon').innerHTML = icon('day');
 $('#rhythm-tab-icon').innerHTML = icon('clock');
 render();

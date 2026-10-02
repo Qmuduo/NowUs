@@ -1,0 +1,17 @@
+[
+  {
+    "Algorithm": "SHA256",
+    "Hash": "6C210F986D25C42CB601DCDA869E00A1B531DA28768E77A598666834906112BD",
+    "Path": "G:\\code_file\\ai_project\\NowUs\\prototype\\app.mjs"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "B7637ADE3AB2903EA4C5CB89E6D7CBADFBC99F50272ED1572D1F902F49580C5D",
+    "Path": "G:\\code_file\\ai_project\\NowUs\\prototype\\index.html"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "344552E66CFF43F0FF9E7B3F5629AAA6CC24A2E5AB1B46CEE8FD12CC27EE77B4",
+    "Path": "G:\\code_file\\ai_project\\NowUs\\prototype\\styles.css"
+  }
+]

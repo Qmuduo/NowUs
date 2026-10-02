@@ -531,3 +531,69 @@ svg { display: block; width: 20px; height: 20px; flex: none; }
 #home-view .note-compose { width: 100%; align-self: stretch; justify-content: space-between; gap: 8px; min-height: 48px; margin: 14px 0 0; padding: 0 1px; border: 0; border-radius: 0; background: transparent; color: var(--accent); }
 #home-view .note-compose-placeholder { font-size: 16px; font-weight: 600; }
 #home-view .note-compose svg, #home-view .note-compose svg:last-child { width: 15px; height: 15px; margin-left: 0; }
+
+/* Paired columns continue from local clocks into the shared contact interval. */
+#home-view .home-thesis-pair, #home-view .time-pair { grid-template-columns: minmax(0,1fr) minmax(0,1fr); column-gap: 24px; }
+#home-view .home-thesis-pair > span:last-child { color: var(--ink); font-size: 17px; }
+#home-view .home-thesis-pair strong { font-weight: 600; }
+#home-view .time-pair::after { content: none; }
+#home-view .time-pair .time-person { padding: 4px 0 0; }
+#home-view .time-pair .partner-person .local-time, #home-view .time-pair .self-person .local-time { color: var(--night); font-size: 46px; line-height: 52px; letter-spacing: -1.4px; }
+#home-view .time-pair .time-person.day .local-time, #home-view .time-pair .time-person.night .local-time { color: var(--night); }
+#home-view .partner-state-current strong, #home-view .self-person .self-activity { color: var(--ink); font-size: 14px; font-weight: 500; }
+#home-view .self-status-action { min-height: 44px; padding: 0; color: var(--accent); font-size: 12px; }
+#home-view .self-person .time-weather { gap: 0; }
+#home-view .pair-relation { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: var(--muted); font-size: 12px; }
+#home-view .pair-relation::before, #home-view .pair-relation::after { content: ''; height: 1px; flex: 1; background: var(--border); }
+#home-view .connection-panel { margin: 20px -22px 0; }
+#home-view .connection-panel .common-card { padding: 13px 22px 16px; background: #E7EDE8; border: 0; }
+#home-view .common-top { align-items: center; }
+#home-view .common-top .common-label { color: var(--ink); font-size: 12px; }
+#home-view .common-top button { padding: 0; font-size: 12px; }
+#home-view .common-mainline { margin-top: 5px; }
+#home-view .common-emphasis { color: var(--night); font-size: 34px; }
+#home-view .common-result-suffix { color: var(--ink); font-size: 14px; }
+#home-view .common-times { grid-template-columns: minmax(0,1fr) minmax(0,1fr); column-gap: 24px; margin-top: 14px; }
+#home-view .local-window, #home-view .local-window.partner, #home-view .local-window.me { flex-direction: column; align-items: flex-start; gap: 3px; }
+#home-view .local-window.partner small, #home-view .local-window.partner strong, #home-view .local-window.me small, #home-view .local-window.me strong { color: var(--night); }
+#home-view .local-window strong { font-size: 21px; }
+#home-view .window-basis { margin-top: 14px; color: var(--muted); font-size: 11px; }
+#home-view .note-section { margin-top: 27px; }
+#home-view .note-preview-text { font-size: 19px; line-height: 1.75; }
+#home-view .note-compose { width: auto; align-self: flex-start; justify-content: flex-start; gap: 10px; margin-top: 9px; }
+#home-view .note-compose-placeholder { font-size: 15px; font-weight: 600; }
+@media (max-width: 350px) {
+  #home-view .connection-panel { margin-left: -16px; margin-right: -16px; }
+  #home-view .connection-panel .common-card { padding-left: 16px; padding-right: 16px; }
+  #home-view .time-pair .partner-person .local-time, #home-view .time-pair .self-person .local-time { font-size: 40px; }
+}
+
+/* Two local skies meet on one horizon; local time remains the subject. */
+#home-view .home-thesis-pair, #home-view .time-pair { column-gap: 12px; }
+#home-view .home-thesis-pair > span { text-align: center; }
+#home-view .time-pair .partner-person, #home-view .time-pair .self-person { grid-template-rows: auto 20px 100px auto auto; row-gap: 5px; padding-top: 2px; }
+#home-view .time-person .person-date { text-align: center; justify-content: center; }
+#home-view .time-pair .time-person .local-time { position: relative; display: flex; justify-content: center; align-items: flex-end; justify-self: stretch; width: 100%; height: 100px; padding: 0 0 17px; border-radius: 100px 100px 0 0; font-size: 44px; line-height: 1; letter-spacing: -1px; }
+#home-view .time-pair .time-person.day .local-time { background: #EBDDAD; color: #3F442F; }
+#home-view .time-pair .time-person.night .local-time { background: #27354B; color: #F7F7EE; }
+#home-view .time-pair .time-person .local-time::before { content: ''; position: absolute; left: calc(50% - 7px); top: 18px; width: 14px; height: 14px; border-radius: 50%; }
+#home-view .time-pair .time-person.day .local-time::before { background: #A98535; }
+#home-view .time-pair .time-person.night .local-time::before { background: transparent; box-shadow: inset -4px -2px 0 #EBDCAB; }
+#home-view .partner-state, #home-view .self-person .time-weather { margin-top: 9px; align-items: center; text-align: center; }
+#home-view .partner-state-current { justify-content: center; }
+#home-view .partner-state-current strong, #home-view .self-person .self-activity { font-size: 12px; font-weight: 400; color: var(--muted); }
+#home-view .partner-state-next { justify-content: center; margin-top: 3px; font-size: 12px; }
+#home-view .pair-relation { margin-top: 4px; }
+#home-view .connection-panel { margin: 16px 0 0; }
+#home-view .connection-panel .common-card { padding: 0 0 17px; background: transparent; border-bottom: 1px solid var(--border); }
+#home-view .common-top .common-label { font-size: 12px; font-weight: 400; color: var(--muted); }
+#home-view .common-mainline { margin-top: 3px; }
+#home-view .common-title { font: 500 23px/1.4 var(--font); letter-spacing: -.5px; color: var(--night); }
+#home-view .common-lead { display: block; }
+#home-view .common-times { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; margin-top: 15px; }
+#home-view .local-window, #home-view .local-window.partner, #home-view .local-window.me { align-items: center; justify-self: stretch; text-align: center; }
+#home-view .local-window strong { font-size: 22px; }
+#home-view .window-basis { text-align: center; margin-top: 11px; }
+#home-view .note-section { margin-top: 18px; }
+#home-view .note-preview-text { margin-top: 10px; font-size: 18px; line-height: 1.65; }
+#home-view .note-compose { margin-top: 6px; }
