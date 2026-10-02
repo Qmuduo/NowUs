@@ -1,0 +1,142 @@
+{
+  "baseline-88": {
+    "source": "design-history/2026-10-02-b/baseline-88/source/prototype",
+    "renderedScreenshotSha256": "fc4427f5660cd217980d8c114dbc30fa8069a1bb27ccac51526f95af71b2f603",
+    "archivedScreenshotSha256": "fc4427f5660cd217980d8c114dbc30fa8069a1bb27ccac51526f95af71b2f603",
+    "archiveMatchesRender": true,
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "dpr": 1,
+      "zoom": 1
+    },
+    "scroll": {
+      "width": 375,
+      "appHeight": 736,
+      "appScrollHeight": 736
+    },
+    "noHorizontalOverflow": true,
+    "text": "阿远 · 纽约\n我 · 北京\n9/29 · 周二\n08:00\n通常在通勤路上\n09:00\n开始上课\n9/29 · 周二\n20:00\n晚间休息\n共同空闲\n设置提醒\n2小时\n后都方便联系\n纽约\n10:00–10:30\n北京\n22:00–22:30\n阿远\n15分钟前\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n回阿远一句",
+    "errors": []
+  },
+  "round-99": {
+    "source": "design-history/2026-10-02-b/round-99/source/prototype",
+    "renderedScreenshotSha256": "c8d1b183b3f80396fb69a519ebda7a3082a614710e4a58a4d8a88120ead1b1e8",
+    "archivedScreenshotSha256": "c8d1b183b3f80396fb69a519ebda7a3082a614710e4a58a4d8a88120ead1b1e8",
+    "archiveMatchesRender": true,
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "dpr": 1,
+      "zoom": 1
+    },
+    "scroll": {
+      "width": 375,
+      "appHeight": 736,
+      "appScrollHeight": 736
+    },
+    "noHorizontalOverflow": true,
+    "text": "远\n阿远\n· 纽约 · 9/29 · 周二\n08:00\n\n早晨 · 通常在通勤路上\n\n我\n我\n· 北京 · 9/29 · 周二\n20:00\n\n夜晚 · 休息\n\n下一段共同时间\n持续30分钟\n\n2小时后开始\n\n纽约\n10:00–10:30\n北京\n22:00–22:30\n按双方联系偏好估计 · 尚未约定\n设置提醒\n远\n阿远\n15分钟前\n\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n\n回阿远一句",
+    "errors": []
+  },
+  "round-100": {
+    "source": "design-history/2026-10-02-b/round-100/source/prototype",
+    "renderedScreenshotSha256": "58ce416d527681ff73b827ba652419e2cdb8624f0a7bc7014ed7b748bed2bead",
+    "archivedScreenshotSha256": "58ce416d527681ff73b827ba652419e2cdb8624f0a7bc7014ed7b748bed2bead",
+    "archiveMatchesRender": true,
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "dpr": 1,
+      "zoom": 1
+    },
+    "scroll": {
+      "width": 375,
+      "appHeight": 736,
+      "appScrollHeight": 736
+    },
+    "noHorizontalOverflow": true,
+    "text": "阿远 · 纽约\n08:00\n10:00–10:30\n07:30\n11:00\n\n9/29 · 周二 · 早晨 · 通常在通勤路上\n\n我 · 北京\n20:00\n22:00–22:30\n19:30\n23:00\n\n9/29 · 周二 · 夜晚 · 休息\n\n下一段共同时间\n持续30分钟\n\n2小时后开始\n\n按双方联系偏好估计 · 尚未约定\n设置提醒\n阿远\n15分钟前\n\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n\n回阿远一句",
+    "errors": []
+  },
+  "round-101": {
+    "source": "design-history/2026-10-02-b/round-101/source/prototype",
+    "renderedScreenshotSha256": "c46bc764a5d8052b7c2cccbec87cd80132d3ac83afd817601ff6538b37a3d2d7",
+    "archivedScreenshotSha256": "c46bc764a5d8052b7c2cccbec87cd80132d3ac83afd817601ff6538b37a3d2d7",
+    "archiveMatchesRender": true,
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "dpr": 1,
+      "zoom": 1
+    },
+    "scroll": {
+      "width": 375,
+      "appHeight": 736,
+      "appScrollHeight": 736
+    },
+    "noHorizontalOverflow": true,
+    "text": "阿远 · 纽约\n08:00\n10:00–10:30\n\n9/29 · 周二 · 早晨 · 通常在通勤路上\n\n我 · 北京\n20:00\n22:00–22:30\n\n9/29 · 周二 · 夜晚 · 休息\n\n07:30 / 19:30\n11:00 / 23:00\n下一段共同时间 · 持续30分钟\n\n2小时后开始\n\n纽约\n10:00–10:30\n北京\n22:00–22:30\n\n按双方联系偏好估计 · 尚未约定\n设置提醒\n远\n阿远\n15分钟前\n\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n\n回阿远一句",
+    "errors": []
+  },
+  "round-102": {
+    "source": "design-history/2026-10-02-b/round-102/source/prototype",
+    "renderedScreenshotSha256": "fcfa93663da1ec1fcafb313b922c69f8dd32a15a5cc8c800db761a82fa1fea05",
+    "archivedScreenshotSha256": "fcfa93663da1ec1fcafb313b922c69f8dd32a15a5cc8c800db761a82fa1fea05",
+    "archiveMatchesRender": true,
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "dpr": 1,
+      "zoom": 1
+    },
+    "scroll": {
+      "width": 375,
+      "appHeight": 736,
+      "appScrollHeight": 736
+    },
+    "noHorizontalOverflow": true,
+    "text": "阿远 · 纽约\n08:00\n\n9/29 周二 · 早晨，通常在通勤路上\n\n我 · 北京\n20:00\n\n9/29 周二 · 夜晚，休息\n\n下一段共同时间\n持续30分钟\n\n2小时后，我们都有空\n\n纽约\n10:00–10:30\n北京\n22:00–22:30\n\n按双方联系偏好估计 · 尚未约定\n设置提醒\n远\n阿远\n15分钟前\n\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n\n回阿远一句",
+    "errors": []
+  },
+  "round-103": {
+    "source": "design-history/2026-10-02-b/round-103/source/prototype",
+    "renderedScreenshotSha256": "7ff157a38536953e5d228596958cb7d7dca5c8e5a814f799e9d15fe70dcf066d",
+    "archivedScreenshotSha256": "7ff157a38536953e5d228596958cb7d7dca5c8e5a814f799e9d15fe70dcf066d",
+    "archiveMatchesRender": true,
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "dpr": 1,
+      "zoom": 1
+    },
+    "scroll": {
+      "width": 375,
+      "appHeight": 736,
+      "appScrollHeight": 736
+    },
+    "noHorizontalOverflow": true,
+    "text": "远\n阿远\n· 纽约\n08:00\n\n9/29 周二\n\n早晨 · 通常在通勤路上\n\n我\n我\n· 北京\n20:00\n\n9/29 周二\n\n夜晚 · 休息\n\n下一段共同时间\n持续30分钟\n\n2小时后，我们都有空\n\n纽约\n10:00–10:30\n北京\n22:00–22:30\n\n按双方联系偏好估计 · 尚未约定\n设置提醒\n远\n阿远\n15分钟前\n\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n\n回阿远一句",
+    "errors": []
+  },
+  "final-88": {
+    "source": "design-history/2026-10-02-b/baseline-88/source/prototype",
+    "renderedScreenshotSha256": "fc4427f5660cd217980d8c114dbc30fa8069a1bb27ccac51526f95af71b2f603",
+    "archivedScreenshotSha256": "fc4427f5660cd217980d8c114dbc30fa8069a1bb27ccac51526f95af71b2f603",
+    "archiveMatchesRender": true,
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "dpr": 1,
+      "zoom": 1
+    },
+    "scroll": {
+      "width": 375,
+      "appHeight": 736,
+      "appScrollHeight": 736
+    },
+    "noHorizontalOverflow": true,
+    "text": "阿远 · 纽约\n我 · 北京\n9/29 · 周二\n08:00\n通常在通勤路上\n09:00\n开始上课\n9/29 · 周二\n20:00\n晚间休息\n共同空闲\n设置提醒\n2小时\n后都方便联系\n纽约\n10:00–10:30\n北京\n22:00–22:30\n阿远\n15分钟前\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n回阿远一句",
+    "errors": []
+  }
+}

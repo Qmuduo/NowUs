@@ -1,0 +1,77 @@
+{
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "dpr": 1,
+    "zoom": 1
+  },
+  "styles": [
+    "http://127.0.0.1:8765/prototype/styles.css?v=133"
+  ],
+  "text": "阿远 · 纽约\n08:00\n\n9/29 周二 · 早晨，通常在通勤路上\n\n我 · 北京\n20:00\n\n9/29 周二 · 夜晚，休息\n\n下一段共同时间\n持续30分钟\n\n2小时后，我们都有空\n\n纽约\n10:00–10:30\n北京\n22:00–22:30\n\n按双方联系偏好估计 · 尚未约定\n设置提醒\n远\n阿远\n15分钟前\n\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n\n回阿远一句",
+  "scroll": {
+    "width": 375,
+    "appHeight": 736,
+    "appScrollHeight": 736,
+    "appScrollTop": 0
+  },
+  "rects": [
+    {
+      "selector": ".app-header",
+      "rect": {
+        "x": 0,
+        "y": 30,
+        "width": 375,
+        "height": 46,
+        "top": 30,
+        "right": 375,
+        "bottom": 76,
+        "left": 0
+      }
+    },
+    {
+      "selector": ".home-thesis",
+      "rect": null
+    },
+    {
+      "selector": ".time-pair",
+      "rect": null
+    },
+    {
+      "selector": ".connection-panel",
+      "rect": null
+    },
+    {
+      "selector": ".note-section",
+      "rect": null
+    },
+    {
+      "selector": ".tabbar",
+      "rect": {
+        "x": 0,
+        "y": 732,
+        "width": 375,
+        "height": 64,
+        "top": 732,
+        "right": 375,
+        "bottom": 796,
+        "left": 0
+      }
+    },
+    {
+      "selector": ".note-compose",
+      "rect": null
+    },
+    {
+      "selector": ".common-card",
+      "rect": null
+    }
+  ],
+  "fonts": [
+    "\"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", system-ui, sans-serif",
+    "Georgia, \"Times New Roman\", \"Noto Serif SC\", \"Songti SC\", STSong, SimSun, serif",
+    "\"Segoe UI\", Arial, sans-serif"
+  ],
+  "label": "selfcheck-102",
+  "errors": []
+}

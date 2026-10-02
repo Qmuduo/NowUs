@@ -1,0 +1,59 @@
+/* ── Home ────────────────────────────────────────────────────────────────────
+   两个人被放进同一条时间轴：两条轨道同底色、同高度、同形状，共用一组刻度，
+   刻度同时读出两地当地时间（07:30 / 19:30），所以「同一时刻、两地读法」不需要心算。
+   全页只有一个显示级元素——下一段共同时间的那句话；此刻是正文级，留言是一件来信。
+   字体只有两种角色：衬线 = 时间与留言；无衬线 = 标签、状态与操作。 */
+.view#home-view { display: flex; flex-direction: column; justify-content: flex-start; min-height: 100%; padding-top: 6px; }
+.home-stack { display: flex; flex-direction: column; }
+
+.lane-board { display: flex; flex-direction: column; }
+.lane-row { display: flex; flex-direction: column; gap: 5px; }
+.lane-row + .lane-row { margin-top: 18px; }
+.lane-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.lane-head strong { color: var(--ink); font-size: 13.5px; font-weight: 700; letter-spacing: -.1px; }
+.now-time { color: var(--muted); font: 400 19px/1 var(--font-serif); font-variant-numeric: tabular-nums; letter-spacing: -.4px; }
+
+.lane-labels { position: relative; height: 20px; }
+.lane-labels time { position: absolute; bottom: 0; transform: translateX(-50%); white-space: nowrap; }
+.window-time { color: var(--ink); font: 400 16px/1 var(--font-serif); font-variant-numeric: tabular-nums; letter-spacing: -.4px; }
+
+.lane { display: flex; }
+.lane-track { position: relative; flex: 1; height: 3px; border-radius: 2px; background: rgba(35, 42, 37, .16); }
+.lane-now { position: absolute; top: 50%; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 3px var(--page); }
+.lane-now.day { background: #B9903C; }
+.lane-now.night { background: var(--night); }
+.lane-window { position: absolute; top: 50%; height: 15px; margin-top: -7.5px; border-radius: 5px; background: var(--accent); }
+.lane-state { color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+
+.axis-scale { display: flex; justify-content: space-between; margin-top: 9px; color: var(--muted); font: 11.5px/1 var(--font-time); font-variant-numeric: tabular-nums; }
+
+.window-answer { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); }
+.answer-label { color: var(--muted); font-size: 11.5px; font-weight: 600; letter-spacing: .12em; }
+.answer-lead { margin-top: 7px; color: var(--ink); font: 400 32px/1.1 var(--font-serif); letter-spacing: -1px; }
+.answer-readings { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 11px; }
+.answer-readings span { display: inline-flex; align-items: baseline; gap: 6px; }
+.answer-readings small { color: var(--muted); font-size: 12px; }
+.answer-readings time { color: var(--ink); font: 400 17px/1 var(--font-serif); font-variant-numeric: tabular-nums; letter-spacing: -.3px; }
+.answer-readings-empty { color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+
+.board-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; padding-top: 6px; }
+.foot-note { color: var(--muted); font-size: 11.5px; line-height: 1.5; }
+.foot-action { display: inline-flex; align-items: center; gap: 3px; min-height: 44px; padding: 0; color: var(--accent); font-size: 12.5px; font-weight: 650; white-space: nowrap; }
+.foot-action svg { width: 14px; height: 14px; }
+
+.board-solo { padding-top: 22px; }
+.board-solo-title { color: var(--ink); font-size: 19px; font-weight: 650; }
+.board-solo-text { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.board-solo-action { display: inline-flex; align-items: center; gap: 5px; margin-top: 16px; min-height: 44px; color: var(--accent); font-size: 13.5px; font-weight: 650; }
+.board-solo-action svg { width: 15px; height: 15px; }
+
+.note-block { display: flex; flex-direction: column; margin-top: 34px; padding: 14px 15px 14px; border-radius: 16px; background: var(--panel); }
+.note-meta { display: flex; align-items: baseline; gap: 8px; }
+.note-mark { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 600; align-self: center; }
+.note-mark.day { background: var(--day); color: var(--day-ink); }
+.note-mark.night { background: var(--night); color: var(--night-ink); }
+.note-author { color: var(--ink); font-size: 14px; font-weight: 700; letter-spacing: -.1px; }
+.note-time { color: var(--muted); font: 12px var(--font-time); font-variant-numeric: tabular-nums; }
+.note-text { max-width: 16em; margin-top: 10px; color: var(--ink); font: 400 19px/1.75 var(--font-serif); letter-spacing: .1px; }
+.reply-field { display: flex; align-items: center; width: 100%; min-height: 48px; margin-top: 14px; padding: 0 14px; border: 1px solid var(--border); border-radius: 11px; background: var(--page); color: var(--muted); text-align: left; }
+.reply-hint { font-size: 14px; }

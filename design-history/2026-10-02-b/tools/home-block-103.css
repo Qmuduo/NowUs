@@ -1,0 +1,55 @@
+/* ── Home ────────────────────────────────────────────────────────────────────
+   两个人并排站在上半部，各自带着自己的当地时刻与昼夜；两条细线从他们那里汇入
+   下半部同一块绿色——那里写着「我们」都能空出来的时间。这是这一页唯一的图形，
+   它承载的是产品唯一的前提：两个时区在靠近，而不是两个数字在并列。
+   全页只有一处显示级文字：共同时间那句话。留言是一件有署名的来信，字号其次。
+   字体只有两种角色：衬线 = 时间与留言；无衬线 = 标签、状态与操作。 */
+.view#home-view { display: flex; flex-direction: column; justify-content: flex-start; min-height: 100%; padding-top: 6px; }
+.home-stack { display: flex; flex-direction: column; }
+
+.person-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px; }
+.person-column { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.column-head { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.person-mark { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 600; flex: none; }
+.person-mark.day { background: var(--day); color: var(--day-ink); }
+.person-mark.night { background: var(--night); color: var(--night-ink); }
+.column-head strong { color: var(--ink); font-size: 13.5px; font-weight: 700; letter-spacing: -.1px; white-space: nowrap; }
+.column-city { color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.now-time { color: var(--ink); font: 400 25px/1.15 var(--font-serif); font-variant-numeric: tabular-nums; letter-spacing: -.9px; margin-top: 4px; }
+.column-date { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.column-state { color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+
+.converge { position: relative; height: 42px; margin-top: 16px; }
+.converge svg { display: block; width: 100%; height: 100%; }
+.converge-dot { position: absolute; left: 50%; bottom: -3px; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: var(--accent); }
+
+.window-block { padding: 17px 15px 18px; border-radius: 18px; background: var(--band); color: var(--band-ink); }
+.block-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.block-label { font-size: 12.5px; font-weight: 650; letter-spacing: .02em; }
+.block-duration { color: var(--band-soft); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.block-lead { margin-top: 8px; font: 400 28px/1.2 var(--font-serif); letter-spacing: -.9px; }
+.block-readings { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 11px; }
+.block-readings span { display: inline-flex; align-items: baseline; gap: 6px; }
+.block-readings small { color: var(--band-soft); font-size: 12px; }
+.block-readings time { font: 400 16px/1 var(--font-serif); font-variant-numeric: tabular-nums; letter-spacing: -.3px; }
+.window-block-empty .block-readings { display: block; color: var(--band-soft); font-size: 12.5px; line-height: 1.6; }
+
+.board-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
+.foot-note { color: rgba(35, 42, 37, .68); font-size: 12px; line-height: 1.5; }
+.foot-action { display: inline-flex; align-items: center; gap: 3px; min-height: 44px; padding: 0; color: var(--accent); font-size: 12.5px; font-weight: 650; white-space: nowrap; }
+.foot-action svg { width: 14px; height: 14px; }
+
+.board-solo { padding-top: 22px; }
+.board-solo-title { color: var(--ink); font-size: 19px; font-weight: 650; }
+.board-solo-text { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.board-solo-action { display: inline-flex; align-items: center; gap: 5px; margin-top: 16px; min-height: 44px; color: var(--accent); font-size: 13.5px; font-weight: 650; }
+.board-solo-action svg { width: 15px; height: 15px; }
+
+.note-block { display: flex; flex-direction: column; margin-top: 58px; }
+.note-meta { display: flex; align-items: baseline; gap: 8px; }
+.note-author { color: var(--ink); font-size: 14px; font-weight: 700; letter-spacing: -.1px; }
+.note-time { color: var(--muted); font: 12px var(--font-time); font-variant-numeric: tabular-nums; }
+.note-text { max-width: 15em; margin-top: 12px; color: var(--ink); font: 400 22px/1.75 var(--font-serif); letter-spacing: .1px; }
+.reply-field { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 54px; margin-top: 16px; padding: 0 1px; border: 0; border-top: 1px solid var(--border); border-radius: 0; background: transparent; color: var(--accent); text-align: left; }
+.reply-hint { font-size: 15px; font-weight: 600; }
+.reply-field svg { width: 15px; height: 15px; }
