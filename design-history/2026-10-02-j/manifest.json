@@ -1,0 +1,11 @@
+{
+  "batch": "2026-10-02-j",
+  "kind": "information-completeness audit (no review round)",
+  "prototype": "113 (unchanged)",
+  "finding": "把自己设为未知后首页仍给出共同窗口，与产品自身规则矛盾",
+  "files": {
+    "build-manifest.py": "7469e2471a8f079bc007d915c24595bf936beb76e0bab3ddfb475a4544adddc0",
+    "findings.md": "01c3df864d82a27e7f4bdef50086aca715aa4875b580871a4879ccffe62c0ace",
+    "README.md": "9490a8aa589fca3d7eef4d35d4d334f68e7c6345a12058caf96320f8a2046f0c"
+  }
+}
