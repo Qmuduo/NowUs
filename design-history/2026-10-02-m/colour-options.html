@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>NowUs · 昼夜状态卡片 · 三个方向</title>
+<style>
+  :root{font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;color:#232A25;background:#fff;font-synthesis:none}
+  *{box-sizing:border-box}
+  body{margin:0;padding:40px 28px 64px}
+  .shell{max-width:1120px;margin:auto}
+  h1{font-size:26px;letter-spacing:-.6px;margin:0 0 8px}
+  .lead{font-size:14px;line-height:1.8;color:#5b6660;margin:0 0 6px;max-width:820px}
+  .lead b{color:#232A25}
+  .opt{margin-top:44px;border-top:1px solid #e3e7e3;padding-top:24px}
+  .opt-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .opt-name{font-size:18px;font-weight:700;letter-spacing:-.3px}
+  .swatches{display:flex;gap:6px;align-items:center}
+  .sw{width:20px;height:20px;border-radius:6px;border:1px solid rgba(0,0,0,.12)}
+  .opt-desc{font-size:13px;color:#5b6660;line-height:1.75;margin:8px 0 0;max-width:820px}
+  .row{display:flex;gap:14px;margin-top:18px;flex-wrap:wrap;align-items:flex-start}
+  .card{width:178px;border-radius:16px;padding:14px 15px 15px;border:1px solid rgba(0,0,0,.06)}
+  .card .who{display:flex;align-items:baseline;gap:6px}
+  .card .who strong{font-size:14px;font-weight:700}
+  .card .who span{font-size:12px;opacity:.72}
+  .card .time{font:400 30px/1.1 Georgia,"Times New Roman",serif;letter-spacing:-1px;margin-top:6px}
+  .card .state{font-size:12.5px;opacity:.78;margin-top:5px;line-height:1.45}
+  .card .period{font-size:11px;letter-spacing:.14em;opacity:.6;margin-bottom:2px}
+  .pair{margin-top:6px;padding:16px;border-radius:20px;display:flex;gap:14px;align-items:center}
+  .pair-label{font-size:11px;letter-spacing:.14em;color:#5b6660;margin-top:20px}
+  .note{margin-top:52px;padding:18px 20px;border-radius:12px;background:#f4f6f4;font-size:13.5px;line-height:1.9}
+  .note b{display:block;margin-bottom:6px}
+  .note ul{margin:6px 0 0;padding-left:20px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <h1>昼夜状态卡片 · 三个方向</h1>
+  <p class="lead">你要的是：首页上方两个人的状态各做成一张卡片，<b>卡片颜色随当地时段变化</b>，一眼看出对方那边是白天还是夜晚。下面是五种当地时段的卡片，以及一个「他清晨 / 我夜晚」的并排示例（这是默认演示场景的真实组合）。</p>
+  <p class="lead">三个方向的差别在<b>底色与强调色</b>，卡片的时段逻辑完全一样。挑一个方向，或者说清你讨厌现在哪一层。</p>
+
+  <!-- A -->
+  <section class="opt">
+    <div class="opt-head">
+      <span class="opt-name">方向 A · 保留现在的绿调，只加昼夜</span>
+      <span class="swatches">
+        <i class="sw" style="background:#F2F5F2"></i><i class="sw" style="background:#2F6B4F"></i><i class="sw" style="background:#F5E5B8"></i><i class="sw" style="background:#27354B"></i>
+      </span>
+    </div>
+    <p class="opt-desc">底色与强调色不动（和现在的原型、应用图标一致），只在两个人的状态上加昼夜底色。改动最小，风险最低——但你现在不喜欢的那层颜色会被原样保留。</p>
+    <div class="row" id="rowA"></div>
+    <p class="pair-label">默认场景并排示例</p>
+    <div class="pair" id="pairA"></div>
+  </section>
+
+  <!-- B -->
+  <section class="opt">
+    <div class="opt-head">
+      <span class="opt-name">方向 B · 暖纸调</span>
+      <span class="swatches">
+        <i class="sw" style="background:#F7F1E8"></i><i class="sw" style="background:#A8503A"></i><i class="sw" style="background:#F7E2C8"></i><i class="sw" style="background:#3A3B52"></i>
+      </span>
+    </div>
+    <p class="opt-desc">米黄纸底 + 陶土红强调色，像信纸与手写。最贴「安静亲密」这个方向，也是历史上评论员反复认可的气质。代价是强调色不再是绿色，应用图标要一起换。</p>
+    <div class="row" id="rowB"></div>
+    <p class="pair-label">默认场景并排示例</p>
+    <div class="pair" id="pairB"></div>
+  </section>
+
+  <!-- C -->
+  <section class="opt">
+    <div class="opt-head">
+      <span class="opt-name">方向 C · 冷灰底 + 强昼夜</span>
+      <span class="swatches">
+        <i class="sw" style="background:#F1F2F4"></i><i class="sw" style="background:#1F6FEB"></i><i class="sw" style="background:#FFF6E0"></i><i class="sw" style="background:#2B3350"></i>
+      </span>
+    </div>
+    <p class="opt-desc">页面退成中性冷灰，把颜色全部交给昼夜卡片——白天更亮更暖、夜晚更深更蓝，对比最强，时差最一目了然。代价是整屏比现在冷，亲密感会弱一些。</p>
+    <div class="row" id="rowC"></div>
+    <p class="pair-label">默认场景并排示例</p>
+    <div class="pair" id="pairC"></div>
+  </section>
+
+  <div class="note">
+    <b>五个时段怎么划分（三个方向共用）</b>
+    <ul>
+      <li><b>清晨</b> 05:00–08:00　<b>白天</b> 08:00–17:00　<b>黄昏</b> 17:00–20:00　<b>夜晚</b> 20:00–24:00　<b>深夜</b> 00:00–05:00</li>
+      <li>默认场景里阿远是 08:00（清晨）、我是 20:00（夜晚）——并排时天然形成「他刚天亮、我已入夜」的对照。</li>
+      <li>时段只影响卡片底色，不影响文字、状态与共同窗口的可读性（产品基线 §6 明确要求氛围不能削弱可读性）。</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const periods = [
+  {key:'dawn',  label:'清晨', time:'06:30', state:'通常在通勤路上', l:'#F6E3C4', ink:'#4A3B26'},
+  {key:'day',   label:'白天', time:'12:00', state:'此刻 · 午间休息', l:'#FBF3DC', ink:'#4A4028'},
+  {key:'dusk',  label:'黄昏', time:'18:30', state:'此刻 · 通勤路上', l:'#F3D3B4', ink:'#523527'},
+  {key:'night', label:'夜晚', time:'21:00', state:'晚间休息',       l:'#2E3D55', ink:'#EDF1F7'},
+  {key:'late',  label:'深夜', time:'01:00', state:'睡觉',           l:'#1E2A3E', ink:'#DDE4EE'},
+];
+const palettes = {
+  A: {page:'#F2F5F2', dawn:['#F6E3C4','#4A3B26'], day:['#FBF3DC','#4A4028'], dusk:['#F3D3B4','#523527'], night:['#2E3D55','#EDF1F7'], late:['#1E2A3E','#DDE4EE']},
+  B: {page:'#F7F1E8', dawn:['#F7E2C8','#4C3626'], day:['#FCF2DE','#4C4029'], dusk:['#EFCFB2','#57362A'], night:['#3A3B52','#F0EEF6'], late:['#292A3E','#E4E3EE']},
+  C: {page:'#F1F2F4', dawn:['#FFE8C8','#4A3A20'], day:['#FFF6E0','#4A4227'], dusk:['#FFD9B8','#54341F'], night:['#2B3350','#EAEEF8'], late:['#1A2036','#D8DFEF']},
+};
+function card(period, pair, who) {
+  return '<div class="card" style="background:' + pair[0] + ';color:' + pair[1] + '">' +
+    '<div class="period">' + period.label + '</div>' +
+    '<div class="who"><strong>' + who.name + '</strong><span>· ' + who.city + '</span></div>' +
+    '<div class="time">' + period.time + '</div>' +
+    '<div class="state">' + period.state + '</div>' +
+  '</div>';
+}
+for (const key of ['A','B','C']) {
+  const pal = palettes[key];
+  document.getElementById('row' + key).innerHTML = periods.map((p, i) =>
+    card(p, pal[p.key], {name:'阿远', city:'纽约'})
+  ).join('');
+  const pair = '<div class="card" style="width:200px;background:' + pal.dawn[0] + ';color:' + pal.dawn[1] + '">' +
+      '<div class="period">清晨</div><div class="who"><strong>阿远</strong><span>· 纽约 · 9/29 周二</span></div>' +
+      '<div class="time">08:00</div><div class="state">通常在通勤路上</div></div>' +
+    '<div class="card" style="width:200px;background:' + pal.night[0] + ';color:' + pal.night[1] + '">' +
+      '<div class="period">夜晚</div><div class="who"><strong>我</strong><span>· 北京 · 9/29 周二</span></div>' +
+      '<div class="time">20:00</div><div class="state">晚间休息</div></div>';
+  document.getElementById('pair' + key).style.background = pal.page;
+  document.getElementById('pair' + key).innerHTML = pair;
+}
+</script>
+</body>
+</html>
