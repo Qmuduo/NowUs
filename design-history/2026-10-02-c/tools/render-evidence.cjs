@@ -7,7 +7,7 @@ const crypto = require('node:crypto');
 
 const root = path.resolve(__dirname, '..');
 const repo = path.resolve(root, '..', '..');
-const rounds = ['baseline-88', 'round-99', 'round-100', 'round-101', 'round-102', 'round-103', 'final-88'];
+const rounds = ['baseline-88', 'round-104', 'round-105', 'round-106', 'round-107', 'round-108'];
 
 (async () => {
   const browser = await chromium.launch({headless: true});
