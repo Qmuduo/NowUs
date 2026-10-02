@@ -121,6 +121,7 @@ function commonCard() {
   if (dataScenario() === 'missing') return `<div class="common-card no-common"><div class="common-label">${icon('clock')}等待彼此的节奏</div><h3 class="common-title">暂时还不能推荐时间</h3><p>${esc(PEOPLE.partner.name)}尚未设置作息和联系偏好，未知时间不会算作共同空闲。</p><button type="button" class="text-button" data-action="edit-note">先留一句关心 ${icon('arrow')}</button></div>`;
   const window = upcomingWindow();
   const ownUnknown = canContact('me',now()) === null;
+  if (ownUnknown) return `<div class="common-card no-common"><div class="common-label">${icon('clock')}我的联系时间还未设置</div><h3 class="common-title">先告诉我什么时候方便</h3><p>未知时间不会算作共同空闲。补充通常愿意联系的时间之后，这里才会给出下一段共同时间。</p><button type="button" class="text-button" data-action="open-rhythm">设置我的节奏 ${icon('arrow')}</button></div>`;
   if (!window) return `<div class="common-card no-common"><div class="common-label">${icon('heart')}我们的时间</div><h3 class="common-title">${ownUnknown ? '我的联系时间还未设置' : '接下来七天，暂时没有交集'}</h3><p>${ownUnknown ? '未知时间不作推荐。可以补充通常愿意联系的时间，也可以先留句话。' : '按目前的联系偏好，没有找到共同窗口。留句话，等彼此方便时再聊。'}</p><button type="button" class="text-button" data-action="${ownUnknown ? 'open-rhythm' : 'edit-note'}">${ownUnknown ? '设置我的节奏' : '留一句关心'} ${icon('arrow')}</button></div>`;
   const start = Math.max(now(), window.start);
   const laterDay = parts(start, PEOPLE.me.zone).date !== parts(now(), PEOPLE.me.zone).date;
