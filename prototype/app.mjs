@@ -124,11 +124,11 @@ function commonCard() {
   if (!window) return `<div class="common-card no-common"><div class="common-label">${icon('heart')}我们的时间</div><h3 class="common-title">${ownUnknown ? '我的联系时间还未设置' : '接下来七天，暂时没有交集'}</h3><p>${ownUnknown ? '未知时间不作推荐。可以补充通常愿意联系的时间，也可以先留句话。' : '按目前的联系偏好，没有找到共同窗口。留句话，等彼此方便时再聊。'}</p><button type="button" class="text-button" data-action="${ownUnknown ? 'open-rhythm' : 'edit-note'}">${ownUnknown ? '设置我的节奏' : '留一句关心'} ${icon('arrow')}</button></div>`;
   const start = Math.max(now(), window.start);
   const laterDay = parts(start, PEOPLE.me.zone).date !== parts(now(), PEOPLE.me.zone).date;
-  const titleLead = window.start <= now()
-    ? '<strong class="common-emphasis">现在</strong><span class="common-result-suffix">可以联系</span>'
+  const whenText = window.start <= now()
+    ? '现在可以联系'
     : laterDay
-      ? `<strong class="common-emphasis">${localDayRelation(start, 'me')}</strong><span class="common-result-suffix">可以联系</span>`
-      : `<strong class="common-emphasis">${esc(minutesText(start - now()).replace(/\s+/g, ''))}</strong><span class="common-result-suffix">后都方便联系</span>`;
+      ? `${localDayRelation(start, 'me')}可以联系`
+      : `${minutesText(start - now()).replace(/\s+/g, '')}后开始`;
   const times = ['partner', 'me'].map(person => {
     const zone = PEOPLE[person].zone;
     const day = localDayRelation(start, person);
@@ -136,7 +136,7 @@ function commonCard() {
     const nextDay = startLocal.date !== endLocal.date ? '<span class="end-next-day">次日</span>' : '';
     return `<span class="local-window ${person}"><small>${esc(PEOPLE[person].city)}${day === '今天' ? '' : ` · ${day}`}</small><strong>${startLocal.time}–${endLocal.time}${nextDay}</strong></span>`;
   }).join('');
-  return `<div class="common-card"><div class="common-top"><span class="common-label">共同空闲</span><button type="button" class="common-action" data-action="window-detail">${state.reminder === window.start ? '提醒已设' : '设置提醒'} ${icon('arrow')}</button></div><div class="common-mainline"><h3 class="common-title"><span class="common-lead">${titleLead}</span></h3></div><div class="common-times" role="group" aria-label="双方当地的联系时段">${times}</div></div>`;
+  return `<div class="common-card"><div class="common-top"><span class="common-label">可联系的时间<span class="common-when">${esc(whenText)}</span></span><button type="button" class="common-action" data-action="window-detail">${state.reminder === window.start ? '提醒已设' : '设置提醒'} ${icon('arrow')}</button></div><div class="common-times" role="group" aria-label="双方当地的联系时段">${times}</div></div>`;
 }
 function noteMarkup(note, person) {
   if (!note) return `<p class="note-empty">留一句今天想告诉${esc(PEOPLE.partner.name)}的话。</p>`;
