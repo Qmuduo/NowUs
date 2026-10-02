@@ -9,8 +9,11 @@
     "build-manifest.py": "0dc14ac4c980e60e4d1fda0746849783adebbe97c0752b5e14e46429c6f1301a",
     "day-baseline-111/day-111.png": "09e80b7c24d49e5aadfb375fa9375a5b67f540bbcf851816b4773bde5eba922a",
     "day-round-112/day-112.png": "09e80b7c24d49e5aadfb375fa9375a5b67f540bbcf851816b4773bde5eba922a",
-    "findings.md": "84f23f8c18801f76163ff278303fd77360cbef25361a78b1fcdd4b0cb5080211",
-    "README.md": "c209697bf418936e56e46faf98d6654171afa8c903771f2224c5a807c8a2f5ae",
+    "day-s4-baseline-111/s4-111.png": "77c6c374d6096f09dfb65bebdf57bc53e6932c4989f4591326875d3a0c287a18",
+    "day-s4-round-112/s4-112.png": "ce92ed11c8eb101a95f5fb69e82614b5ac0556cd66b2fbdd3f99e711248c440e",
+    "findings.md": "76118ed52cb63379a71fa40d5867bff2b389ca03f7cc4561c5bd02b62dafb72b",
+    "home-s4-shared.png": "be8c534a6d1adc2c9f536d6b97b0aff75dc5f2b6ebdf58aa7c62f323a66c7cd1",
+    "README.md": "50c1398fe8d048bee7edb586ec26a55538c8ed92067b0d1975e8d92d79092db0",
     "round-112/source/prototype/app.mjs": "ef0e19a69567863a898cce8869a1d2a11ea0f3c4b8a28efddf21225e38b80f87",
     "round-112/source/prototype/index.html": "7f4744c2c7bdff34ed702c529e440c805c30aedb21be8f29ab9c7cc0fa0efdba",
     "round-112/source/prototype/model.mjs": "4801cd7597bdcc1dc4ca2cd16f0b81e03bd158dc145c35c15dc819ca5652c458",
@@ -27,6 +30,7 @@
     "round-112/source/prototype/rhythm.mjs": "a7627b04763058addc67b0f59463bd32b19be8739e7570fba99b994116d789b6",
     "round-112/source/prototype/styles.css": "eea5d583ad86484d25a95a1643fda376ca20c2ceb3fbd789fe7a5557823dd4cb",
     "round-112/source-hashes.json": "05b9d875f31aece92f59d2ee8207c1e46e80ce39c3aed875574811b325323913",
+    "tools/capture-day-scenario.cjs": "451223f00cbad4bb2a67a61d113402b123f1d36f4633a18a4d84b60649dda1ed",
     "tools/capture-day.cjs": "225619c98afe8d3166a0c67edb3745b81714e4eaa3a33f8858ab91643cef7c10"
   }
 }

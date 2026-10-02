@@ -14,4 +14,4 @@ for relative_path, expected in manifest['files'].items():
         failures.append(f'Changed: {relative_path}')
 if failures:
     raise SystemExit('\n'.join(failures))
-print(f"Verified {len(manifest['files'])} archive files; round 112 (functional verification only).")
+print(f"Verified {len(manifest['files'])} archive files; round 112 (reviewed on track B, scenario 4).")
