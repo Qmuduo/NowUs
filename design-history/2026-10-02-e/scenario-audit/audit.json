@@ -1,0 +1,245 @@
+{
+  "results": [
+    {
+      "label": "日常的一天",
+      "slug": "scenario-1",
+      "text": "阿远 · 纽约\n我 · 北京\n9/29 · 周二\n08:00\n通常在通勤路上\n09:00\n开始上课\n9/29 · 周二\n20:00\n晚间休息\n可联系的时间\n2小时后开始\n设置提醒\n纽约\n10:00–10:30\n北京\n22:00–22:30\n\n按双方联系偏好估计，尚未约定\n\n阿远\n15分钟前\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n回阿远一句",
+      "docWidth": 375,
+      "appScrollHeight": 736,
+      "appHeight": 736,
+      "noScroll": true,
+      "rects": {
+        "thesis": {
+          "top": 81,
+          "bottom": 103,
+          "left": 22,
+          "right": 353
+        },
+        "pair": {
+          "top": 107,
+          "bottom": 224,
+          "left": 22,
+          "right": 353
+        },
+        "window": {
+          "top": 284,
+          "bottom": 451,
+          "left": 22,
+          "right": 353
+        },
+        "note": {
+          "top": 507,
+          "bottom": 680,
+          "left": 22,
+          "right": 353
+        },
+        "reply": {
+          "top": 636,
+          "bottom": 680,
+          "left": 22,
+          "right": 127
+        },
+        "tabbar": {
+          "top": 732,
+          "bottom": 796,
+          "left": 0,
+          "right": 375
+        }
+      },
+      "clipped": []
+    },
+    {
+      "label": "日期不同",
+      "slug": "scenario-2",
+      "text": "阿远 · 纽约\n我 · 北京\n9/29 · 周二\n12:30\n平时在午间休息\n13:00\n开始上课\n9/30 · 周三\n00:30\n睡觉\n可联系的时间\n6小时30分钟后开始\n设置提醒\n纽约\n19:00–20:00\n北京\n07:00–08:00\n\n按双方联系偏好估计，尚未约定\n\n阿远\n4小时前\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n回阿远一句",
+      "docWidth": 375,
+      "appScrollHeight": 736,
+      "appHeight": 736,
+      "noScroll": true,
+      "rects": {
+        "thesis": {
+          "top": 81,
+          "bottom": 103,
+          "left": 22,
+          "right": 353
+        },
+        "pair": {
+          "top": 107,
+          "bottom": 224,
+          "left": 22,
+          "right": 353
+        },
+        "window": {
+          "top": 284,
+          "bottom": 451,
+          "left": 22,
+          "right": 353
+        },
+        "note": {
+          "top": 507,
+          "bottom": 680,
+          "left": 22,
+          "right": 353
+        },
+        "reply": {
+          "top": 636,
+          "bottom": 680,
+          "left": 22,
+          "right": 127
+        },
+        "tabbar": {
+          "top": 732,
+          "bottom": 796,
+          "left": 0,
+          "right": 375
+        }
+      },
+      "clipped": []
+    },
+    {
+      "label": "没有共同空闲",
+      "slug": "scenario-3",
+      "text": "阿远 · 纽约\n我 · 北京\n9/29 · 周二\n08:00\n通常在通勤路上\n09:00\n开始上课\n9/29 · 周二\n20:00\n晚间休息\n可联系的时间\n明天可以联系\n设置提醒\n纽约\n19:00–20:00\n北京 · 明天\n07:00–08:00\n\n按双方联系偏好估计，尚未约定\n\n阿远\n15分钟前\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n回阿远一句",
+      "docWidth": 375,
+      "appScrollHeight": 736,
+      "appHeight": 736,
+      "noScroll": true,
+      "rects": {
+        "thesis": {
+          "top": 81,
+          "bottom": 103,
+          "left": 22,
+          "right": 353
+        },
+        "pair": {
+          "top": 107,
+          "bottom": 224,
+          "left": 22,
+          "right": 353
+        },
+        "window": {
+          "top": 284,
+          "bottom": 451,
+          "left": 22,
+          "right": 353
+        },
+        "note": {
+          "top": 507,
+          "bottom": 680,
+          "left": 22,
+          "right": 353
+        },
+        "reply": {
+          "top": 636,
+          "bottom": 680,
+          "left": 22,
+          "right": 127
+        },
+        "tabbar": {
+          "top": 732,
+          "bottom": 796,
+          "left": 0,
+          "right": 375
+        }
+      },
+      "clipped": []
+    },
+    {
+      "label": "临时忙碌",
+      "slug": "scenario-4",
+      "text": "阿远 · 纽约\n我 · 北京\n9/29 · 周二\n08:00\n此刻 · 临时在图书馆\n9/29 · 周二\n20:00\n晚间休息\n可联系的时间\n明天可以联系\n设置提醒\n纽约\n19:00–20:00\n北京 · 明天\n07:00–08:00\n\n按双方联系偏好估计，尚未约定\n\n阿远\n15分钟前\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n回阿远一句",
+      "docWidth": 375,
+      "appScrollHeight": 736,
+      "appHeight": 736,
+      "noScroll": true,
+      "rects": {
+        "thesis": {
+          "top": 81,
+          "bottom": 103,
+          "left": 22,
+          "right": 353
+        },
+        "pair": {
+          "top": 107,
+          "bottom": 225,
+          "left": 22,
+          "right": 353
+        },
+        "window": {
+          "top": 285,
+          "bottom": 452,
+          "left": 22,
+          "right": 353
+        },
+        "note": {
+          "top": 508,
+          "bottom": 681,
+          "left": 22,
+          "right": 353
+        },
+        "reply": {
+          "top": 637,
+          "bottom": 681,
+          "left": 22,
+          "right": 127
+        },
+        "tabbar": {
+          "top": 732,
+          "bottom": 796,
+          "left": 0,
+          "right": 375
+        }
+      },
+      "clipped": []
+    },
+    {
+      "label": "对方尚未设置",
+      "slug": "scenario-5",
+      "text": "阿远 · 纽约\n我 · 北京\n9/29 · 周二\n08:00\n此刻安排未分享\n9/29 · 周二\n20:00\n晚间休息\n等待彼此的节奏\n暂时还不能推荐时间\n\n阿远尚未设置作息和联系偏好，未知时间不会算作共同空闲。\n\n先留一句关心\n阿远\n15分钟前\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n回阿远一句",
+      "docWidth": 375,
+      "appScrollHeight": 736,
+      "appHeight": 736,
+      "noScroll": true,
+      "rects": {
+        "thesis": {
+          "top": 81,
+          "bottom": 103,
+          "left": 22,
+          "right": 353
+        },
+        "pair": {
+          "top": 107,
+          "bottom": 204,
+          "left": 22,
+          "right": 353
+        },
+        "window": {
+          "top": 264,
+          "bottom": 434,
+          "left": 22,
+          "right": 353
+        },
+        "note": {
+          "top": 490,
+          "bottom": 663,
+          "left": 22,
+          "right": 353
+        },
+        "reply": {
+          "top": 619,
+          "bottom": 663,
+          "left": 22,
+          "right": 127
+        },
+        "tabbar": {
+          "top": 732,
+          "bottom": 796,
+          "left": 0,
+          "right": 375
+        }
+      },
+      "clipped": []
+    }
+  ],
+  "errors": []
+}

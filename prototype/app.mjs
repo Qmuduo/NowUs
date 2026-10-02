@@ -136,7 +136,7 @@ function commonCard() {
     const nextDay = startLocal.date !== endLocal.date ? '<span class="end-next-day">次日</span>' : '';
     return `<span class="local-window ${person}"><small>${esc(PEOPLE[person].city)}${day === '今天' ? '' : ` · ${day}`}</small><strong>${startLocal.time}–${endLocal.time}${nextDay}</strong></span>`;
   }).join('');
-  return `<div class="common-card"><div class="common-top"><span class="common-label">可联系的时间<span class="common-when">${esc(whenText)}</span></span><button type="button" class="common-action" data-action="window-detail">${state.reminder === window.start ? '提醒已设' : '设置提醒'} ${icon('arrow')}</button></div><div class="common-times" role="group" aria-label="双方当地的联系时段">${times}</div></div>`;
+  return `<div class="common-card"><div class="common-top"><span class="common-label">可联系的时间<span class="common-when">${esc(whenText)}</span></span><button type="button" class="common-action" data-action="window-detail">${state.reminder === window.start ? '提醒已设' : '设置提醒'} ${icon('arrow')}</button></div><div class="common-times" role="group" aria-label="双方当地的联系时段">${times}</div><p class="common-source">按双方联系偏好估计，尚未约定</p></div>`;
 }
 function noteMarkup(note, person) {
   if (!note) return `<p class="note-empty">留一句今天想告诉${esc(PEOPLE.partner.name)}的话。</p>`;

@@ -2,7 +2,7 @@
 import hashlib, json, pathlib, shutil, subprocess, sys
 
 round_no = sys.argv[1]
-batch = sys.argv[2] if len(sys.argv) > 2 else '2026-10-02-d'
+batch = sys.argv[2] if len(sys.argv) > 2 else '2026-10-02-e'
 root = pathlib.Path('.').resolve()
 out = root / 'design-history' / batch / f'round-{round_no}'
 (out / 'source').mkdir(parents=True, exist_ok=True)
