@@ -26,7 +26,7 @@ const path = require('node:path');
   // 2. the shared window is stated once, with the estimate disclaimer kept apart from it
   report.window = await page.evaluate(() => ({
     label: document.querySelector('.common-label').innerText,
-    headline: document.querySelector('.common-title').innerText.replace(/\n/g, ' '),
+    headline: (document.querySelector('.common-title, .common-when') || {}).innerText ? document.querySelector('.common-title, .common-when').innerText.replace(/\n/g, ' ') : null,
     ranges: [...document.querySelectorAll('.local-window')].map(el => el.innerText.replace(/\n/g, ' ')),
     source: document.querySelector('.common-footer, .foot-note') ? document.querySelector('.common-footer, .foot-note').innerText.replace(/\n/g, ' ') : null,
   }));

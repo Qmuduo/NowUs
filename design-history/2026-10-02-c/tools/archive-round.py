@@ -7,7 +7,7 @@ root = pathlib.Path('.').resolve()
 out = root / 'design-history' / batch / f'round-{round_no}'
 (out / 'source').mkdir(parents=True, exist_ok=True)
 
-subprocess.run(['node', 'design-history/2026-10-02-b/tools/capture.cjs', f'round-{round_no}', f'round{round_no}'], check=True)
+subprocess.run(['node', f'design-history/{batch}/tools/capture.cjs', f'round-{round_no}', f'round{round_no}'], check=True)
 
 src = root / 'prototype'
 dst = out / 'source' / 'prototype'
