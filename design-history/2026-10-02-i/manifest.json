@@ -1,0 +1,36 @@
+{
+  "batch": "2026-10-02-i",
+  "track": "B cross-view consistency",
+  "scenario": "临时忙碌",
+  "round": 113,
+  "reviewed": true,
+  "records": {
+    "112": "两两比较负",
+    "113": "两两比较胜"
+  },
+  "adopted": "113",
+  "files": {
+    "build-manifest.py": "8f2af2db9305b4290f2af2c822f6b4bb4486816ee70850d540f6aa2d0dfcaef6",
+    "findings.md": "3225ba9bcf3559ee911fbfe39ec2b309690e95cd05bba05f813b9807ebc90046",
+    "README.md": "4623d33bf3537873f2676d0bcb4bc814c4b435b243edec42d84b094407c22f48",
+    "round-113/source/prototype/app.mjs": "0e192104b1f4312aa1405179e3534cfa6fe21c24159d29f0653b9a4f24e3c690",
+    "round-113/source/prototype/index.html": "7f4744c2c7bdff34ed702c529e440c805c30aedb21be8f29ab9c7cc0fa0efdba",
+    "round-113/source/prototype/model.mjs": "4801cd7597bdcc1dc4ca2cd16f0b81e03bd158dc145c35c15dc819ca5652c458",
+    "round-113/source/prototype/model.test.mjs": "8b79f7f79a3663993e3ff8a98d95e428e7de692d6531d0836bd4b405829fa7db",
+    "round-113/source/prototype/onboarding.mjs": "f8a7de7cb891cb43a55f897cb596014ad55d488c60fbf29d3b70f970aed806ae",
+    "round-113/source/prototype/pairing-model.mjs": "97d6750f06b4208eb976b6403ae3ee644c9e74dd70bb1b34a8f472bc21b41aa0",
+    "round-113/source/prototype/pairing-model.test.mjs": "647c695eb7a5c91d906a2dc47f07c24a105c0a5d1d8c8aa955308d3f9701ca45",
+    "round-113/source/prototype/preview-day.png": "1c4f88261c4c10908428284df430c22fc43fad1aa3e45ed2153d116be41f82b9",
+    "round-113/source/prototype/preview-home.png": "7b31d9659431308c48186f6abcc44ef65ed50724ac7071795ab9f863005b0f1d",
+    "round-113/source/prototype/preview-invite.png": "06ce6d591769e69692c7491b24b22769a561e5a3ce01d66b36af39d9a1caff44",
+    "round-113/source/prototype/preview-pairing.png": "d44061240e578c47ecdfbc964338b82e3daa1ba513eac9a54687a6603ee86769",
+    "round-113/source/prototype/preview-rhythm.png": "1b22074d1341435b338ad6aea790b85671a19d072a3d1ed3b60da9e9e913e52c",
+    "round-113/source/prototype/preview-setup.png": "72d1f47b4693fe79612c9964a464e583d90c60ea11baac66fc43c80e801cd2af",
+    "round-113/source/prototype/rhythm.mjs": "a7627b04763058addc67b0f59463bd32b19be8739e7570fba99b994116d789b6",
+    "round-113/source/prototype/styles.css": "eea5d583ad86484d25a95a1643fda376ca20c2ceb3fbd789fe7a5557823dd4cb",
+    "round-113/source-hashes.json": "4912d7645f0d298a05358657dc4a6e21a3b1a88d6bf0277ca6f34028707b305e",
+    "s4-baseline-112/s4-112.png": "ce92ed11c8eb101a95f5fb69e82614b5ac0556cd66b2fbdd3f99e711248c440e",
+    "s4-round-113/s4-113.png": "0b86166b91af3970d4dd779f2117d1f6fb6b2d6adb2365916ffa9c2a6989a643",
+    "tools/capture-day-scenario.cjs": "451223f00cbad4bb2a67a61d113402b123f1d36f4633a18a4d84b60649dda1ed"
+  }
+}
