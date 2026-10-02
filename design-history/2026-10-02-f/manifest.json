@@ -1,0 +1,22 @@
+{
+  "batch": "2026-10-02-f",
+  "kind": "cross-view audit (no review round)",
+  "prototype": "110 (unchanged)",
+  "files": {
+    "build-manifest.py": "93b3b657888314d20f034fc0b78577a66f351a1e8d0a684c07f5608ae9a8bd15",
+    "findings.md": "c59091b5b1fcba1f6811c324f351e4d8fea02fd15ae054bce9299913e659d01e",
+    "README.md": "fcc13dc470a5198063518e1ce70e728efd984d213c5ef577b3c1dac684a90d4e",
+    "tools/view-audit.cjs": "3c9751734c6f970e62dc682421bcead8eb74f4df2333e0bb924c5fc66a096410",
+    "view-audit/scenario-1-day.png": "e08a0b3aa27ec51aff2b3b2b80096adeeafb4b093882bf93879cd6e1ebb63df3",
+    "view-audit/scenario-1-rhythm.png": "8d81f6576ce59ffd7fa19e03e148bb8809091ea4979c907159241d0eb48a3fd2",
+    "view-audit/scenario-2-day.png": "a8e79d42e0ef1631e344fde0738775d74f1ce9d98d9b84a6612e9feb96e4de6c",
+    "view-audit/scenario-2-rhythm.png": "4f182dd21f62e33e3b0284f4a039b8743e0eaf5a57119ad013f068dab6c2afcb",
+    "view-audit/scenario-3-day.png": "69a61702ae26088b70a537a05f6aa6f243da67c36c0bb8a02cb5c9b1cb941f38",
+    "view-audit/scenario-3-rhythm.png": "8d81f6576ce59ffd7fa19e03e148bb8809091ea4979c907159241d0eb48a3fd2",
+    "view-audit/scenario-4-day.png": "44fde359c90cd1d6bdfcf6ba64dc807c598fa358c446f860c6022e9fc908f743",
+    "view-audit/scenario-4-rhythm.png": "8d81f6576ce59ffd7fa19e03e148bb8809091ea4979c907159241d0eb48a3fd2",
+    "view-audit/scenario-5-day.png": "c02199ef6fdf7ed4e2876b6c199807188bd854f5359659815b55fb2fd39d7d72",
+    "view-audit/scenario-5-rhythm.png": "8d81f6576ce59ffd7fa19e03e148bb8809091ea4979c907159241d0eb48a3fd2",
+    "view-audit/view-audit.json": "4722e13eba7201928951b7c58e7b64f2ab9f189f74ccbd1a5202af130074b094"
+  }
+}
