@@ -2,12 +2,20 @@
  * B=system-sans+tabular-numerals · C=life-first+continuous-aligned-timeline
  * D=CSS-state-feedback · E=two-horizons · SOUL=6 SPECTACLE=2 DENSITY=5 */
 :root {
-  --page: #F2F5F2;
-  --panel: #FAFCFA;
+  --page: #F7F1E8;
+  --panel: #FFFCF7;
   --ink: #232A25;
   --muted: #45534B;
-  --accent: #2F6B4F;
-  --accent-soft: #E3EEE5;
+  --accent: #1F4A36;
+  --accent-soft: #E4EBE3;
+  --p-dawn: #F6E1C6;
+  --p-dawn-ink: #4A3B26;
+  --p-day: #FFFCF4;
+  --p-day-ink: #3E3826;
+  --p-dusk: #F1CFAE;
+  --p-dusk-ink: #533426;
+  --p-night: #2C3A52;
+  --p-night-ink: #EEF2F8;
   --border: rgba(35, 42, 37, .09);
   --night: #27354B;
   --night-mid: #3D4F68;
@@ -22,8 +30,8 @@
   --rest: #F3ECD7;
   --rest-ink: #655426;
   --error: #9F392F;
-  --surround: #DFE7E0;
-  --surround-light: #EFF4EE;
+  --surround: #EAE2D6;
+  --surround-light: #F7F2E9;
   --scrim: rgba(27, 43, 32, .35);
   --shadow: 0 4px 16px -10px rgba(29, 60, 42, .19);
   --frame-shadow: 0 30px 80px -35px rgba(29, 60, 42, .36);
@@ -532,3 +540,31 @@ svg { display: block; width: 20px; height: 20px; flex: none; }
 #home-view .note-compose { width: auto; max-width: 100%; align-self: flex-start; justify-content: flex-start; gap: 6px; min-height: 44px; margin: 12px 0 0; padding: 0 2px; border: 0; border-radius: 0; background: transparent; color: var(--accent); }
 #home-view .note-compose-placeholder { font-size: 16px; font-weight: 600; }
 #home-view .note-compose svg, #home-view .note-compose svg:last-child { width: 15px; height: 15px; margin-left: 0; }
+
+/* ── 第 115 轮：首页两列改为昼夜卡片 ─────────────────────────────────────
+   颜色只承担昼夜，字号仍只由共同窗口承担主次；卡片低饱和 + 细边，不加阴影。 */
+#home-view .time-pair .time-person { border-radius: 16px; }
+#home-view .time-pair .time-person.dawn  { background: var(--p-dawn);  color: var(--p-dawn-ink); }
+#home-view .time-pair .time-person.day   { background: var(--p-day);   color: var(--p-day-ink); }
+#home-view .time-pair .time-person.dusk  { background: var(--p-dusk);  color: var(--p-dusk-ink); }
+#home-view .time-pair .time-person.night { background: var(--p-night); color: var(--p-night-ink); }
+#home-view .time-pair { gap: 10px; }
+#home-view .time-pair::after { content: none; }
+#home-view .time-pair .time-person .person-date,
+#home-view .time-pair .time-person .person-label,
+#home-view .time-pair .time-person .local-date { color: inherit; opacity: .72; }
+#home-view .time-pair .time-person .local-time { color: inherit; }
+#home-view .time-pair .time-person .partner-state-current strong,
+#home-view .time-pair .time-person .self-activity { color: inherit; }
+/* 第 115 轮修正：卡内文字一律继承卡片墨色，避免旧规则把深色卡上的字设成深色 */
+#home-view .time-pair .time-person .time-weather,
+#home-view .time-pair .time-person .time-weather span,
+#home-view .time-pair .time-person .time-weather strong,
+#home-view .time-pair .time-person .self-activity,
+#home-view .time-pair .time-person .partner-state-next time,
+#home-view .time-pair .time-person .partner-state-next span,
+#home-view .time-pair .time-person .local-date,
+#home-view .time-pair .time-person .person-city { color: inherit; }
+#home-view .time-pair .time-person.night.self-person .time-weather,
+#home-view .time-pair .time-person.day.partner-person .partner-state,
+#home-view .time-pair .time-person.day.partner-person .partner-state-current strong { color: inherit; }

@@ -75,7 +75,10 @@ const bounds = () => {
 function source(activity) { return `<span class="source ${activity.source === '主动设置' ? 'active' : ''}">${esc(activity.source)}</span>`; }
 function stage(instant, person) {
   const hour = +parts(instant, PEOPLE[person].zone).hour;
-  return hour >= 6 && hour < 18 ? { kind: 'day', label: hour < 11 ? '早晨' : hour < 14 ? '午间' : '午后', icon: 'sun' } : { kind: 'night', label: hour >= 23 || hour < 6 ? '深夜' : '夜晚', icon: 'moon' };
+  if (hour >= 5 && hour < 8) return { kind: 'dawn', label: '清晨', icon: 'sun' };
+  if (hour >= 8 && hour < 17) return { kind: 'day', label: '白天', icon: 'sun' };
+  if (hour >= 17 && hour < 20) return { kind: 'dusk', label: '黄昏', icon: 'sun' };
+  return { kind: 'night', label: '夜晚', icon: 'moon' };
 }
 function scenarioButtons() {
   return Object.entries(SCENARIOS).map(([id, s]) => `<button type="button" class="scenario-button" data-scenario="${id}" aria-pressed="${state.scenario === id}"><span>${esc(s.label)}</span>${state.scenario === id ? icon('check') : icon('arrow')}</button>`).join('');
@@ -95,7 +98,7 @@ function timePerson(person) {
   const localDate = parts(now(), p.zone);
   const weekday = new Intl.DateTimeFormat('zh-CN', { timeZone: p.zone, weekday: 'short' }).format(now());
   const compactDate = `${Number(localDate.date.slice(5, 7))}/${Number(localDate.date.slice(8, 10))}`;
-  return `<div class="time-person ${period.kind} ${role}-person${sameLocalDate ? ' same-date' : ''}"><div class="person-label"><span class="person-name">${person === 'me' ? '我' : esc(p.name)}</span><span class="person-city">· ${p.city}</span></div><div class="person-date">${compactDate} · ${weekday}</div><div class="local-time">${local.time.replace(':', '<span class="time-colon" aria-hidden="true">:</span>')}</div>${stateLine}</div>`;
+  return `<div class="time-person ${period.kind} ${role}-person${sameLocalDate ? ' same-date' : ''}"><div class="person-label"><span class="person-name">${person === 'me' ? '我' : esc(p.name)}</span><span class="person-city">· ${p.city}</span></div><div class="person-date">${period.label} · ${compactDate} ${weekday}</div><div class="local-time">${local.time.replace(':', '<span class="time-colon" aria-hidden="true">:</span>')}</div>${stateLine}</div>`;
 }
 function nextStage(person) {
   const current = routineAt(person, now(), state.scenario, overrides());
