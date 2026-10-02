@@ -1,0 +1,40 @@
+{
+  "batch": "2026-10-02-g",
+  "track": "B cross-view consistency",
+  "versions": [
+    110,
+    111
+  ],
+  "records": {
+    "110": "两两比较负",
+    "111": "两两比较胜（日视图两列与首页方向对齐）"
+  },
+  "adopted": "111",
+  "files": {
+    "build-manifest.py": "08326eb99e2d95ffd16209ad3139a3fd2bcc81dcdbd33e80afc0cc91ef4ae94a",
+    "day-baseline-110/day-110.png": "e08a0b3aa27ec51aff2b3b2b80096adeeafb4b093882bf93879cd6e1ebb63df3",
+    "day-round-111/day-111.png": "09e80b7c24d49e5aadfb375fa9375a5b67f540bbcf851816b4773bde5eba922a",
+    "findings.md": "6cd7226e14a8b628d3dba96da959c0a7849cecdfdb23fd006a27de4592561abf",
+    "home-shared.png": "daadbabbb5cad15c2b3cd2fec80070e29549f33faaf7291e18833c6ffb634509",
+    "README.md": "02ec53bdb01b106602c59cdc74947ebc63b4016b7cf5cc5f901cbc3ddac94f85",
+    "round-111/day.png": "09e80b7c24d49e5aadfb375fa9375a5b67f540bbcf851816b4773bde5eba922a",
+    "round-111/source/prototype/app.mjs": "9aa64666d2b56d60c0d9b96311912de7ed9c80b8c5dcc5eaf966fdd33e76b13b",
+    "round-111/source/prototype/index.html": "7f4744c2c7bdff34ed702c529e440c805c30aedb21be8f29ab9c7cc0fa0efdba",
+    "round-111/source/prototype/model.mjs": "4801cd7597bdcc1dc4ca2cd16f0b81e03bd158dc145c35c15dc819ca5652c458",
+    "round-111/source/prototype/model.test.mjs": "8b79f7f79a3663993e3ff8a98d95e428e7de692d6531d0836bd4b405829fa7db",
+    "round-111/source/prototype/onboarding.mjs": "f8a7de7cb891cb43a55f897cb596014ad55d488c60fbf29d3b70f970aed806ae",
+    "round-111/source/prototype/pairing-model.mjs": "97d6750f06b4208eb976b6403ae3ee644c9e74dd70bb1b34a8f472bc21b41aa0",
+    "round-111/source/prototype/pairing-model.test.mjs": "647c695eb7a5c91d906a2dc47f07c24a105c0a5d1d8c8aa955308d3f9701ca45",
+    "round-111/source/prototype/preview-day.png": "1c4f88261c4c10908428284df430c22fc43fad1aa3e45ed2153d116be41f82b9",
+    "round-111/source/prototype/preview-home.png": "7b31d9659431308c48186f6abcc44ef65ed50724ac7071795ab9f863005b0f1d",
+    "round-111/source/prototype/preview-invite.png": "06ce6d591769e69692c7491b24b22769a561e5a3ce01d66b36af39d9a1caff44",
+    "round-111/source/prototype/preview-pairing.png": "d44061240e578c47ecdfbc964338b82e3daa1ba513eac9a54687a6603ee86769",
+    "round-111/source/prototype/preview-rhythm.png": "1b22074d1341435b338ad6aea790b85671a19d072a3d1ed3b60da9e9e913e52c",
+    "round-111/source/prototype/preview-setup.png": "72d1f47b4693fe79612c9964a464e583d90c60ea11baac66fc43c80e801cd2af",
+    "round-111/source/prototype/rhythm.mjs": "a7627b04763058addc67b0f59463bd32b19be8739e7570fba99b994116d789b6",
+    "round-111/source/prototype/styles.css": "eea5d583ad86484d25a95a1643fda376ca20c2ceb3fbd789fe7a5557823dd4cb",
+    "round-111/source-hashes.json": "8883973240c48ba066b55356d9f2f5a74e76ed0f1c080904ed7e79c5fb6203ca",
+    "tools/capture-day.cjs": "225619c98afe8d3166a0c67edb3745b81714e4eaa3a33f8858ab91643cef7c10",
+    "tools/capture-from-source.cjs": "c2e64f7e1e8279610cf7d04ebcdf4f1493e15763cd9d3f5a6c136fdee3c6b7c1"
+  }
+}

@@ -342,8 +342,8 @@ svg { display: block; width: 20px; height: 20px; flex: none; }
 .window-summary:disabled { opacity: 1; color: var(--muted); background: var(--busy); }
 .continuous { margin-top: 12px; }
 .activity-column { position: absolute; top: 0; bottom: 0; width: calc((100% - 48px) / 2); z-index: 1; }
-.activity-column.me { left: 0; }
-.activity-column.partner { right: 0; }
+.activity-column.me { right: 0; }
+.activity-column.partner { left: 0; }
 .continuous .timeline-block { position: absolute; margin: 0; padding: 10px 8px; overflow: hidden; background: color-mix(in srgb, var(--busy) 68%, transparent); }
 .continuous .timeline-block.sleep { background: color-mix(in srgb, var(--sleep) 68%, transparent); }
 .continuous .timeline-block.rest { background: color-mix(in srgb, var(--rest) 68%, transparent); }
