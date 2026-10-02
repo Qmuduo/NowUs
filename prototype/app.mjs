@@ -170,6 +170,7 @@ function renderDay() {
   const top = time => (time-range.start)/60000*scale;
   currentRows = ['me','partner'].flatMap(person => activitySegments(range,person,dataScenario(),overrides(),state.rhythm));
   currentWindows = commonWindows(range);
+  const dayWindows = commonWindows(day);
   const short = currentRows.filter(row => row.end-row.start < 30*60000);
   const columns = ['me','partner'].map(person => `<div class="activity-column ${person}">${currentRows.map((row,index) => {
     if (row.person !== person) return '';
@@ -186,7 +187,7 @@ function renderDay() {
   }
   const marker = now() >= range.start && now() < range.end ? `<div class="timeline-now" id="now-marker" style="top:${top(now())}px"><span>此刻</span></div>` : '';
   const firstWindow = currentWindows.find(window => window.end > now()) || currentWindows[0];
-  const windowLabel = firstWindow ? `${currentWindows.length > 1 ? `${currentWindows.length} 段 · ` : ''}${parts(firstWindow.start,PEOPLE.partner.zone).time} / ${parts(firstWindow.start,PEOPLE.me.zone).time} · ${minutesText(firstWindow.end-firstWindow.start)}` : dataScenario() === 'missing' ? '资料不足，暂不能推荐' : '这段范围没有共同窗口';
+  const windowLabel = firstWindow ? `${currentWindows.length > 1 ? `${currentWindows.length} 段 · ` : ''}${parts(firstWindow.start,PEOPLE.partner.zone).time} / ${parts(firstWindow.start,PEOPLE.me.zone).time} · ${minutesText(firstWindow.end-firstWindow.start)}` : dataScenario() === 'missing' ? '资料不足，暂不能推荐' : dayWindows.length ? `这段范围没有共同窗口 · 全天还有 ${dayWindows.length} 段` : '这段范围没有共同窗口';
   $('#day-view').innerHTML = `<h1 class="screen-title">我们的一天</h1><p class="screen-subtitle">活动各自连续，同一高度是同一时刻。</p><div class="timeline-toolbar"><div class="day-controls"><button type="button" data-action="previous-day" aria-label="查看前一天">‹</button><strong>我的 ${dateText(day.start, PEOPLE.me.zone)}</strong><button type="button" data-action="next-day" aria-label="查看后一天">›</button><button type="button" class="text-button" data-action="return-now">回到此刻</button></div><div class="day-scope"><div class="range-switch" role="group" aria-label="时间轴范围"><button type="button" data-range="nearby" aria-pressed="${nearby}">附近几小时</button><button type="button" data-range="full" aria-pressed="${!nearby}">展开全天</button></div></div><div class="timeline-people"><div><span>${esc(PEOPLE.partner.name)} · ${PEOPLE.partner.city}</span><small>${dateText(range.start,PEOPLE.partner.zone)}</small></div><span class="axis-key">你 / 我</span><div><span>我 · ${PEOPLE.me.city}</span><small>${dateText(range.start,PEOPLE.me.zone)}</small></div></div><button type="button" class="window-summary" ${firstWindow ? 'data-action="timeline-window"' : 'disabled'}>${icon(firstWindow ? 'heart' : 'clock')}<span>${firstWindow ? '共同可联系 · ' : ''}${windowLabel}</span>${firstWindow ? icon('arrow') : ''}</button>${short.length ? `<button type="button" class="text-button short-detail" data-action="short-activities">查看 ${short.length} 段短活动 ${icon('arrow')}</button>` : ''}</div><div class="timeline continuous" style="height:${top(range.end)}px">${bands}${columns}<div class="timeline-axis">${ticks.join('')}</div>${marker}</div><div class="day-end"><span>${fullDateText(range.end,PEOPLE.me.zone)}</span><span>${fullDateText(range.end,PEOPLE.partner.zone)}</span></div><p class="quiet-footnote">绿色横带按联系偏好估计，尚未约定。</p>`;
 }
 function renderRhythm() {
