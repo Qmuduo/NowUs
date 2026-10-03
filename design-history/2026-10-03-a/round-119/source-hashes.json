@@ -1,6 +1,11 @@
 {
   "round": 119,
-  "label": "已实现，尚未送评",
+  "label": "本轮已评实现",
+  "reviewed": true,
+  "records": {
+    "117": "两两比较负",
+    "119": "两两比较胜"
+  },
   "prototype": {
     "app.mjs": "2c4fd6a517156cc3bf081a2a0ae69e594bd6ae8eb1a100d148859edfdef96816",
     "index.html": "7f4744c2c7bdff34ed702c529e440c805c30aedb21be8f29ab9c7cc0fa0efdba",
