@@ -665,3 +665,13 @@ svg { display: block; width: 20px; height: 20px; flex: none; }
   --sleep:#E7EBEF;      --sleep-ink:#44505E;
   --busy:#EDEFF1;
 }
+
+/* ── 第 119 轮：让卡片成为「面」────────────────────────────────────────────
+   评审量出：白卡 #FFFFFF 与页面 #F4F5F7 的明度差只有 10——白卡在页面上没有形状，
+   而夜晚卡与页面的差是 207。两张「卡片」一个有面一个没有，这就是不协调的来源。
+   把页面压低一档、细边加强，使所有卡片都读成同一种「面」。 */
+:root{ --page:#EAEDF1; --line:#DCE0E6; }
+#home-view .time-pair{ background:#FFFFFF; }
+#home-view .time-pair .time-person.day{ background:#FFFFFF; box-shadow:0 1px 2px rgba(26,29,33,.05); }
+#home-view .connection-panel{ background:var(--tint); border-color:var(--line); }
+#home-view .connection-panel .common-label{ color:var(--accent); }
