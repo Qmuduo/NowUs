@@ -21,21 +21,21 @@
   .phone{width:398px;padding:9px;background:#1B1B1B;border-radius:46px;box-shadow:0 18px 40px rgba(0,0,0,.16);flex:0 0 auto}
   .screen{background:var(--page);border-radius:38px;padding:12px 0 0}
   .status{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);padding:0 16px 10px}
-  .brand{font-size:17px;font-weight:800;letter-spacing:-.5px;padding:0 16px 10px}
+  .brand{font-size:17px;font-weight:800;letter-spacing:-.5px;padding:0 16px 11px;border-bottom:1px solid var(--line)}
   .brand i{font-style:normal;color:var(--blue)}
   /* 顶部下划线标签（取自参考图） */
   .tabs{display:flex;gap:20px;padding:0 16px;border-bottom:1px solid var(--line)}
   .tabs span{font-size:14px;color:var(--muted);padding-bottom:9px}
   .tabs b{font-size:14px;font-weight:700;color:var(--blue);padding-bottom:9px;border-bottom:2px solid var(--blue);margin-bottom:-1px}
   /* 对开两栏 */
-  .spread{display:flex}
-  .col{flex:1;min-width:0;padding:16px 14px 18px}
+  .spread{display:flex;margin:0 16px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+  .col{flex:1;min-width:0;padding:16px 16px 18px}
   .col.night{background:var(--night);color:var(--nightink)}
   .who{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
   .col.night .who{color:rgba(238,242,247,.72)}
   .mono{width:26px;height:26px;border-radius:6px;background:var(--tint);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:0 0 auto}
   .col.night .mono{background:rgba(238,242,247,.14);color:var(--nightink)}
-  .clock{font-family:var(--serif);font-size:40px;line-height:1;letter-spacing:-1.6px;margin:10px 0 7px}
+  .clock{font-family:var(--font);font-weight:700;font-size:44px;line-height:1;letter-spacing:-2.2px;margin:10px 0 7px}
   .st{font-size:12.5px;line-height:1.55;color:#3F4550}
   .col.night .st{color:rgba(238,242,247,.78)}
   .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--tint);color:var(--blue);margin-bottom:7px}
@@ -47,7 +47,7 @@
   /* 浅蓝分组面板 */
   .panel{margin:0 16px 14px;background:var(--tint);border-radius:10px;padding:12px 13px}
   .panel .k{font-size:11.5px;color:var(--blue);display:flex;align-items:center;gap:6px}
-  .panel .v{font-family:var(--serif);font-size:19px;letter-spacing:-.4px;margin-top:7px;white-space:nowrap}
+  .panel .v{font-family:var(--font);font-weight:700;font-size:17.5px;letter-spacing:-.3px;margin-top:7px;white-space:nowrap}
   .panel .m{font-size:11.5px;color:#5A6B80;margin-top:6px;line-height:1.6}
   .seps{color:#A9B4C2;font-size:15px;vertical-align:middle}
   /* 留言行：缩略图 + 标题 + 灰副行（取自参考图） */
@@ -76,7 +76,6 @@
     <div class="phone"><div class="screen">
       <div class="status"><span>20:00</span><span>▮▮▮ ▮</span></div>
       <div class="brand">NowUs<i>.</i></div>
-      <div class="tabs"><b>此刻</b><span>我们的一天</span><span>我的节奏</span></div>
 
       <div class="spread">
         <div class="col">
