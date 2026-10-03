@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>NowUs 首页 · 三个版面方向</title>
+<style>
+  :root{--ink:#0E0E0E;--muted:#6B6B6B;--line:#E2E2E2;--page:#FAFAF8;--night:#111111;--nightink:#F5F5F3;
+        --font:-apple-system,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+        --serif:Georgia,"Times New Roman","Songti SC",serif}
+  *{box-sizing:border-box}
+  body{margin:0;padding:36px 24px 60px;background:#F1F1EF;font-family:var(--font);color:var(--ink)}
+  .shell{max-width:1180px;margin:auto}
+  h1{font-size:24px;letter-spacing:-.5px;margin:0 0 6px}
+  .lead{font-size:13.5px;line-height:1.85;color:var(--muted);max-width:820px;margin:0 0 4px}
+  .lead b{color:var(--ink)}
+  .dir{margin-top:40px;display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+  .dir-head{width:100%;border-top:1px solid var(--line);padding-top:16px}
+  .dir-name{font-size:17px;font-weight:700;letter-spacing:-.2px}
+  .dir-sub{font-size:13px;color:var(--muted);line-height:1.8;margin-top:6px;max-width:820px}
+  /* 手机框：自适应高度，禁止固定高 + overflow:hidden */
+  .phone{width:398px;padding:9px;background:#1B1B1B;border-radius:46px;box-shadow:0 18px 40px rgba(0,0,0,.16)}
+  .screen{background:var(--page);border-radius:38px;overflow:visible;padding:14px 0 0}
+  .inner{padding:0 16px}
+  .status{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);padding:0 16px 8px}
+  .brand{font-size:19px;font-weight:800;letter-spacing:-.6px;padding:2px 16px 14px}
+  .brand i{font-style:normal}
+  .hair{height:1px;background:var(--line);margin:0 16px}
+  .tabbar{display:flex;justify-content:space-between;padding:12px 22px 22px;font-size:12.5px;color:var(--muted)}
+  .tabbar b{color:var(--ink);font-weight:700}
+  .notes{flex:1 1 320px;min-width:300px;max-width:430px}
+  .note{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin-bottom:11px}
+  .note h4{margin:0 0 5px;font-size:13.5px}
+  .note p{margin:0;font-size:12.5px;line-height:1.75;color:#3F3F3F}
+  .was{color:#8A8A8A;text-decoration:line-through}
+  .now{color:#1D6B4A;font-weight:600}
+  /* ── 方向 1：封面式 ───────────────────────────── */
+  .d1 .cover{padding:20px 16px 22px}
+  .d1 .cover .who{font-size:12px;letter-spacing:.22em;color:var(--muted)}
+  .d1 .cover .clock{font-family:var(--serif);font-size:70px;line-height:1;letter-spacing:-3px;margin:8px 0 6px}
+  .d1 .cover .st{font-size:13px;color:#3F3F3F}
+  .d1 .cover.night{background:var(--night);color:var(--nightink)}
+  .d1 .cover.night .who,.d1 .cover.night .st{color:rgba(245,245,243,.74)}
+  .d1 .win{padding:16px}
+  .d1 .win .lbl{font-size:11.5px;letter-spacing:.2em;color:var(--muted)}
+  .d1 .win .v{font-family:var(--serif);font-size:26px;letter-spacing:-.5px;margin-top:6px}
+  .d1 .win .sub{font-size:11.5px;color:var(--muted);margin-top:6px}
+  /* ── 方向 2：版式网格（无卡片，纯字排）─────────── */
+  .d2 .row{display:grid;grid-template-columns:96px 1fr;gap:14px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .d2 .row:first-of-type{border-top:1px solid var(--line)}
+  .d2 .k{font-size:11px;letter-spacing:.16em;color:var(--muted);padding-top:9px}
+  .d2 .clock{font-family:var(--serif);font-size:44px;line-height:1;letter-spacing:-1.6px}
+  .d2 .st{font-size:12.5px;color:#3F3F3F;margin-top:6px}
+  .d2 .winv{font-family:var(--serif);font-size:22px;letter-spacing:-.4px}
+  .d2 .dot{display:inline-block;width:7px;height:7px;border-radius:999px;vertical-align:middle;margin-right:7px}
+  /* ── 方向 3：对开式 ───────────────────────────── */
+  .d3 .spread{display:flex}
+  .d3 .col{flex:1;padding:18px 14px 20px;min-width:0}
+  .d3 .col.night{background:var(--night);color:var(--nightink)}
+  .d3 .col .who{font-size:11.5px;letter-spacing:.16em;color:var(--muted)}
+  .d3 .col.night .who{color:rgba(245,245,243,.74)}
+  .d3 .col .clock{font-family:var(--serif);font-size:40px;line-height:1;letter-spacing:-1.6px;margin:8px 0 6px}
+  .d3 .col .st{font-size:12px;color:#3F3F3F;line-height:1.5}
+  .d3 .col.night .st{color:rgba(245,245,243,.78)}
+  .d3 .band{padding:15px 16px;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .d3 .band .lbl{font-size:11px;letter-spacing:.18em;color:var(--muted)}
+  .d3 .band .v{font-family:var(--serif);font-size:24px;letter-spacing:-.5px;margin-top:7px}
+  .d3 .band .sub{font-size:11.5px;color:var(--muted);margin-top:6px}
+  .quote{font-family:var(--serif);font-size:17px;line-height:1.72;padding:16px}
+  .byline{font-size:11.5px;letter-spacing:.14em;color:var(--muted);padding:0 16px 10px}
+  .reply{font-size:13px;font-weight:700;padding:0 16px 18px;border-bottom:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <h1>NowUs 首页 · 三个版面方向</h1>
+  <p class="lead">这三版<b>不是配色差异，是版面结构差异</b>。都用你的真实数据：阿远 08:00 纽约（白天、通勤路上、09:00 开始上课）／我 20:00 北京（夜晚、休息）／可联系 10:00–10:30 与 22:00–22:30／阿远 15 分钟前的留言。</p>
+  <p class="lead">底色统一用中性白 <b>#FAFAF8</b>、文字近黑 <b>#0E0E0E</b>、昼夜只靠明暗（白／黑）。杂志感来自版面与字，不来自颜色。</p>
+
+  <!-- 方向 1 -->
+  <section class="dir d1">
+    <div class="dir-head">
+      <div class="dir-name">方向 1 · 封面式</div>
+      <div class="dir-sub">两个人的状态各占一条<b>通栏</b>，上下叠放：他那边是白底，我这边是黑底，各用超大衬线数字。共同时间降为一条通栏小节。像杂志的跨页——先看人，再看事。</div>
+    </div>
+    <div class="phone"><div class="screen">
+      <div class="status"><span>20:00</span><span>▮▮▮ ▮</span></div>
+      <div class="brand">NowUs<i>.</i></div>
+      <div class="cover">
+        <div class="who">阿远 · 纽约</div>
+        <div class="clock">08:00</div>
+        <div class="st">白天 · 通常在通勤路上 · 09:00 开始上课</div>
+      </div>
+      <div class="cover night">
+        <div class="who">我 · 北京</div>
+        <div class="clock">20:00</div>
+        <div class="st">夜晚 · 休息</div>
+      </div>
+      <div class="hair"></div>
+      <div class="win">
+        <div class="lbl">可联系的时间</div>
+        <div class="v">10:00–10:30 ／ 22:00–22:30</div>
+        <div class="sub">2 小时后开始 · 按双方联系偏好估计，尚未约定</div>
+      </div>
+      <div class="hair"></div>
+      <div class="byline" style="padding-top:14px">阿远 · 15 分钟前</div>
+      <div class="quote">我找到你说的那家唱片店了，地址发你，周末一起去？</div>
+      <div class="reply">回阿远一句 ›</div>
+      <div class="tabbar"><b>此刻</b><span>我们的一天</span><span>我的节奏</span></div>
+    </div></div>
+    <div class="notes">
+      <div class="note"><h4>原来 → 现在</h4><p><span class="was">两个钟并排成两列卡片，共用一个 380px 宽度的上半屏</span><br><span class="now">两个人的状态各占一条通栏，上下叠放，各 70px 衬线数字</span></p></div>
+      <div class="note"><h4>为什么</h4><p>并排两列时，两个人的信息各只有 180px 宽，「阿远 · 纽约 / 白天 / 通勤路上 / 09:00 上课」四行被挤成小字。通栏之后每一条都有整屏宽度，字号可以大一倍，昼夜底色也能真正铺满——黑与白的对比只有通栏才成立。</p></div>
+      <div class="note"><h4>代价</h4><p>纵向变长（这一屏约高 900px，需要滚动）。若不想滚动，可把两条通栏各压到 150px 高、去掉状态行第二句。</p></div>
+    </div>
+  </section>
+
+  <!-- 方向 2 -->
+  <section class="dir d2">
+    <div class="dir-head">
+      <div class="dir-name">方向 2 · 版式网格</div>
+      <div class="dir-sub">完全不用卡片：左窄栏放小字标签，右宽栏放内容，行与行之间只用<b>发丝线</b>。昼夜用一个小圆点＋文字表示，不用底色块。最克制，也最像杂志内页。</div>
+    </div>
+    <div class="phone"><div class="screen">
+      <div class="status"><span>20:00</span><span>▮▮▮ ▮</span></div>
+      <div class="brand">NowUs<i>.</i></div>
+      <div class="row"><div class="k">阿远 · 纽约</div><div><div class="clock">08:00</div><div class="st"><span class="dot" style="background:#D6D6D2"></span>白天 · 通常在通勤路上<br><span style="color:var(--muted)">09:00 开始上课</span></div></div></div>
+      <div class="row"><div class="k">我 · 北京</div><div><div class="clock">20:00</div><div class="st"><span class="dot" style="background:#111111"></span>夜晚 · 休息</div></div></div>
+      <div class="row"><div class="k">可联系</div><div><div class="winv">10:00–10:30 ／ 22:00–22:30</div><div class="st" style="color:var(--muted)">2 小时后开始 · 按双方联系偏好估计，尚未约定</div></div></div>
+      <div class="row" style="border-bottom:0"><div class="k">留言</div><div><div class="byline" style="padding:0 0 8px">阿远 · 15 分钟前</div><div class="quote" style="padding:0 0 12px">我找到你说的那家唱片店了，地址发你，周末一起去？</div><div class="reply" style="padding:0;border:0">回阿远一句 ›</div></div></div>
+      <div class="tabbar"><b>此刻</b><span>我们的一天</span><span>我的节奏</span></div>
+    </div></div>
+    <div class="notes">
+      <div class="note"><h4>原来 → 现在</h4><p><span class="was">两张填充卡片 + 分隔线 + 区块标题，像常规 App 的堆叠列表</span><br><span class="now">左窄栏标签 / 右宽栏内容的两列网格，只有发丝线，没有任何填充块</span></p></div>
+      <div class="note"><h4>为什么</h4><p>杂志内页靠<b>对齐和分隔线</b>组织信息，不靠色块。去掉填充后，屏幕上只剩两种东西：字和线。昼夜改由一个 7px 圆点承担——颜色只出现在一个点上，是最省的表达。</p></div>
+      <div class="note"><h4>风险</h4><p>昼夜对比变弱（只是一个点），「一眼看出白天还是夜晚」这条会打折。若这条不能让步，这个方向不合适。</p></div>
+    </div>
+  </section>
+
+  <!-- 方向 3 -->
+  <section class="dir d3">
+    <div class="dir-head">
+      <div class="dir-name">方向 3 · 对开式</div>
+      <div class="dir-sub">左右两栏各占半屏、等高，左边白右边黑；共同时间做成一条<b>横跨两栏</b>的通栏带，接在下面。这是把「同一段时间属于两个人」用版面直接画出来，而不是用图形。</div>
+    </div>
+    <div class="phone"><div class="screen">
+      <div class="status"><span>20:00</span><span>▮▮▮ ▮</span></div>
+      <div class="brand">NowUs<i>.</i></div>
+      <div class="spread">
+        <div class="col">
+          <div class="who">阿远 · 纽约</div>
+          <div class="clock">08:00</div>
+          <div class="st">白天<br>通常在通勤路上<br><span style="color:var(--muted)">09:00 开始上课</span></div>
+        </div>
+        <div class="col night">
+          <div class="who">我 · 北京</div>
+          <div class="clock">20:00</div>
+          <div class="st">夜晚<br>休息</div>
+        </div>
+      </div>
+      <div class="band">
+        <div class="lbl">可联系的时间</div>
+        <div class="v">10:00–10:30 ／ 22:00–22:30</div>
+        <div class="sub">2 小时后开始 · 按双方联系偏好估计，尚未约定</div>
+      </div>
+      <div class="byline" style="padding-top:14px">阿远 · 15 分钟前</div>
+      <div class="quote">我找到你说的那家唱片店了，地址发你，周末一起去？</div>
+      <div class="reply">回阿远一句 ›</div>
+      <div class="tabbar"><b>此刻</b><span>我们的一天</span><span>我的节奏</span></div>
+    </div></div>
+    <div class="notes">
+      <div class="note"><h4>原来 → 现在</h4><p><span class="was">两列卡片中间一条竖线，共同时间在下面另起一块</span><br><span class="now">两栏等高对开（白／黑），共同时间做成横跨两栏的通栏带</span></p></div>
+      <div class="note"><h4>为什么</h4><p>「同一段时间属于两个人」这件事，用版面表达比用图形可靠：通栏带在视觉上同时接住左栏和右栏，不需要刻度、坐标或图例——而后者在第 98／100／101 轮三次被读成装饰。</p></div>
+      <div class="note"><h4>与方向 1 的差别</h4><p>方向 1 是上下叠放、强调「先后」；这一版是左右对开、强调「同时」。默认场景（他白天／我夜晚）在左右对开下对照最强。</p></div>
+    </div>
+  </section>
+</div>
+</body>
+</html>
