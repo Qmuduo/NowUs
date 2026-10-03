@@ -10,7 +10,7 @@
   --accent-soft: #E4EBE3;
   --p-dawn: #EFE6D9;
   --p-dawn-ink: #3C372F;
-  --p-day: #FDFBF7;
+  --p-day: #FBF5EA;
   --p-day-ink: #3A352E;
   --p-dusk: #E4D6C3;
   --p-dusk-ink: #3B342B;
@@ -543,7 +543,8 @@ svg { display: block; width: 20px; height: 20px; flex: none; }
 
 /* ── 第 115 轮：首页两列改为昼夜卡片 ─────────────────────────────────────
    颜色只承担昼夜，字号仍只由共同窗口承担主次；卡片低饱和 + 细边，不加阴影。 */
-#home-view .time-pair .time-person { border-radius: 16px; }
+#home-view .time-pair .time-person { border-radius: 16px; border: 1px solid rgba(35,42,37,.08); }
+#home-view .time-pair .time-person.night { border-color: rgba(255,255,255,.14); }
 #home-view .time-pair .time-person.dawn  { background: var(--p-dawn);  color: var(--p-dawn-ink); }
 #home-view .time-pair .time-person.day   { background: var(--p-day);   color: var(--p-day-ink); }
 #home-view .time-pair .time-person.dusk  { background: var(--p-dusk);  color: var(--p-dusk-ink); }
