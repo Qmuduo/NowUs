@@ -653,3 +653,15 @@ svg { display: block; width: 20px; height: 20px; flex: none; }
 #home-view .time-pair .time-person .partner-state-current strong,
 #home-view .time-pair .time-person .time-weather,
 #home-view .time-pair .time-person .self-activity{ font-size:11.5px; line-height:1.5; }
+
+/* ── 第 117 轮：次级视图的旧暖色令牌对齐到新家族 ─────────────────────────
+   日视图 / 节奏视图 / 弹窗仍在用 --day / --day-ink / --sleep / --border 等旧值
+   （暖奶油 + 暖棕 + 带绿味的边），与首页的新中性冷灰并置会明显打架。 */
+:root{
+  --border:#E6E8EB;
+  --day:#EEF1F4;        --day-mid:#E4E8EC;   --day-ink:#1A1D21;
+  --night:#1E2733;      --night-mid:#2A3644;
+  --night-ink:#EEF2F7;  --night-muted:#AEBBC9;
+  --sleep:#E7EBEF;      --sleep-ink:#44505E;
+  --busy:#EDEFF1;
+}
