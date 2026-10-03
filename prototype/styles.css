@@ -2,20 +2,20 @@
  * B=system-sans+tabular-numerals · C=life-first+continuous-aligned-timeline
  * D=CSS-state-feedback · E=two-horizons · SOUL=6 SPECTACLE=2 DENSITY=5 */
 :root {
-  --page: #F4EFE7;
-  --panel: #FDFBF7;
-  --ink: #232A25;
-  --muted: #45534B;
-  --accent: #1F4A36;
-  --accent-soft: #E4EBE3;
-  --p-dawn: #EFE6D9;
-  --p-dawn-ink: #3C372F;
-  --p-day: #FBF5EA;
-  --p-day-ink: #3A352E;
-  --p-dusk: #E4D6C3;
-  --p-dusk-ink: #3B342B;
-  --p-night: #2F2B27;
-  --p-night-ink: #F2EDE6;
+  --page: #FAFAF8;
+  --panel: #FFFFFF;
+  --ink: #0E0E0E;
+  --muted: #6B6B6B;
+  --accent: #111111;
+  --accent-soft: #F1F1F1;
+  --p-dawn: #EDEDEA;
+  --p-dawn-ink: #2A2A28;
+  --p-day: #FFFFFF;
+  --p-day-ink: #0E0E0E;
+  --p-dusk: #D6D6D2;
+  --p-dusk-ink: #1A1A18;
+  --p-night: #111111;
+  --p-night-ink: #F5F5F3;
   --border: rgba(35, 42, 37, .09);
   --night: #27354B;
   --night-mid: #3D4F68;
@@ -30,8 +30,8 @@
   --rest: #F3ECD7;
   --rest-ink: #655426;
   --error: #9F392F;
-  --surround: #EAE2D6;
-  --surround-light: #F7F2E9;
+  --surround: #E8E8E6;
+  --surround-light: #F4F4F2;
   --scrim: rgba(27, 43, 32, .35);
   --shadow: 0 4px 16px -10px rgba(29, 60, 42, .19);
   --frame-shadow: 0 30px 80px -35px rgba(29, 60, 42, .36);
@@ -543,8 +543,8 @@ svg { display: block; width: 20px; height: 20px; flex: none; }
 
 /* ── 第 115 轮：首页两列改为昼夜卡片 ─────────────────────────────────────
    颜色只承担昼夜，字号仍只由共同窗口承担主次；卡片低饱和 + 细边，不加阴影。 */
-#home-view .time-pair .time-person { border-radius: 16px; border: 1px solid rgba(35,42,37,.08); }
-#home-view .time-pair .time-person.night { border-color: rgba(255,255,255,.14); }
+#home-view .time-pair .time-person { border-radius: 2px; border: 1px solid #E2E2E2; }
+#home-view .time-pair .time-person.night { border-color: #111111; }
 #home-view .time-pair .time-person.dawn  { background: var(--p-dawn);  color: var(--p-dawn-ink); }
 #home-view .time-pair .time-person.day   { background: var(--p-day);   color: var(--p-day-ink); }
 #home-view .time-pair .time-person.dusk  { background: var(--p-dusk);  color: var(--p-dusk-ink); }

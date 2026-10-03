@@ -1,6 +1,6 @@
 {
   "round": 115,
-  "label": "已评分 7，评审后修正一处",
+  "label": "杂志方向配色（用户第二次反馈后）",
   "prototype": {
     "app.mjs": "2c4fd6a517156cc3bf081a2a0ae69e594bd6ae8eb1a100d148859edfdef96816",
     "index.html": "7f4744c2c7bdff34ed702c529e440c805c30aedb21be8f29ab9c7cc0fa0efdba",
@@ -16,6 +16,6 @@
     "preview-rhythm.png": "1b22074d1341435b338ad6aea790b85671a19d072a3d1ed3b60da9e9e913e52c",
     "preview-setup.png": "72d1f47b4693fe79612c9964a464e583d90c60ea11baac66fc43c80e801cd2af",
     "rhythm.mjs": "a7627b04763058addc67b0f59463bd32b19be8739e7570fba99b994116d789b6",
-    "styles.css": "1d7d7cfc9489deb9540300f9982e7aa8661208d9e2225ce6bd53559485a1214b"
+    "styles.css": "cce7a2612b7707e974ebf4c9e89693bbd0869ddefdb7b245d8ce892bd78e9367"
   }
 }
