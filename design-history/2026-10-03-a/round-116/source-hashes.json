@@ -1,0 +1,21 @@
+{
+  "round": 116,
+  "label": "方向落地的第一版实现，尚未送评",
+  "prototype": {
+    "app.mjs": "2c4fd6a517156cc3bf081a2a0ae69e594bd6ae8eb1a100d148859edfdef96816",
+    "index.html": "7f4744c2c7bdff34ed702c529e440c805c30aedb21be8f29ab9c7cc0fa0efdba",
+    "model.mjs": "4801cd7597bdcc1dc4ca2cd16f0b81e03bd158dc145c35c15dc819ca5652c458",
+    "model.test.mjs": "8b79f7f79a3663993e3ff8a98d95e428e7de692d6531d0836bd4b405829fa7db",
+    "onboarding.mjs": "f8a7de7cb891cb43a55f897cb596014ad55d488c60fbf29d3b70f970aed806ae",
+    "pairing-model.mjs": "97d6750f06b4208eb976b6403ae3ee644c9e74dd70bb1b34a8f472bc21b41aa0",
+    "pairing-model.test.mjs": "647c695eb7a5c91d906a2dc47f07c24a105c0a5d1d8c8aa955308d3f9701ca45",
+    "preview-day.png": "1c4f88261c4c10908428284df430c22fc43fad1aa3e45ed2153d116be41f82b9",
+    "preview-home.png": "7b31d9659431308c48186f6abcc44ef65ed50724ac7071795ab9f863005b0f1d",
+    "preview-invite.png": "06ce6d591769e69692c7491b24b22769a561e5a3ce01d66b36af39d9a1caff44",
+    "preview-pairing.png": "d44061240e578c47ecdfbc964338b82e3daa1ba513eac9a54687a6603ee86769",
+    "preview-rhythm.png": "1b22074d1341435b338ad6aea790b85671a19d072a3d1ed3b60da9e9e913e52c",
+    "preview-setup.png": "72d1f47b4693fe79612c9964a464e583d90c60ea11baac66fc43c80e801cd2af",
+    "rhythm.mjs": "a7627b04763058addc67b0f59463bd32b19be8739e7570fba99b994116d789b6",
+    "styles.css": "21b75ecacdfea6cc2fbf57225f88aef1f5d159693c1c5843f7baadfc9075cfd6"
+  }
+}

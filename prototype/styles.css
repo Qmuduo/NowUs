@@ -581,3 +581,75 @@ svg { display: block; width: 20px; height: 20px; flex: none; }
 /* 卡片内大时间：必须继承卡片墨色（旧规则 id+4 类，需同等权重覆盖） */
 #home-view .time-pair .time-person.night.self-person .local-time,
 #home-view .time-pair .time-person.day.partner-person .local-time { color: inherit; }
+
+/* ══ 2026-10-03-a：对开两栏 + 浅蓝面板 + 单一无衬线 ══ */
+/* 调色板：中性冷灰 + 低饱和蓝强调色（取自用户提供的参考图语言） */
+:root{
+  --page:#F4F5F7; --panel:#FFFFFF; --line:#E6E8EB;
+  --ink:#1A1D21; --muted:#6B7280;
+  --accent:#3A6EA5; --accent-soft:#E8EEF6; --tint:#E8EEF6;
+  --night:#1E2733; --night-ink:#EEF2F7;
+  --p-dawn:#EDEFF2; --p-dawn-ink:#1A1D21;
+  --p-day:#FFFFFF;  --p-day-ink:#1A1D21;
+  --p-dusk:#E2E6EA; --p-dusk-ink:#1A1D21;
+  --p-night:#1E2733; --p-night-ink:#EEF2F7;
+}
+
+/* 两栏：内缩 16px、圆角 10、细边——与下面的卡片同一种物体 */
+#home-view .time-pair{ margin:0 16px; gap:0; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--panel); }
+#home-view .time-pair::after{ content:none; }
+#home-view .time-pair .time-person{ border:0; border-radius:0; padding:15px 16px 17px; }
+#home-view .time-pair .time-person.dawn,
+#home-view .time-pair .time-person.day{ background:var(--panel); color:var(--ink); }
+#home-view .time-pair .time-person.dusk{ background:#E9EDF1; color:var(--ink); }
+#home-view .time-pair .time-person.night{ background:var(--night); color:var(--night-ink); }
+#home-view .time-pair .time-person .person-label,
+#home-view .time-pair .time-person .person-city,
+#home-view .time-pair .time-person .person-date,
+#home-view .time-pair .time-person .time-weather,
+#home-view .time-pair .time-person .self-activity,
+#home-view .time-pair .time-person .partner-state,
+#home-view .time-pair .time-person .partner-state-current strong,
+#home-view .time-pair .time-person .partner-state-next time,
+#home-view .time-pair .time-person .partner-state-next span{ color:inherit; }
+
+/* 数字：统一无衬线粗体紧字距（原为 Georgia 衬线） */
+#home-view .time-pair .time-person .local-time,
+#home-view .time-pair .time-person.night.self-person .local-time,
+#home-view .time-pair .time-person.day.partner-person .local-time{
+  font-family:inherit; font-weight:700; letter-spacing:-2.2px; color:inherit;
+}
+#home-view .time-pair .time-person .time-colon{ opacity:.5; font-weight:400; }
+
+/* 窗口块：改为浅蓝面板（全屏唯一有底色的块） */
+#home-view .connection-panel{
+  margin:0 16px; border:1px solid var(--line); border-radius:10px;
+  background:var(--tint); padding:13px 15px 14px;
+}
+#home-view .connection-panel .common-label{ color:var(--accent); font-size:15.5px; font-weight:700; letter-spacing:-.2px; }
+#home-view .connection-panel .common-when{ color:#5A6B80; font-size:12px; font-weight:500; }
+#home-view .connection-panel .common-action{ color:var(--accent); font-size:12.5px; font-weight:600; }
+#home-view .connection-panel .local-window strong{ font-family:inherit; font-weight:700; letter-spacing:-.4px; font-size:17.5px; }
+#home-view .connection-panel .local-window small{ color:#5A6B80; font-size:11.5px; }
+#home-view .connection-panel .common-source{ color:#5A6B80; font-size:11.5px; margin-top:7px; }
+
+/* 留言：白卡 + 发送者方章（无图片素材，不用假缩略图） */
+#home-view .note-section{
+  margin:14px 16px 0; padding:13px 15px 12px;
+  background:var(--panel); border:1px solid var(--line); border-radius:10px;
+}
+#home-view .note-preview-text{ font-family:inherit; font-weight:700; font-size:15px; line-height:1.55; margin-top:9px; letter-spacing:-.2px; }
+#home-view .note-compose{ margin-top:9px; min-height:32px; }
+#home-view .note-compose-placeholder{ color:var(--accent); font-size:12.5px; font-weight:700; }
+
+/* 区块标题行：标题 + 右对齐小链接（取自参考图） */
+#home-view .common-top{ align-items:baseline; }
+#home-view .note-head strong{ font-size:14px; font-weight:700; }
+#home-view .note-head time{ color:var(--muted); font-size:12px; }
+#home-view .avatar{ background:var(--tint); color:var(--accent); border-radius:7px; }
+
+/* 两栏内文字：缩到 11.5px 避免「通常在通勤路上」折行 */
+#home-view .time-pair .time-person .partner-state,
+#home-view .time-pair .time-person .partner-state-current strong,
+#home-view .time-pair .time-person .time-weather,
+#home-view .time-pair .time-person .self-activity{ font-size:11.5px; line-height:1.5; }
