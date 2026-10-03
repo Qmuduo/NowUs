@@ -675,3 +675,16 @@ svg { display: block; width: 20px; height: 20px; flex: none; }
 #home-view .time-pair .time-person.day{ background:#FFFFFF; box-shadow:0 1px 2px rgba(26,29,33,.05); }
 #home-view .connection-panel{ background:var(--tint); border-color:var(--line); }
 #home-view .connection-panel .common-label{ color:var(--accent); }
+
+/* ── 第 120 轮：统一卡片间距 ──────────────────────────────────────────────
+   实测四个相邻间距为 31 / 0 / 14 / 144——其中「两栏 → 共同时间」是 0（贴死），
+   相邻两块却各用不同的值，这就是「卡片之间间距不协调」。
+   统一为 14px，左右仍是 16px。 */
+#home-view .time-pair{ margin:14px 16px 0; }
+#home-view .connection-panel{ margin:14px 16px 0; }
+#home-view .note-section{ margin:14px 16px 0; }
+#home-view .home-stack{ display:flex; flex-direction:column; }
+
+/* 名字行与卡片对齐；名字行的盒高含约 5px 行距，故用 9px 边距得到 14px 视觉间距 */
+#home-view .home-thesis{ margin:9px 16px 0; }
+#home-view .time-pair{ margin:19px 16px 0; }
