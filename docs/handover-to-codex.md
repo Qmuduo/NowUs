@@ -2,18 +2,15 @@
 
 ## 该用哪份提示词
 
-**主用 `docs/design-review-continuation-prompt-v2.md`。**
+**只给一份：`docs/design-review-continuation-prompt-final.md`。**
 
-但**它不是自包含的**——文件里写着「未提及的部分全部逐字沿用 v1」。所以 Codex 里需要**同时提供两份**：
+这是 v1 与 v2 合并后的**自包含**版本，不再有「其余逐字沿用另一份」的间接引用。给这一份即可执行。
 
-| 用途 | 文件 |
-| --- | --- |
-| **当前有效**（评审协议、评论员提示词、两条轨道、终止规则） | `docs/design-review-continuation-prompt-v2.md` |
-| **v2 未覆盖、仍逐字有效的部分**（历史保留与字节规则、评审隔离、固定设备与场景、截图条件、每轮记录、诚实报告） | `docs/design-review-continuation-prompt-deepseek-v4.1-flash.md` |
+被取代、**不用给**的三份（都保留作记录）：
 
-`docs/design-review-continuation-prompt.md` 是最初的 v1，**已被上面第二份取代**，不用给。
-
-**建议**：让我把这两份合并成一份自包含的最终提示词（去掉「沿用 v1」的间接引用），这样 Codex 里只需要给一份。要的话说一声。
+- `docs/design-review-continuation-prompt.md`（最初 v1）
+- `docs/design-review-continuation-prompt-deepseek-v4.1-flash.md`（v1 的模型绑定版）
+- `docs/design-review-continuation-prompt-v2.md`（v2 及历次修订）
 
 ## 当前进度（交接点）
 
