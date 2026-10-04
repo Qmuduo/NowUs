@@ -30,6 +30,7 @@ interface SessionStore {
 interface AccountSnapshotStore {
     suspend fun load(userId: String): AppState?
     suspend fun save(userId: String, state: AppState)
+    suspend fun loadDraft(userId: String): String? = load(userId)?.noteDraft
     suspend fun clear()
 }
 
@@ -97,23 +98,38 @@ class EncryptedAccountSnapshotStore(context: Context) : AccountSnapshotStore {
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
     override suspend fun load(userId: String): AppState? = withContext(Dispatchers.IO) {
+        val key = "snapshot:$userId"
         try {
-            val encoded = preferences.getString("snapshot", null) ?: return@withContext null
-            val record = json.decodeFromString<SnapshotRecord>(SecureBlob.decrypt("nowus_snapshot_key_v1", encoded))
-            record.state.takeIf { record.userId == userId }
+            val encoded = preferences.getString(key, null) ?: preferences.getString("snapshot", null)
+            val record = encoded?.let {
+                json.decodeFromString<SnapshotRecord>(SecureBlob.decrypt("nowus_snapshot_key_v1", it))
+            }
+            val snapshot = record?.state?.takeIf { record.userId == userId }
+            snapshot?.copy(noteDraft = loadDraft(userId) ?: snapshot.noteDraft)
         } catch (_: Exception) {
-            preferences.edit().remove("snapshot").commit()
+            preferences.edit().remove(key).commit()
             null
         }
     }
 
+    override suspend fun loadDraft(userId: String): String? = withContext(Dispatchers.IO) {
+        preferences.getString("draft:$userId", null)?.let { SecureBlob.decrypt("nowus_snapshot_key_v1", it) }
+    }
+
     override suspend fun save(userId: String, state: AppState) = withContext(Dispatchers.IO) {
         val encrypted = SecureBlob.encrypt("nowus_snapshot_key_v1", json.encodeToString(SnapshotRecord(userId, state)))
-        check(preferences.edit().putString("snapshot", encrypted).commit()) { "无法安全保存同步快照" }
+        val editor = preferences.edit().putString("snapshot:$userId", encrypted)
+        if (state.noteDraft == null) editor.remove("draft:$userId")
+        else editor.putString("draft:$userId", SecureBlob.encrypt("nowus_snapshot_key_v1", state.noteDraft))
+        check(editor.commit()) { "无法安全保存同步快照" }
     }
 
     override suspend fun clear() {
-        withContext(Dispatchers.IO) { preferences.edit().remove("snapshot").commit() }
+        withContext(Dispatchers.IO) {
+            val editor = preferences.edit().remove("snapshot")
+            preferences.all.keys.filter { it.startsWith("snapshot:") }.forEach { editor.remove(it) }
+            check(editor.commit()) { "无法清除同步快照" }
+        }
     }
 }
 

@@ -1,7 +1,7 @@
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import BaseModel, ConfigDict, Field
 
 from .db import connect
@@ -29,6 +29,10 @@ class ScheduleInput(Input):
 
 class NoteInput(Input):
     text: str
+
+
+class NoteRevisionInput(Input):
+    expectedRevision: datetime
 
 
 class TemporaryInput(Input):
@@ -60,7 +64,7 @@ def _user_values(database, user_id: str, timestamp) -> dict:
         "SELECT name, city_id, sharing_enabled, setup_complete FROM profiles WHERE user_id = %s", (user_id,)
     ).fetchone()
     schedule = database.execute("SELECT value FROM rhythms WHERE user_id = %s", (user_id,)).fetchone()
-    note = database.execute("SELECT text, updated_at FROM notes WHERE user_id = %s", (user_id,)).fetchone()
+    note = database.execute("SELECT text, updated_at FROM notes WHERE user_id = %s AND deleted_at IS NULL", (user_id,)).fetchone()
     temporary = database.execute(
         "SELECT available, updated_at, until_at FROM temporary_statuses WHERE user_id = %s AND until_at > %s",
         (user_id, timestamp),
@@ -68,7 +72,7 @@ def _user_values(database, user_id: str, timestamp) -> dict:
     return {
         "profile": {"name": profile["name"], "cityId": profile["city_id"]} if profile else None,
         "schedule": schedule["value"] if schedule else None,
-        "note": {"text": note["text"], "updatedAt": note["updated_at"].isoformat()} if note else None,
+        "note": {"text": note["text"], "updatedAt": note["updated_at"].astimezone(timezone.utc).isoformat()} if note else None,
         "temporary": {
             "available": temporary["available"],
             "fromMillis": int(temporary["updated_at"].timestamp() * 1000),
@@ -172,19 +176,45 @@ def save_note(body: NoteInput, request: Request, user: dict = Depends(current_us
         _error(422, "note_too_long", maximum=120)
     timestamp = now(request)
     with connect(request.app.state.settings.database_url) as database:
-        database.execute(
+        note = database.execute(
             "INSERT INTO notes (user_id, text, updated_at) VALUES (%s, %s, %s) "
-            "ON CONFLICT (user_id) DO UPDATE SET text = excluded.text, updated_at = excluded.updated_at",
+            "ON CONFLICT (user_id) DO UPDATE SET text = excluded.text, "
+            "updated_at = GREATEST(excluded.updated_at, notes.updated_at + interval '1 microsecond'), "
+            "deleted_at = NULL RETURNING text, updated_at",
             (user["id"], body.text, timestamp),
-        )
-    return {"note": {"text": body.text, "updatedAt": timestamp.isoformat()}}
+        ).fetchone()
+    return {"note": {"text": note["text"], "updatedAt": note["updated_at"].astimezone(timezone.utc).isoformat()}}
 
 
 @router.delete("/me/note", status_code=204)
-def delete_note(request: Request, user: dict = Depends(current_user)):
+def delete_note(request: Request, expectedRevision: datetime = Query(...), user: dict = Depends(current_user)):
+    if expectedRevision.tzinfo is None:
+        _error(422, "note_revision_invalid")
     with connect(request.app.state.settings.database_url) as database:
-        database.execute("DELETE FROM notes WHERE user_id = %s", (user["id"],))
+        deleted = database.execute(
+            "UPDATE notes SET deleted_at = %s WHERE user_id = %s AND updated_at = %s "
+            "AND deleted_at IS NULL RETURNING user_id",
+            (now(request), user["id"], expectedRevision),
+        ).fetchone()
+        if deleted is None:
+            _error(409, "note_conflict")
     return Response(status_code=204)
+
+
+@router.post("/me/note/restore")
+def restore_note(body: NoteRevisionInput, request: Request, user: dict = Depends(current_user)):
+    if body.expectedRevision.tzinfo is None:
+        _error(422, "note_revision_invalid")
+    with connect(request.app.state.settings.database_url) as database:
+        note = database.execute(
+            "UPDATE notes SET deleted_at = NULL, "
+            "updated_at = GREATEST(%s, updated_at + interval '1 microsecond') "
+            "WHERE user_id = %s AND updated_at = %s AND deleted_at IS NOT NULL RETURNING text, updated_at",
+            (now(request), user["id"], body.expectedRevision),
+        ).fetchone()
+        if note is None:
+            _error(409, "note_conflict")
+    return {"note": {"text": note["text"], "updatedAt": note["updated_at"].astimezone(timezone.utc).isoformat()}}
 
 
 @router.put("/me/temporary")

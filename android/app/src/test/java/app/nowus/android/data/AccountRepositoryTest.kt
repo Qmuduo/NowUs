@@ -17,6 +17,85 @@ import java.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AccountRepositoryTest {
+    @Test fun refreshPreservesLocalDraftFromCache() = runTest {
+        val cached=kotlinx.serialization.json.Json { ignoreUnknownKeys=true }.decodeFromString<AppState>("""{"me":{"name":"我","cityId":"beijing"},"noteDraft":"unsent account"}""")
+        val cache=MemoryCache(cached)
+        val repository=AccountRepository(FakeApi(),AccountSession("token","user-a",Long.MAX_VALUE),cache,pollIntervalMillis=60_000)
+        repository.states.first { !it.syncStale }
+        assertTrue(kotlinx.serialization.json.Json.encodeToString(cache.value!!).contains("unsent account"))
+    }
+
+    @Test fun draftIsLocalAndSurvivesOfflineRefreshAndRepositoryRecreation() = runTest {
+        val api=FakeApi();val cache=MemoryCache()
+        val session=AccountSession("token","user-a",Long.MAX_VALUE)
+        val repository=AccountRepository(api,session,cache,pollIntervalMillis=60_000)
+        repository.states.first()
+        api.snapshotError=IOException("offline")
+        repository.updateNoteDraft("private unsent")
+        assertEquals("private unsent",cache.value?.noteDraft)
+        assertNull(api.snapshotResult.me.note)
+        val reopened=AccountRepository(api,session,cache,pollIntervalMillis=60_000)
+        assertEquals("private unsent",reopened.states.first().noteDraft)
+    }
+
+    @Test fun failedSaveKeepsDraftAndSuccessfulRetryClearsIt() = runTest {
+        val api=FakeApi();val cache=MemoryCache()
+        val repository=AccountRepository(api,AccountSession("token","user-a",Long.MAX_VALUE),cache,pollIntervalMillis=60_000)
+        repository.states.first()
+        api.failNoteSave=true
+        assertNotNull(runCatching { repository.saveNote("unsent",123) }.exceptionOrNull())
+        assertEquals("unsent",cache.value?.noteDraft)
+        assertNull(cache.value?.note)
+        api.failNoteSave=false
+        repository.saveNote("published",124)
+        assertNull(cache.value?.noteDraft)
+        assertEquals("published",cache.value?.note?.text)
+        assertEquals("2026-09-30T00:00:00.000001Z",cache.value?.note?.revision)
+    }
+
+    @Test fun acknowledgedSaveClearsDraftEvenIfFollowUpSnapshotFails() = runTest {
+        val api=FakeApi();val cache=MemoryCache()
+        val repository=AccountRepository(api,AccountSession("token","user-a",Long.MAX_VALUE),cache,pollIntervalMillis=60_000)
+        repository.states.first()
+        api.snapshotError=IOException("offline after acknowledgement")
+        repository.saveNote("published",124)
+        assertNull(cache.value?.noteDraft)
+        assertEquals("published",cache.value?.note?.text)
+        assertTrue(repository.states.first().syncStale)
+    }
+
+    @Test fun deleteAndRestoreUseExactServerRevisionAndNeverSaveOldText() = runTest {
+        val api=FakeApi().apply {
+            snapshotResult=snapshotResult.copy(me=snapshotResult.me.copy(note=ApiNote("old","2026-09-30T00:00:00.123456+00:00")))
+        }
+        val cache=MemoryCache()
+        val repository=AccountRepository(api,AccountSession("token","user-a",Long.MAX_VALUE),cache,pollIntervalMillis=60_000)
+        val note=repository.states.first().note!!
+        assertEquals("2026-09-30T00:00:00.123456+00:00",note.revision)
+        repository.deleteNote(note)
+        assertNull(cache.value?.note)
+        assertEquals(note,cache.value?.deletedNote)
+        assertEquals(note.revision,api.deletedRevision)
+        api.snapshotResult=api.snapshotResult.copy(me=api.snapshotResult.me.copy(note=ApiNote("newer","2026-09-30T00:00:00.223456+00:00")))
+        val conflict=runCatching { repository.restoreNote(note) }.exceptionOrNull()
+        assertTrue(conflict is ApiException)
+        assertEquals("newer",api.snapshotResult.me.note?.text)
+        assertEquals(0,api.noteSaves)
+    }
+
+    @Test fun successfulRestoreUsesRestoredServerRevision() = runTest {
+        val api=FakeApi().apply { snapshotResult=snapshotResult.copy(me=snapshotResult.me.copy(note=ApiNote("old","2026-09-30T00:00:00.123456+00:00"))) }
+        val cache=MemoryCache()
+        val repository=AccountRepository(api,AccountSession("token","user-a",Long.MAX_VALUE),cache,pollIntervalMillis=60_000)
+        val note=repository.states.first().note!!
+        repository.deleteNote(note)
+        repository.restoreNote(note)
+        assertEquals("old",cache.value?.note?.text)
+        assertEquals("2026-09-30T00:00:00.123457+00:00",cache.value?.note?.revision)
+        assertNull(cache.value?.deletedNote)
+        assertEquals(0,api.noteSaves)
+    }
+
     @Test fun staleCacheHidesPartnerDataButPreservesOwnDataAndTimestamp() = runTest {
         val cached = AppState(
             me = Profile("小舟", "beijing"),
@@ -136,6 +215,76 @@ class AccountRepositoryTest {
         assertTrue(observed.last().sharingPaused)
     }
 
+    @Test fun snapshotCacheWriteCannotEraseNewerDraft() = runTest {
+        val api=FakeApi()
+        val started=CompletableDeferred<Unit>();val finish=CompletableDeferred<Unit>()
+        var cached: AppState?=null
+        var blockNext=false
+        val cache=object:AccountSnapshotStore {
+            override suspend fun load(userId:String)=cached
+            override suspend fun save(userId:String,state:AppState) {
+                if(blockNext) { blockNext=false;started.complete(Unit);finish.await() }
+                cached=state
+            }
+            override suspend fun clear() { cached=null }
+        }
+        val repository=AccountRepository(api,AccountSession("token","user-a",Long.MAX_VALUE),cache,pollIntervalMillis=60_000)
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { repository.states.collect() }
+        runCurrent()
+        blockNext=true
+        advanceTimeBy(60_000);runCurrent();started.await()
+        val draft=launch { repository.updateNoteDraft("new local draft") }
+        runCurrent();finish.complete(Unit);draft.join();runCurrent()
+        assertEquals("new local draft",cached?.noteDraft)
+    }
+
+    @Test fun failedFollowUpSnapshotAfterNoteSaveHidesUnconfirmedPartner() = runTest {
+        val api=FakeApi().apply { snapshotResult=pairedSnapshot() }
+        val repository=AccountRepository(api,AccountSession("token","user-a",Long.MAX_VALUE),MemoryCache(),pollIntervalMillis=60_000)
+        val observed=mutableListOf<AppState>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { repository.states.collect { observed+=it } }
+        runCurrent()
+        api.snapshotError=IOException("offline after save")
+        repository.saveNote("published",123)
+        runCurrent()
+        assertNull(observed.last().partner)
+        assertTrue(observed.last().syncStale)
+    }
+
+    @Test fun snapshotStartedBeforeDeleteCannotReintroduceDeletedNote() = runTest {
+        val api=FakeApi().apply { snapshotResult=snapshotResult.copy(me=snapshotResult.me.copy(note=ApiNote("old","2026-09-30T00:00:00.123456+00:00"))) }
+        val before=api.snapshotResult
+        val cache=MemoryCache()
+        val repository=AccountRepository(api,AccountSession("token","user-a",Long.MAX_VALUE),cache,pollIntervalMillis=60_000)
+        val observed=mutableListOf<AppState>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { repository.states.collect { observed+=it } }
+        runCurrent()
+        val note=observed.last().note!!
+        val pending=CompletableDeferred<ApiSnapshot>();api.nextSnapshot=pending
+        advanceTimeBy(60_000);runCurrent()
+        repository.deleteNote(note)
+        pending.complete(before);runCurrent()
+        assertNull(observed.last().note)
+        assertEquals(note,observed.last().deletedNote)
+    }
+
+    @Test fun sharedCacheKeepsAccountDraftsSeparateAcrossRepositories() = runTest {
+        val snapshots=mutableMapOf<String,AppState>()
+        val cache=object:AccountSnapshotStore {
+            override suspend fun load(userId:String)=snapshots[userId]
+            override suspend fun save(userId:String,state:AppState) { snapshots[userId]=state }
+            override suspend fun clear() { snapshots.clear() }
+        }
+        val a=AccountRepository(FakeApi(),AccountSession("a","user-a",Long.MAX_VALUE),cache,pollIntervalMillis=60_000)
+        val bApi=FakeApi().apply { snapshotResult=snapshotResult.copy(userId="user-b") }
+        val b=AccountRepository(bApi,AccountSession("b","user-b",Long.MAX_VALUE),cache,pollIntervalMillis=60_000)
+        a.states.first();a.updateNoteDraft("private A")
+        b.states.first();assertNull(snapshots["user-b"]?.noteDraft);b.updateNoteDraft("private B")
+        val reopened=AccountRepository(FakeApi(),AccountSession("a","user-a",Long.MAX_VALUE),cache,pollIntervalMillis=60_000)
+        assertEquals("private A",reopened.states.first().noteDraft)
+        assertEquals("private B",snapshots["user-b"]?.noteDraft)
+    }
+
     private fun pairedSnapshot() = ApiSnapshot(
         userId = "user-a",
         me = ApiUserData(Profile("小舟", "beijing"), setupComplete = true),
@@ -155,6 +304,9 @@ class AccountRepositoryTest {
     private class FakeApi : AccountApi {
         var snapshotError: Exception? = null
         var failNoteSave = false
+        var deletedRevision: String? = null
+        var deletedApiNote: ApiNote? = null
+        var noteSaves = 0
         var sharingChanges = mutableListOf<Boolean>()
         var unpairCalls = 0
         var snapshotCalls = 0
@@ -178,8 +330,26 @@ class AccountRepositoryTest {
         }
         override suspend fun saveProfile(token: String, profile: Profile) = Unit
         override suspend fun saveSchedule(token: String, schedule: Schedule) = Unit
-        override suspend fun saveNote(token: String, text: String) { if (failNoteSave) throw IOException("offline") }
-        override suspend fun deleteNote(token: String) = Unit
+        override suspend fun saveNote(token: String, text: String): ApiNote {
+            if (failNoteSave) throw IOException("offline")
+            noteSaves++
+            val note=ApiNote(text,"2026-09-30T00:00:00.000001Z")
+            snapshotResult=snapshotResult.copy(me=snapshotResult.me.copy(note=note))
+            return note
+        }
+        override suspend fun deleteNote(token: String, expectedRevision: String) {
+            val note=snapshotResult.me.note
+            if (note?.updatedAt != expectedRevision) throw ApiException(409,"note_conflict")
+            deletedRevision=expectedRevision;deletedApiNote=note
+            snapshotResult=snapshotResult.copy(me=snapshotResult.me.copy(note=null))
+        }
+        override suspend fun restoreNote(token: String, expectedRevision: String): ApiNote {
+            if (snapshotResult.me.note != null || deletedRevision != expectedRevision) throw ApiException(409,"note_conflict")
+            val note=ApiNote(requireNotNull(deletedApiNote).text,"2026-09-30T00:00:00.123457+00:00")
+            snapshotResult=snapshotResult.copy(me=snapshotResult.me.copy(note=note))
+            deletedApiNote=null;deletedRevision=null
+            return note
+        }
         override suspend fun setTemporary(token: String, available: Boolean, minutes: Int) = Unit
         override suspend fun resetTemporary(token: String) = Unit
         override suspend fun markSetupComplete(token: String) = Unit

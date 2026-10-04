@@ -66,6 +66,65 @@ class AppViewModelTest {
   assertEquals("REAL123456",account.data.value.invite?.code)
   assertEquals("本人演示留言",account.data.value.note?.text)
  }
+ @Test fun blankSaveKeepsCurrentNoteUntilExplicitDeletion()=runTest(dispatcher){
+  val original=Note("published",10)
+  val repo=FakeRepository(AppState(Profile("我","beijing"),note=original))
+  val vm=AppViewModel(repo);runCurrent()
+  vm.saveNote("   ");runCurrent()
+  assertEquals(original,vm.state.value?.note)
+  assertNotNull(vm.error.value)
+ }
+ @Test fun draftSurvivesViewModelRecreationAndOnlySuccessfulSaveClearsIt()=runTest(dispatcher){
+  val repo=FakeRepository();val vm=AppViewModel(repo);runCurrent()
+  vm.updateNoteDraft("unsent");runCurrent()
+  val reopened=AppViewModel(repo);runCurrent()
+  assertEquals("unsent",reopened.state.value?.noteDraft)
+  repo.fail=true;reopened.saveNote("unsent");runCurrent()
+  assertEquals("unsent",reopened.state.value?.noteDraft)
+  repo.fail=false;reopened.saveNote("published");runCurrent()
+  assertNull(reopened.state.value?.noteDraft)
+  assertEquals("published",reopened.state.value?.note?.text)
+ }
+ @Test fun repositoriesKeepLocalExperienceDraftOutOfAccount()=runTest(dispatcher){
+  val local=FakeRepository();val account=FakeRepository()
+  val localVm=AppViewModel(local);val accountVm=AppViewModel(account,local);runCurrent()
+  localVm.updateNoteDraft("local private");accountVm.updateNoteDraft("account private");runCurrent()
+  assertEquals("local private",localVm.state.value?.noteDraft)
+  assertEquals("account private",accountVm.state.value?.noteDraft)
+ }
+ @Test fun localUndoRefusesToOverwriteNoteCreatedAfterDeletion()=runTest(dispatcher){
+  val original=Note("old",10)
+  val repo=FakeRepository(AppState(Profile("我","beijing"),note=original))
+  val vm=AppViewModel(repo);runCurrent()
+  vm.deleteNote(original);runCurrent()
+  assertNull(vm.state.value?.note)
+  assertEquals(original,vm.deletedNote.value)
+  vm.saveNote("newer");runCurrent()
+  vm.restoreNote(original);runCurrent()
+  assertEquals("newer",vm.state.value?.note?.text)
+  assertNotNull(vm.error.value)
+ }
+ @Test fun localDeleteChecksCurrentNoteAndSuccessfulUndoRestoresIt()=runTest(dispatcher){
+  val original=Note("old",10)
+  val repo=FakeRepository(AppState(Profile("我","beijing"),note=original))
+  val vm=AppViewModel(repo);runCurrent()
+  vm.deleteNote(Note("stale",9));runCurrent()
+  assertEquals(original,vm.state.value?.note)
+  vm.deleteNote(original);runCurrent()
+  vm.restoreNote(original);runCurrent()
+  assertEquals("old",vm.state.value?.note?.text)
+  assertNull(vm.deletedNote.value)
+ }
+ @Test fun oldLocalUndoCannotRestoreASecondDeletion()=runTest(dispatcher){
+  val original=Note("old",10)
+  val repo=FakeRepository(AppState(Profile("我","beijing"),note=original))
+  val vm=AppViewModel(repo);runCurrent()
+  vm.deleteNote(original);runCurrent();vm.restoreNote(original);runCurrent()
+  val restored=vm.state.value!!.note!!
+  vm.deleteNote(restored);runCurrent();vm.restoreNote(original);runCurrent()
+  assertNull(vm.state.value?.note)
+  assertNotNull(vm.error.value)
+ }
  private class FakeRepository(initial:AppState=AppState(Profile("我","beijing"))):StateRepository{
   var fail=false; var failLoad=false
   val data=MutableStateFlow(initial)

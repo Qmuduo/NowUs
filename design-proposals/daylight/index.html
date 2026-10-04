@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="icon" type="image/svg+xml" href="brand/app-icon.svg">
+  <meta name="theme-color" content="#f5f7fa">
+  <title>NowUs · 两地天光</title>
+  <link rel="stylesheet" href="styles.css?v=4.1">
+</head>
+<body>
+  <main class="studio">
+    <aside class="intro">
+      <a class="wordmark" href="#home"><img class="studio-logo" src="brand/logo.svg" alt="NowUs"></a>
+      <div class="intro-copy"><p class="kicker">页面设计提案 · 两地天光</p><h1>你的早晨。<br>我的夜晚。<br><span>我们之间。</span></h1><p class="lead">把时差变成看得懂的日常，<br>把想念留在恰好的时候。</p></div>
+      <div class="preview-nav" aria-label="设计页面">
+        <button data-page="home" class="selected">此刻 <span>双方时间与联系机会</span></button>
+        <button data-page="day">一天 <span>同一时刻，两种生活</span></button>
+        <button data-page="note">留话 <span>只留一句，不催回复</span></button>
+        <button data-page="rhythm">我的节奏 <span>日常安排与联系偏好</span></button>
+        <button data-page="pair">邀请与配对 <span>让两个人的时间相遇</span></button>
+        <button data-page="settings">分享设置 <span>亲密也需要边界</span></button>
+      </div>
+      <a class="brand-link" href="brand/index.html">查看应用图标与 Logo ↗</a>
+      <p class="studio-foot">NOWUS / DESIGN STUDY / OCT 2026</p>
+    </aside>
+    <section class="phone" aria-label="NowUs 手机设计预览">
+      <div class="statusbar"><span>20:30</span><div><span class="signal">▂▄▆</span><span class="battery"></span></div></div>
+      <div id="app" tabindex="-1"></div>
+      <nav class="tabbar" aria-label="主导航"></nav>
+      <div class="gesture"></div>
+      <div class="scrim" hidden></div>
+      <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden></section>
+      <div class="toast" role="status" hidden></div>
+    </section>
+    <aside class="annotation"><p class="kicker">设计注解</p><h2 id="annotation-title"></h2><p id="annotation-copy"></p><div class="swatches"><i></i><i></i><i></i><i></i></div><div class="demo-control"><label for="scene">首页情境</label><select id="scene"><option value="normal">日常 · 即将有交集</option><option value="busy">对方暂时不方便</option><option value="none">七天内没有交集</option><option value="unknown">对方尚未设置</option><option value="midnight">两地日期不同</option><option value="offline">离线 · 数据已过期</option></select></div><p class="demo-caption">可点击交互设计稿<br>人物、时间及内容均为演示数据<br>操作仅在本页模拟，不会发送给他人</p></aside>
+  </main>
+  <script src="schedule.js?v=4.1"></script>
+  <script src="app.js?v=4.1"></script>
+</body>
+</html>

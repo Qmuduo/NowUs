@@ -1,13 +1,25 @@
 # NowUs Android
 
-Android first release candidate: Kotlin + Jetpack Compose, minimum Android 8.0 (API 26). The app has two deliberately separate entry paths:
+## Current implementation: daylight v4.1
+
+The current and only active product design baseline is [`design-proposals/daylight/`](../design-proposals/daylight/), version v4.1. The previously accepted round-120 direction, older logos, and earlier interface proposals are historical references; they do not describe the current Android UI. The existing Kotlin + Jetpack Compose app has been migrated to native v4.1 screens and assets; it is not a WebView wrapper.
+
+The main surfaces are 此刻, 一天, 留话, and 我的节奏, with native invitation/pairing, profile, sharing, and sign-in flows using the same visual system. Existing account/API behavior, local-only demo separation, encrypted account snapshots, note persistence, schedules, temporary contact preferences, and access revocation remain in the native app.
+
+See the [daylight v4.1 acceptance record](../docs/acceptance/daylight-v4-1/README.md) for this implementation's Android test evidence, device and service limits, native screenshots, and the installable APK. Older acceptance records below are historical evidence for their own earlier builds only.
+
+Android: Kotlin + Jetpack Compose, minimum Android 8.0 (API 26). The app has two deliberately separate entry paths:
 
 - **Email account** uses the FastAPI service for six-digit email OTP, pairing, and server-synced personal data.
 - **Local experience** keeps demo people, demo invitations, and example schedules in a separate local DataStore. Nothing is uploaded from that path. Importing the signed-in user's own local profile, schedule, and note requires an explicit review and confirmation.
 
 The local environment proves the feature flow only. It does not prove that a deployed service is reachable from Mainland China or a particular overseas network, or that production email reaches inboxes.
 
-## Start the local server
+## Start a local development server
+
+The [same-Wi-Fi setup](../docs/android-wifi-test.md) and its APK address record a machine-specific earlier development setup. Use the steps below with the current machine's LAN address if connecting a phone; the development inbox remains accessible only on the computer.
+
+The backend acceptance record documents the environment used for each run. In particular, a prior machine-specific Docker status is not a statement about the current environment.
 
 From the repository root, copy the development template and start PostgreSQL, Mailpit, and the API:
 
@@ -17,7 +29,7 @@ docker compose up --build -d db mailpit api
 docker compose ps
 ```
 
-The API applies versioned SQL migrations in `backend/migrations/` on startup. The first launch applies `0001_initial.sql` and `0002_setup_complete.sql`. PostgreSQL data stays in the `nowus-postgres` Docker volume. Check `http://localhost:8000/health`; Mailpit's local inbox is `http://localhost:8025` and accepts SMTP on port 1025. The local-only values in `.env.example` are not deployment secrets.
+The API applies versioned SQL migrations in `backend/migrations/` on startup, including the current note soft-delete migration `0003_note_soft_delete.sql`. PostgreSQL data stays in the `nowus-postgres` Docker volume. Check `http://localhost:8000/health`; Mailpit's local inbox is `http://localhost:8025` and accepts SMTP on port 1025. The local-only values in `.env.example` are not deployment secrets.
 
 Published development ports bind to `127.0.0.1` by default, including API, PostgreSQL, and Mailpit SMTP/inbox. To connect a physical Android phone on the same LAN, explicitly change `NOWUS_API_BIND_ADDRESS` in the private `.env` to `0.0.0.0`, restart Compose, and use the development computer's LAN address in `NOWUS_API_BASE_URL`. PostgreSQL and Mailpit remain loopback-only.
 
@@ -99,14 +111,16 @@ Invite links use `nowus://invite/{CODE}`. Android stores the pending code encryp
 
 ## Data and time model
 
-- `domain/` keeps the existing Kotlin IANA timezone calculations, weekday/rest-day schedules, timeline, temporary contact preference, and common contact windows. New accounts start with a city-adjusted editable student template; an office-worker template is also available. Each routine block stores a category (sleep, preparation, meal, commute, study/work, rest, exercise, life admin, social/leisure, or other); the editor and timeline share one color palette and continue to display text labels. Unscheduled gaps remain unknown. Old blocks without a category decode as “other”. Exact clock times are starting suggestions, not claims about everyone in a city; details and evidence limits are in [the routine template note](../docs/superpowers/specs/2026-09-30-nowus-routine-templates.md).
+- `domain/` keeps the existing Kotlin IANA timezone calculations, weekday/rest-day schedules, timeline, temporary contact preference, and common contact windows. A new account has no assumed city or partner. The user can choose a city and explicitly select an editable student or office-worker routine template. Each routine block stores a category (sleep, preparation, meal, commute, study/work, rest, exercise, life admin, social/leisure, or other); the editor and timeline share one color palette and continue to display text labels. Unscheduled gaps remain unknown. Old blocks without a category decode as “other”. Exact clock times are starting suggestions, not claims about everyone in a city; details and evidence limits are in [the routine template note](../docs/superpowers/specs/2026-09-30-nowus-routine-templates.md).
 - `backend/` owns accounts, OTPs, hashed sessions, invitations, pair membership, and each user's own profile, schedule, temporary preference, and current note.
 - The server returns partner data only while both members are sharing and the current pair exists. Pause and unpair checks apply on each read. A/B synchronization refreshes while the app is open (30-second poll) and when a request succeeds; offline UI shows the last server timestamp.
 - Unknown partner fields remain absent. There are no demo defaults sent to the server. The editor's suggested schedule is not uploaded until the user saves it.
 - Android encrypts its session, pending invite, and last account snapshot with Android Keystore-backed AES-GCM. Account snapshots are tagged with the owning account ID.
 - The development API and Mailpit are single-host tools without production availability, automated backups, or tested cross-border routing. iOS, HTTPS deployment, real SMTP deliverability, and two-physical-device acceptance remain outstanding.
 
-## Verification completed for this branch
+## Historical verification before daylight v4.1
+
+The records below describe earlier source states and devices. They do not verify the daylight v4.1 implementation; see its current [acceptance record](../docs/acceptance/daylight-v4-1/README.md).
 
 - `docker compose --profile test run --build --rm tests`: 27 backend tests passed against PostgreSQL, including optional routine-category compatibility and rejection cases.
 - `python backend/scripts/acceptance.py`: A/B/C OTP and Mailpit flow passed, including two-way schedule/note visibility, C access denial, pause/resume, and unpair revocation.

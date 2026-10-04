@@ -61,10 +61,26 @@ object TimeEngine {
   result.add(end)
   return result.distinct().sorted()
  }
- fun commonWindows(start: Instant,end: Instant,me: Profile,meSchedule: Schedule?,temporary: TemporaryStatus?,partner: Profile,partnerSchedule: Schedule?): List<Window> {
+ fun commonWindows(start: Instant,end: Instant,me: Profile,meSchedule: Schedule?,temporary: TemporaryStatus?,partner: Profile,partnerSchedule: Schedule?,partnerTemporary: TemporaryStatus? = null): List<Window> {
   val result=mutableListOf<Window>()
-  boundaries(start,end,temporary?.let { listOf(Instant.ofEpochMilli(it.fromMillis), Instant.ofEpochMilli(it.untilMillis)) } ?: emptyList()).zipWithNext().forEach { (a,b)->
-   if(a<b && contactAt(me,meSchedule,temporary,a)==true && contactAt(partner,partnerSchedule,null,a)==true) {
+  val temporaryBoundaries=listOfNotNull(temporary,partnerTemporary).flatMap {
+   listOf(Instant.ofEpochMilli(it.fromMillis),Instant.ofEpochMilli(it.untilMillis))
+  }
+  boundaries(start,end,temporaryBoundaries).zipWithNext().forEach { (a,b)->
+   if(a<b && contactAt(me,meSchedule,temporary,a)==true && contactAt(partner,partnerSchedule,partnerTemporary,a)==true) {
+    if(result.lastOrNull()?.end==a) result[result.lastIndex]=result.last().copy(end=b) else result.add(Window(a,b))
+   }
+  }
+  return result
+ }
+ /** Returns one person's positive contact-preference intervals on the shared instant axis. */
+ fun contactWindows(start: Instant,end: Instant,profile: Profile,schedule: Schedule?,temporary: TemporaryStatus? = null): List<Window> {
+  val temporaryBoundaries=listOfNotNull(temporary).flatMap {
+   listOf(Instant.ofEpochMilli(it.fromMillis),Instant.ofEpochMilli(it.untilMillis))
+  }
+  val result=mutableListOf<Window>()
+  boundaries(start,end,temporaryBoundaries).zipWithNext().forEach { (a,b)->
+   if(a<b && contactAt(profile,schedule,temporary,a)==true) {
     if(result.lastOrNull()?.end==a) result[result.lastIndex]=result.last().copy(end=b) else result.add(Window(a,b))
    }
   }

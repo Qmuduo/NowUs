@@ -1,5 +1,6 @@
 package app.nowus.android
 
+import android.graphics.Bitmap
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -17,6 +18,8 @@ import app.nowus.android.domain.*
 import app.nowus.android.ui.NowUsEntry
 import app.nowus.android.ui.NowUsTheme
 import app.nowus.android.ui.defaultSchedule
+import androidx.test.platform.app.InstrumentationRegistry
+import java.io.File
 import java.time.Instant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,12 +45,15 @@ class AuthEntryFlowTest {
 
         compose.onNodeWithText("已保存邀请码 $inviteCode。登录后可查看邀请人和共享范围。").assertExists()
         compose.onNodeWithTag("authEmail").performTextInput("person@example.net")
-        compose.onNodeWithText("发送 6 位验证码").performClick()
+        compose.onNodeWithText("发送 6 位验证码").performScrollTo().assertIsDisplayed().performClick()
         compose.onNodeWithTag("authOtpCode").assertIsDisplayed()
         compose.onNodeWithTag("authOtpCode").performTextInput("246810")
-        compose.onNodeWithText("验证并继续").performClick()
+        compose.onNodeWithText("验证并继续").performScrollTo().assertIsDisplayed().performClick()
         compose.waitUntil(10_000) { sessions.current.value?.userId == "user-a" }
-        compose.onNodeWithText("真实账号 · 作息与留言仅和已配对伴侣共享").assertIsDisplayed()
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithText("真实账号 · 仅与已配对伴侣共享").fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithText("真实账号 · 仅与已配对伴侣共享").assertIsDisplayed()
         compose.waitUntil(10_000) { api.previewedCode == inviteCode }
         compose.onNodeWithText("邀请来自：小舟 · 北京").assertExists()
         compose.runOnIdle {
@@ -69,8 +75,35 @@ class AuthEntryFlowTest {
             }
         }
 
-        compose.onNodeWithText("真实账号 · 作息与留言仅和已配对伴侣共享").assertIsDisplayed()
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithText("真实账号 · 仅与已配对伴侣共享").fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithText("真实账号 · 仅与已配对伴侣共享").assertIsDisplayed()
         compose.onNodeWithText("发送 6 位验证码").assertDoesNotExist()
+    }
+
+    @Test fun signedInProfileCreatesAndShowsTheServerIssuedInviteTicket() {
+        val api = FakeAccountApi()
+        val sessions = MemorySessionStore(AccountSession("restored-token", "user-a", System.currentTimeMillis() + 86_400_000))
+        val local = MemoryRepository(AppState(Profile("", "beijing")))
+        val auth = AuthViewModel(api, sessions)
+        val demo = AppViewModel(local)
+        compose.setContent {
+            NowUsTheme { NowUsEntry(auth, sessions, api, MemorySnapshotStore(), demo, local, null, {}, {}) }
+        }
+
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithText("真实账号 · 仅与已配对伴侣共享").fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithText("邀请伴侣").performScrollTo().performClick()
+        compose.onNodeWithText("创建我的邀请").performScrollTo().assertExists()
+        compose.onNodeWithText("创建邀请").performScrollTo().performClick()
+        compose.waitUntil(10_000) {
+            api.createdInvitationCode != null &&
+                compose.onAllNodesWithText("等待对方接受 · 24 小时有效").fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithText("23456 789AB").assertIsDisplayed()
+        capture("nowus-invite.png")
     }
 
     @Test fun newAccountGetsEditableScheduleSuggestionsThatUploadOnlyWhenSaved() {
@@ -86,9 +119,9 @@ class AuthEntryFlowTest {
         }
 
         compose.onNodeWithTag("authEmail").performTextInput("new-person@example.net")
-        compose.onNodeWithText("发送 6 位验证码").performClick()
+        compose.onNodeWithText("发送 6 位验证码").performScrollTo().assertIsDisplayed().performClick()
         compose.onNodeWithTag("authOtpCode").performTextInput("246810")
-        compose.onNodeWithText("验证并继续").performClick()
+        compose.onNodeWithText("验证并继续").performScrollTo().assertIsDisplayed().performClick()
         compose.waitUntil(10_000) { sessions.current.value?.userId == "user-a" }
 
         compose.onNodeWithText("城市：请选择 ▾").assertExists()
@@ -97,12 +130,15 @@ class AuthEntryFlowTest {
         compose.onNodeWithText("纽约 · America/New_York").performClick()
         compose.onNodeWithText("下一步：我的节奏").performScrollTo().performClick()
 
-        compose.onNodeWithText("23:00").assertExists()
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithTag("rhythm-weekday-sleep-start").fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithTag("rhythm-weekday-sleep-start").assertTextEquals("23:00")
         compose.onNodeWithTag("rhythm-weekday-sleep-start").assertExists()
         compose.onNodeWithText("休息日").performClick()
         compose.onNodeWithTag("rhythm-rest-sleep-end").assertTextEquals("08:30")
         compose.onNodeWithText("工作日").performClick()
-        compose.onNodeWithTag("rhythm-weekday-sleep-start").performClick()
+        compose.onNodeWithTag("rhythm-weekday-sleep-start").performScrollTo().performClick()
         compose.onNodeWithText("设置睡眠开始").assertExists()
         compose.onNodeWithTag("time-wheel-hour").performScrollToIndex(0)
         compose.onNodeWithTag("time-wheel-minute").performScrollToIndex(5)
@@ -144,6 +180,8 @@ class AuthEntryFlowTest {
         var requestedEmail: String? = null
         var verifiedCode: String? = null
         var previewedCode: String? = null
+        var createdInvitationCode: String? = null
+        private var invitationExpiresAt: String? = null
         var savedScheduleCount = 0
         var savedSchedule: Schedule? = null
         private var profile: Profile? = if (freshAccount) null else Profile("小舟", "beijing")
@@ -161,24 +199,40 @@ class AuthEntryFlowTest {
             paired = false,
             pairStatus = "not_paired",
             sharingEnabled = true,
+            invitation = invitationExpiresAt?.let { app.nowus.android.data.ApiPendingInvitation(it) },
             serverTime = Instant.now().toString(),
         )
         override suspend fun saveProfile(token: String, profile: Profile) { this.profile = profile }
         override suspend fun saveSchedule(token: String, schedule: Schedule) { savedScheduleCount += 1; savedSchedule = schedule; this.schedule = schedule }
-        override suspend fun saveNote(token: String, text: String) = Unit
-        override suspend fun deleteNote(token: String) = Unit
+        override suspend fun saveNote(token: String, text: String) = app.nowus.android.data.ApiNote(text, Instant.now().toString())
+        override suspend fun deleteNote(token: String, expectedRevision: String) = Unit
+        override suspend fun restoreNote(token: String, expectedRevision: String): app.nowus.android.data.ApiNote = error("not used")
         override suspend fun setTemporary(token: String, available: Boolean, minutes: Int) = Unit
         override suspend fun resetTemporary(token: String) = Unit
         override suspend fun markSetupComplete(token: String) { setupComplete = true }
         override suspend fun setSharing(token: String, enabled: Boolean) = Unit
         override suspend fun unpair(token: String) = Unit
-        override suspend fun createInvitation(token: String) = Invite("23456789AB", System.currentTimeMillis() + 86_400_000)
-        override suspend fun revokeInvitation(token: String) = Unit
+        override suspend fun createInvitation(token: String): Invite {
+            val expiry = System.currentTimeMillis() + 86_400_000
+            return Invite("23456789AB", expiry).also {
+                createdInvitationCode = it.code
+                invitationExpiresAt = Instant.ofEpochMilli(expiry).toString()
+            }
+        }
+        override suspend fun revokeInvitation(token: String) { createdInvitationCode = null; invitationExpiresAt = null }
         override suspend fun previewInvitation(code: String): InvitePreview {
             previewedCode = code
             return InvitePreview(code, Profile("小舟", "beijing"), listOf("个人资料"), System.currentTimeMillis() + 86_400_000)
         }
         override suspend fun acceptInvitation(token: String, code: String) = Unit
         override suspend fun logout(token: String) = Unit
+    }
+
+    private fun capture(name: String) {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        instrumentation.waitForIdleSync()
+        val bitmap: Bitmap = instrumentation.uiAutomation.takeScreenshot()
+        val directory = instrumentation.targetContext.externalCacheDir!!
+        File(directory, name).outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 }

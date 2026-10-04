@@ -11,6 +11,23 @@ import org.junit.Test
 import java.nio.file.Files
 
 class LocalRepositoryTest {
+    @Test fun draftSurvivesStoreRecreationWithoutBecomingPublishedNote() = runBlocking {
+        val file = Files.createTempDirectory("nowus-draft").resolve("state.preferences_pb").toFile()
+        val job = SupervisorJob()
+        val store = PreferenceDataStoreFactory.create(scope=CoroutineScope(Dispatchers.IO + job), produceFile={file})
+        store.edit { it[stringPreferencesKey("nowus_local_v1")] = """{"schema":1,"data":{"me":{"name":"我","cityId":"beijing"},"noteDraft":"unsent 🌙"}}""" }
+        val repository = LocalRepository(store)
+        val encoded = kotlinx.serialization.json.Json.encodeToString(repository.states.first())
+        assertTrue(encoded.contains("unsent 🌙"))
+        assertNull(repository.states.first().note)
+        job.cancelAndJoin()
+        val reopenedJob=SupervisorJob()
+        try {
+            val reopened = LocalRepository(PreferenceDataStoreFactory.create(scope=CoroutineScope(Dispatchers.IO + reopenedJob),produceFile={file}))
+            assertTrue(kotlinx.serialization.json.Json.encodeToString(reopened.states.first()).contains("unsent 🌙"))
+        } finally { reopenedJob.cancelAndJoin() }
+    }
+
     @Test fun profileAndNoteSurviveStoreRecreation() = runBlocking {
         val file = Files.createTempDirectory("nowus-test").resolve("state.preferences_pb").toFile()
         val job = SupervisorJob()

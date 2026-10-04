@@ -34,8 +34,9 @@ interface AccountApi : AuthenticationApi {
     suspend fun snapshot(token: String): ApiSnapshot
     suspend fun saveProfile(token: String, profile: Profile)
     suspend fun saveSchedule(token: String, schedule: Schedule)
-    suspend fun saveNote(token: String, text: String)
-    suspend fun deleteNote(token: String)
+    suspend fun saveNote(token: String, text: String): ApiNote
+    suspend fun deleteNote(token: String, expectedRevision: String)
+    suspend fun restoreNote(token: String, expectedRevision: String): ApiNote
     suspend fun setTemporary(token: String, available: Boolean, minutes: Int)
     suspend fun resetTemporary(token: String)
     suspend fun markSetupComplete(token: String)
@@ -68,6 +69,7 @@ interface AccountApi : AuthenticationApi {
 )
 
 @Serializable data class ApiNote(val text: String, val updatedAt: String)
+@Serializable data class ApiNoteResult(val note: ApiNote)
 @Serializable data class ApiPendingInvitation(val expiresAt: String)
 @Serializable data class ApiInviteCreated(
     val code: String = "",
@@ -112,13 +114,16 @@ class NowUsApiClient(private val baseUrl: String) : AccountApi {
         put("/v1/me/rhythm", token, ScheduleInput(schedule.weekday, schedule.rest, schedule.templateId))
     }
 
-    override suspend fun saveNote(token: String, text: String) {
-        put("/v1/me/note", token, NoteInput(text))
+    override suspend fun saveNote(token: String, text: String): ApiNote =
+        json.decodeFromString<ApiNoteResult>(put("/v1/me/note", token, NoteInput(text))).note
+
+    override suspend fun deleteNote(token: String, expectedRevision: String) {
+        val revision = URLEncoder.encode(expectedRevision, Charsets.UTF_8.name())
+        request("DELETE", "/v1/me/note?expectedRevision=$revision", token)
     }
 
-    override suspend fun deleteNote(token: String) {
-        request("DELETE", "/v1/me/note", token)
-    }
+    override suspend fun restoreNote(token: String, expectedRevision: String): ApiNote =
+        json.decodeFromString<ApiNoteResult>(post("/v1/me/note/restore", token, NoteRevisionInput(expectedRevision))).note
 
     override suspend fun setTemporary(token: String, available: Boolean, minutes: Int) {
         put("/v1/me/temporary", token, TemporaryInput(available, minutes))
@@ -218,6 +223,7 @@ class NowUsApiClient(private val baseUrl: String) : AccountApi {
     @Serializable private data class VerifyInput(val email: String, val code: String)
     @Serializable private data class ScheduleInput(val weekday: app.nowus.android.domain.Rhythm, val rest: app.nowus.android.domain.Rhythm, val templateId: String = "学生")
     @Serializable private data class NoteInput(val text: String)
+    @Serializable private data class NoteRevisionInput(val expectedRevision: String)
     @Serializable private data class TemporaryInput(val available: Boolean, val minutes: Int)
     @Serializable private data class SetupInput(val complete: Boolean)
     @Serializable private data class SharingInput(val enabled: Boolean)

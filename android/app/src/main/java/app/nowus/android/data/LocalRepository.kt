@@ -15,6 +15,27 @@ interface StateRepository {
     val states: Flow<AppState>
     suspend fun update(transform: (AppState) -> AppState)
 
+    suspend fun updateNoteDraft(text: String) = update { it.copy(noteDraft = text) }
+
+    suspend fun saveNote(text: String, nowMillis: Long) {
+        updateNoteDraft(text)
+        update { state ->
+            val result = Rules.saveNote(state, text, nowMillis)
+            require(result.error == null) { result.error.orEmpty() }
+            result.state
+        }
+    }
+
+    suspend fun deleteNote(expectedNote: Note) = update { state ->
+        require(state.note == expectedNote) { "留言已更新，请刷新后重试" }
+        state.copy(note = null, deletedNote = expectedNote)
+    }
+
+    suspend fun restoreNote(note: Note) = update { state ->
+        require(state.note == null && state.deletedNote == note) { "留言已更新，无法撤销删除" }
+        state.copy(note = note.copy(revision = java.util.UUID.randomUUID().toString()), deletedNote = null)
+    }
+
     suspend fun createInvitation(code: String, nowMillis: Long): Invite {
         var created: Invite? = null
         update { state ->

@@ -13,7 +13,7 @@ import java.time.ZoneId
 @Serializable data class Rhythm(val sleepStart: String="23:00", val sleepEnd: String="07:00", val activity: String="上班", val activityStart: String="09:00", val activityEnd: String="18:00", val contactKnown: Boolean=true, val contactStart: String="20:00", val contactEnd: String="22:30", val blocks: List<RoutineBlock> = emptyList())
 @Serializable data class Schedule(val weekday: Rhythm, val rest: Rhythm, val templateId: String="学生")
 @Serializable data class TemporaryStatus(val available: Boolean, val untilMillis: Long, val fromMillis: Long=0)
-@Serializable data class Note(val text: String, val updatedMillis: Long)
+@Serializable data class Note(val text: String, val updatedMillis: Long, val revision: String? = null)
 @Serializable data class Invite(val code: String, val expiresMillis: Long, val revoked: Boolean=false)
 @Serializable data class InvitePreview(val code: String, val inviter: Profile, val scope: List<String>, val expiresMillis: Long)
 @Serializable data class AppState(
@@ -32,6 +32,8 @@ import java.time.ZoneId
  val sharingPaused: Boolean=false,
  val syncStale: Boolean=false,
  val lastSyncMillis: Long?=null,
+ val noteDraft: String?=null,
+ val deletedNote: Note?=null,
 )
 data class City(val id: String,val name: String,val zoneId: String) { val zone: ZoneId get()=ZoneId.of(zoneId) }
 object Cities {

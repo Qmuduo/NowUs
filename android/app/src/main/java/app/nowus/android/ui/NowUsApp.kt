@@ -26,9 +26,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.nowus.android.AppViewModel
+import app.nowus.android.R
 import app.nowus.android.domain.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -55,45 +57,76 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
  val readFailed by vm.readFailed.collectAsStateWithLifecycle()
  val now by vm.now.collectAsStateWithLifecycle()
  val demo by vm.demo.collectAsStateWithLifecycle()
+ val deletedNote by vm.deletedNote.collectAsStateWithLifecycle()
  LaunchedEffect(vm){while(isActive){vm.refreshTime();delay(1000)}}
+ val snackbarHostState = remember { SnackbarHostState() }
+ LaunchedEffect(deletedNote) {
+  val removed = deletedNote ?: return@LaunchedEffect
+  val result = snackbarHostState.showSnackbar("便签已删除", actionLabel = "撤销", withDismissAction = true)
+  if (result == SnackbarResult.ActionPerformed) vm.restoreNote(removed)
+ }
  var tab by rememberSaveable {mutableIntStateOf(0)}
- BackHandler(enabled=tab!=0){tab=0}
+ var route by rememberSaveable { mutableStateOf("") }
+ var routeReturn by rememberSaveable { mutableStateOf("") }
+ var timelineFocusMillis by rememberSaveable { mutableStateOf<Long?>(null) }
+ BackHandler(enabled=route.isNotEmpty() || tab!=0){ if(route.isNotEmpty()){route=routeReturn;routeReturn=""} else tab=0 }
  val current=state
  if(current==null){
-  Box(Modifier.fillMaxSize().safeDrawingPadding().padding(24.dp)){
+  Box(Modifier.fillMaxSize().background(Page).safeDrawingPadding().padding(24.dp)){
    Column(verticalArrangement=Arrangement.spacedBy(20.dp)){
-    Text("NowUs",style=MaterialTheme.typography.headlineLarge)
+    DaylightLogo(Modifier.width(134.dp).height(37.dp))
     Text(error?:"正在打开我们的本地时光…")
     if(error!=null)Button(onClick=vm::retry){Text("重试加载")} else CircularProgressIndicator()
    }
   };return
  }
- if(!current.setupComplete){Onboarding(vm,current,error,saving,realAccount,pendingInviteCode,onPendingInviteConsumed);return}
- val tabStates=rememberSaveableStateHolder()
- Scaffold(containerColor=Page,bottomBar={
-  NavigationBar(containerColor=MaterialTheme.colorScheme.surface){
-   listOf("此刻","我们的一天","我的节奏").forEachIndexed {index,label->
-    NavigationBarItem(selected=tab==index,onClick={tab=index},icon={Text(listOf("◉","☷","◷")[index],fontSize=22.sp)},label={Text(label)})
-   }
+ if(!current.setupComplete){Onboarding(vm,current,error,saving,realAccount,pendingInviteCode,onPendingInviteConsumed,onExitDemo);return}
+  LaunchedEffect(realAccount,pendingInviteCode,current.setupComplete){
+   if(realAccount&&!pendingInviteCode.isNullOrBlank())route="pair"
   }
+ val tabStates=rememberSaveableStateHolder()
+ val pageScrollState=rememberScrollState()
+ LaunchedEffect(tab,route){pageScrollState.scrollTo(0)}
+ val liveTemporary=current.temporary?.takeIf{now.toEpochMilli() in it.fromMillis until it.untilMillis}
+ val statusLabel=when(liveTemporary?.available){true->"愿意联系";false->"暂不方便";null->"我的状态"}
+ Scaffold(containerColor=DaylightBg,snackbarHost={ SnackbarHost(snackbarHostState) },bottomBar={
+  NowUsNavigation(tab){tab=it;route="";routeReturn="";if(it!=1)timelineFocusMillis=null}
  }){insets->
   tabStates.SaveableStateProvider(tab){
-  Column(Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets).imePadding().verticalScroll(rememberScrollState()).padding(horizontal=20.dp,vertical=18.dp),verticalArrangement=Arrangement.spacedBy(18.dp)){
-   Text("NowUs",style=MaterialTheme.typography.titleLarge,color=Forest)
-   Text(if(realAccount)"真实账号 · 作息与留言仅和已配对伴侣共享" else "本地体验 · 演示配对，无账号同步",style=MaterialTheme.typography.bodySmall,color=Muted)
+  Column(Modifier.fillMaxSize().testTag("screen-${route.ifEmpty { "tab-$tab" }}").padding(insets).consumeWindowInsets(insets).imePadding().verticalScroll(pageScrollState).padding(horizontal=22.dp,vertical=10.dp),verticalArrangement=Arrangement.spacedBy(14.dp)){
+   if(route.isEmpty()) DaylightHeader(onOpenProfile={routeReturn="";route="profile"},statusLabel=statusLabel,onOpenStatus={routeReturn="";route="status"}) else {
+    Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)){
+     androidx.compose.material3.IconButton(onClick={if(route.isNotEmpty()){route=routeReturn;routeReturn=""}else tab=0},modifier=Modifier.size(48.dp).testTag("back-to-$routeReturn")){DaylightIcon(R.drawable.daylight_icon_back,"返回",Modifier.size(21.dp),DaylightInk)}
+    Text(when(route){"profile"->"我的";"rhythm"->"我的节奏";"pair"->"邀请另一半";"about"->"关于 NowUs";"status"->"我的状态";else->""},style=MaterialTheme.typography.titleLarge,color=DaylightInk)
+    }
+   }
+   if(tab==2||current.partner==null)Text(if(realAccount)"真实账号 · 仅与已配对伴侣共享" else "本地体验 · 内容保存在此设备",style=MaterialTheme.typography.bodySmall,color=Muted)
    if(realAccount && pendingInviteCode != null){
     Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){
-     Text("已保存邀请 $pendingInviteCode",style=MaterialTheme.typography.bodySmall,color=Forest)
+     Text("已保存邀请 $pendingInviteCode",style=MaterialTheme.typography.bodySmall,color=Accent,modifier=Modifier.weight(1f))
+     TextButton(onClick={route="pair"}){Text("查看邀请")}
      TextButton(onClick=onPendingInviteConsumed){Text("清除")}
     }
    }
-   if(realAccount)SyncStatus(current)
-   if(demo){ErrorText("固定演示时间 · 2026/9/29 · 不代表此刻");Button(onClick={vm.setDemo(false)}){Text("退出固定演示")}}
-   if(!realAccount)TextButton(onClick=onExitDemo){Text("返回登录")}
+   if(realAccount&&(current.syncStale||current.sharingPaused||tab==2||route.isNotEmpty()))SyncStatus(current)
    if(error!=null)ErrorText(error!!)
    if(readFailed)Button(onClick=vm::retry){Text("重试加载")}
    if(realAccount&&current.syncStale)OutlinedButton(onClick=vm::retry){Text("重试同步")}
-   when(tab){0->Home(vm,current,now,demo,error,saving,realAccount,pendingInviteCode,onPendingInviteConsumed);1->Timeline(current,now);else->MyRhythm(vm,current,error,saving,demo,realAccount,onLogout)}
+   when {
+    route=="pair" -> Invitation(vm,current,saving,error,realAccount,pendingInviteCode,onPendingInviteConsumed,onAccepted={route="";routeReturn=""})
+    route=="about" -> BrandAboutScreen()
+    route=="status" -> StatusSettings(vm,current,now,saving,error){route=""}
+    route=="profile" -> DaylightProfileSettings(
+     vm,current,error,saving,demo,realAccount,
+     onOpenRhythm={routeReturn=route;route="rhythm"},onOpenPair={routeReturn=route;route="pair"},onOpenAbout={routeReturn=route;route="about"},
+     onLogout=onLogout,onExitDemo=onExitDemo,
+    )
+    route=="rhythm" -> DaylightRhythmScreen(vm,current,error,saving,realAccount)
+    route.isNotEmpty() -> Unit
+    tab==0 -> DaylightHome(vm,current,now,error,saving,realAccount,onOpenPair={routeReturn="";route="pair"},onOpenRhythm={routeReturn="";route="rhythm"},onOpenNote={tab=2},onOpenWindow={window->timelineFocusMillis=window.start.toEpochMilli();tab=1})
+    tab==1 -> Timeline(current,now,timelineFocusMillis?.let{Instant.ofEpochMilli(it)})
+    else -> NotePage(vm,current,error,saving,realAccount)
+   }
    Spacer(Modifier.height(18.dp))
   }
   }
@@ -102,85 +135,10 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
 
 @Composable fun ErrorText(error:String){Surface(color=MaterialTheme.colorScheme.errorContainer,shape=RoundedCornerShape(12.dp)){Text(error,Modifier.padding(12.dp),color=MaterialTheme.colorScheme.onErrorContainer)}}
 @Composable fun SectionCard(title:String,content:@Composable ColumnScope.()->Unit){
- Card(shape=RoundedCornerShape(24.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surface),modifier=Modifier.fillMaxWidth()){
-  Column(Modifier.padding(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){Text(title,style=MaterialTheme.typography.titleLarge);content()}
+ Card(shape=RoundedCornerShape(10.dp),border=androidx.compose.foundation.BorderStroke(1.dp,Line),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surface),modifier=Modifier.fillMaxWidth()){
+  Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){Text(title,style=MaterialTheme.typography.titleMedium);content()}
  }
 }
-@Composable private fun Clock(profile:Profile,schedule:Schedule?,temporary:TemporaryStatus?,now:Instant,modifier:Modifier=Modifier,simulated:Boolean=false,compact:Boolean=false,partner:Boolean=false){
- val hour=now.atZone(profile.zone()).hour;val night=hour<7||hour>=19
- Card(shape=RoundedCornerShape(24.dp),colors=CardDefaults.cardColors(containerColor=if(night)Night else Sunlight),modifier=modifier.fillMaxWidth()){
-  Column(Modifier.padding(if(compact)14.dp else 22.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
-   val color=if(night)Color.White else Ink
-   Text("${profile.name} · ${profile.cityName()} · ${if(simulated)"模拟对方" else if(partner)"伴侣" else "我"}",color=color,style=MaterialTheme.typography.titleMedium)
-   Text(localTime(now,profile),fontSize=if(compact)32.sp else 46.sp,lineHeight=if(compact)40.sp else 54.sp,color=color)
-   Text(localDate(now,profile),color=color)
-   val activity=TimeEngine.activityAt(profile,schedule,null,now)
-   Text(activity.label,color=color,style=MaterialTheme.typography.titleMedium)
-   Text(sourceText(activity.source),color=color,style=MaterialTheme.typography.bodySmall)
-   val contact=TimeEngine.contactAt(profile,schedule,temporary,now)
-   Text(when(contact){true->"联系意愿：可联系";false->"联系意愿：暂不联系";null->"联系意愿：未知"},color=color)
-   if(temporary!=null && now.toEpochMilli() in temporary.fromMillis until temporary.untilMillis)Text("主动设置 · 到 ${localTime(Instant.ofEpochMilli(temporary.untilMillis),profile)} 恢复通常偏好",color=color,style=MaterialTheme.typography.bodySmall)
-  }
- }
-}
-@Composable private fun Home(vm:AppViewModel,state:AppState,now:Instant,demo:Boolean,error:String?,saving:Boolean,realAccount:Boolean,pendingInviteCode:String?,onPendingInviteConsumed:()->Unit){
- Text("不同的时间，同一份惦念",style=MaterialTheme.typography.headlineSmall)
- val partner=state.partner
- BoxWithConstraints(Modifier.fillMaxWidth()){
-  if(partner!=null && maxWidth>=320.dp && LocalDensity.current.fontScale<=1.3f){
-   Row(horizontalArrangement=Arrangement.spacedBy(12.dp)){
-    Clock(state.me,state.schedule,state.temporary,now,modifier=Modifier.weight(1f),compact=true)
-    Clock(partner,state.partnerSchedule,state.partnerTemporary,now,Modifier.weight(1f),simulated=!realAccount,compact=true,partner=realAccount)
-   }
-  }else Column(verticalArrangement=Arrangement.spacedBy(12.dp)){
-   Clock(state.me,state.schedule,state.temporary,now)
-   if(partner!=null)Clock(partner,state.partnerSchedule,state.partnerTemporary,now,simulated=!realAccount,partner=realAccount)
-  }
- }
- if(partner!=null){
-  Text(offsetText(state.me,partner,now),color=Muted)
-  if(state.partnerSchedule==null)SectionCard("对方作息待补充"){
-   Text(if(realAccount)"对方尚未填写通常作息，活动和联系意愿保持未知。未知不会被当作有空。" else "演示已配对，但没有对方作息。未知不会被当作空闲。")
-   if(!realAccount)Button(enabled=!saving,onClick=vm::samplePartner){Text("填入对方示例作息")}
-   if(error!=null)ErrorText(error)
-  }
-  if(realAccount)SectionCard("对方的留言"){
-   Text(state.partnerNote?.text?:"对方还没有留下当前留言。")
-  }
- }else if(realAccount&&state.syncStale)SectionCard("伴侣资料暂不可用"){
-  Text("无法确认当前分享权限，因此暂不显示缓存的伴侣资料。联网后重试同步即可恢复可访问内容。")
- }else if(realAccount&&state.sharingPaused)SectionCard("分享已暂停"){
-  Text("你或对方暂停了分享。对方的资料不会显示；可在“我的节奏”恢复分享。")
- }else if(realAccount&&state.paired)SectionCard("配对已建立"){
-  Text("对方尚未填写可共享的昵称与城市；内容保持未知，不会用演示资料补齐。")
- }else SectionCard(if(realAccount)"邀请伴侣" else "把时光留一个位置"){
-  Text(if(realAccount)"创建邀请链接或输入伴侣的邀请码。对方接受前会先看到你的昵称、城市和共享范围。" else "目前独自使用。演示邀请只在这台设备上模拟配对，不会发送给任何人。")
-  Invitation(vm,state,saving,error,realAccount,pendingInviteCode,onPendingInviteConsumed)
- }
- if(realAccount&&partner==null&&state.partnerNote!=null)SectionCard("对方的留言"){
-  Text(state.partnerNote.text)
-  Text("对方尚未填写昵称与城市 · ${shortDateTime(Instant.ofEpochMilli(state.partnerNote.updatedMillis),state.me)}",style=MaterialTheme.typography.bodySmall,color=Muted)
- }
- val windows by produceState<List<Window>?>(null,state,now.epochSecond/60){
-  value=withContext(Dispatchers.Default){partner?.let{TimeEngine.commonWindows(now,now.plusSeconds(7*86400),state.me,state.schedule,state.temporary,it,state.partnerSchedule)}?:emptyList()}
- }
- SectionCard("可以一起的片刻"){
-  Text("未来七天 · 来自通常联系偏好与主动设置",style=MaterialTheme.typography.bodySmall,color=Muted)
-  val next=windows?.firstOrNull{it.end>now}
-  if(windows==null)Text("正在寻找共同窗口…")
-  else if(next==null)Text(if(partner==null||state.partnerSchedule==null)"资料尚不完整，暂不能计算共同窗口" else "未来七天暂无共同联系窗口")
-  else{
-   val start=maxOf(next.start,now)
-   Text(if(next.start<=now)"此刻可以一起" else "下一个共同窗口",color=Forest,style=MaterialTheme.typography.titleMedium)
-   Text("我：${shortDateTime(start,state.me)} – ${shortDateTime(next.end,state.me)}")
-   Text("${partner!!.name}：${shortDateTime(start,partner)} – ${shortDateTime(next.end,partner)}")
-   Text("时区与日期按所在地计算；不会推断对方实时状态。",style=MaterialTheme.typography.bodySmall,color=Muted)
-  }
- }
-  NoteCard(vm,state,error,saving,realAccount)
- TemporaryCard(vm,state,now,demo,error,saving)
-}
-
 @Composable private fun SyncStatus(state:AppState){
  val last=state.lastSyncMillis
  val text=when{
@@ -193,14 +151,14 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
 }
 
 @OptIn(ExperimentalLayoutApi::class)
-@Composable private fun TemporaryCard(vm:AppViewModel,state:AppState,now:Instant,demo:Boolean,error:String?,saving:Boolean){
+@Composable internal fun TemporaryCard(vm:AppViewModel,state:AppState,now:Instant,demo:Boolean,error:String?,saving:Boolean){
  var open by rememberSaveable {mutableStateOf(false)}
  var available by rememberSaveable {mutableStateOf(true)}
  var minutes by rememberSaveable {mutableIntStateOf(30)}
  SectionCard("此刻的联系意愿"){
   val temporary=state.temporary
   if(temporary!=null && now.toEpochMilli() in temporary.fromMillis until temporary.untilMillis){
-   Text("主动设置：${if(temporary.available) "可联系" else "忙碌"} · 至 ${localTime(Instant.ofEpochMilli(temporary.untilMillis),state.me)}",color=Forest)
+   Text("主动设置：${if(temporary.available) "可联系" else "忙碌"} · 至 ${localTime(Instant.ofEpochMilli(temporary.untilMillis),state.me)}",color=Accent)
    TextButton(enabled=!saving,onClick=vm::resetTemporary){Text("恢复通常联系偏好")}
   }else Text("当前按通常联系偏好；活动与联系意愿独立。",color=Muted)
   if(demo)Text("退出固定演示后，可设置真实联系意愿。",style=MaterialTheme.typography.bodySmall,color=Muted)
@@ -220,33 +178,15 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
   Button(enabled=!saving,onClick={vm.temporary(available,minutes){open=false}}){Text("保存临时意愿")}
  }
 }
-@Composable private fun NoteCard(vm:AppViewModel,state:AppState,error:String?,saving:Boolean,realAccount:Boolean){
- var open by rememberSaveable {mutableStateOf(false)}
- var draft by rememberSaveable {mutableStateOf(state.note?.text.orEmpty())}
- SectionCard(if(realAccount)"我的当前留言" else "留一句话"){
-  Text(state.note?.text?:"给我们的下一次相遇，留一句期待。")
-  if(state.note!=null)Text(if(realAccount)"仅配对伴侣可见 · ${shortDateTime(Instant.ofEpochMilli(state.note.updatedMillis),state.me)}" else "仅保存到本机 · ${shortDateTime(Instant.ofEpochMilli(state.note.updatedMillis),state.me)}",style=MaterialTheme.typography.bodySmall,color=Muted)
-  Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
-   TextButton(onClick={vm.clearError();draft=state.note?.text.orEmpty();open=true}){Text(if(state.note==null)"写留言" else "编辑留言")}
-   if(state.note!=null)TextButton(enabled=!saving,onClick={vm.saveNote(""){draft=""}}){Text("删除留言")}
-  }
-  if(error!=null&&!open)ErrorText(error)
- }
- if(open)EditorDialog("留一句话",{open=false}){
-  OutlinedTextField(draft,{draft=it},label={Text("留言")},supportingText={Text("${draft.codePointCount(0,draft.length)} / 120 字 · ${if(realAccount)"配对伴侣可见" else "仅在本机"}")},modifier=Modifier.fillMaxWidth().testTag("noteDraft"),minLines=3)
-  if(error!=null)ErrorText(error)
-  Button(enabled=!saving,onClick={vm.saveNote(draft){open=false}}){Text("保存留言")}
- }
-}
-
-@Composable private fun Invitation(
+@Composable internal fun Invitation(
  vm:AppViewModel,state:AppState,saving:Boolean,error:String?,realAccount:Boolean=false,
  pendingInviteCode:String?=null,onPendingInviteConsumed:()->Unit={},onAccepted:()->Unit={},
 ){
+ InvitationDesignIntro()
  if(realAccount){RealInvitation(vm,state,saving,error,pendingInviteCode,onPendingInviteConsumed,onAccepted);return}
  var code by rememberSaveable {mutableStateOf("")}
  var partnerName by rememberSaveable {mutableStateOf("")}
- var partnerCity by rememberSaveable {mutableStateOf("new-york")}
+ var partnerCity by rememberSaveable {mutableStateOf("")}
  Text("本机演示邀请 · 填写模拟对方的昵称和城市，接受后作息仍未知。",style=MaterialTheme.typography.bodySmall,color=Muted)
  val invite=state.invite
  if(invite!=null){Text("邀请码：${invite.code}",style=MaterialTheme.typography.titleMedium)
@@ -259,12 +199,36 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
  if(error!=null)ErrorText(error)
 }
 
+@Composable private fun InvitationDesignIntro(){
+ Column(
+  Modifier.fillMaxWidth().padding(top=8.dp,bottom=12.dp),
+  horizontalAlignment=Alignment.CenterHorizontally,
+  verticalArrangement=Arrangement.spacedBy(8.dp),
+ ){
+  Box(Modifier.fillMaxWidth().height(104.dp),contentAlignment=Alignment.Center){
+   Surface(
+    Modifier.align(Alignment.CenterStart).padding(start=26.dp).size(76.dp),
+    shape=CircleShape,color=DaylightNight,
+   ){Box(contentAlignment=Alignment.Center){DaylightIcon(R.drawable.daylight_icon_moon,null,Modifier.size(30.dp),DaylightNightInk)}}
+   DaylightIcon(R.drawable.daylight_icon_link,null,Modifier.size(27.dp),DaylightContact)
+   Surface(
+    Modifier.align(Alignment.CenterEnd).padding(end=26.dp).size(76.dp),
+    shape=CircleShape,color=DaylightBrandLight,
+   ){Box(contentAlignment=Alignment.Center){DaylightIcon(R.drawable.daylight_icon_sun,null,Modifier.size(30.dp),DaylightInk)}}
+  }
+  Text("从你的此刻，",style=MaterialTheme.typography.headlineSmall,color=DaylightInk)
+  Text("到你们的日常。",style=MaterialTheme.typography.headlineSmall,color=DaylightContact)
+  Text("各自拥有一天，\n也找到属于两个人的时间。",style=MaterialTheme.typography.bodyMedium,color=DaylightMuted,textAlign=TextAlign.Center)
+ }
+}
+
 @Composable private fun RealInvitation(
  vm:AppViewModel,state:AppState,saving:Boolean,error:String?,pendingInviteCode:String?,onPendingInviteConsumed:()->Unit,onAccepted:()->Unit,
 ){
  var code by rememberSaveable {mutableStateOf(pendingInviteCode.orEmpty())}
  val preview by vm.invitePreview.collectAsStateWithLifecycle()
  val context=LocalContext.current
+ var copied by rememberSaveable(state.invite?.code) { mutableStateOf(false) }
  LaunchedEffect(pendingInviteCode){
   if(!pendingInviteCode.isNullOrBlank()){
    code=pendingInviteCode
@@ -275,15 +239,24 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
   Text("有效期 24 小时。对方接受前可查看你的昵称、城市和共享范围。接受后双方都能暂停分享或解除配对。")
   val invite=state.invite
   if(invite!=null){
-   Text("邀请码：${invite.code}",style=MaterialTheme.typography.titleMedium)
-   Text("有效至 ${shortDateTime(Instant.ofEpochMilli(invite.expiresMillis),state.me)}（服务器时间）",style=MaterialTheme.typography.bodySmall,color=Muted)
+   Surface(color=DaylightContactSoft,shape=RoundedCornerShape(16.dp),modifier=Modifier.fillMaxWidth()){
+    Column(Modifier.fillMaxWidth().padding(18.dp),horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(7.dp)){
+     Text("${if(copied)"已复制邀请" else "等待对方接受"} · 24 小时有效",style=MaterialTheme.typography.bodySmall,color=DaylightContact)
+     Text(invite.code.chunked(5).joinToString(" "),style=MaterialTheme.typography.headlineSmall,color=DaylightInk,fontWeight=androidx.compose.ui.text.font.FontWeight.SemiBold)
+     Text("有效至 ${shortDateTime(Instant.ofEpochMilli(invite.expiresMillis),state.me)} · 服务器时间",style=MaterialTheme.typography.bodySmall,color=Muted)
+    }
+   }
    if(invite.code.isNotBlank()){
     val link="nowus://invite/${invite.code}"
-    Text(link,style=MaterialTheme.typography.bodySmall)
+    Text(link,style=MaterialTheme.typography.bodySmall,color=Muted)
+    OutlinedButton(onClick={
+     context.getSystemService(android.content.ClipboardManager::class.java)?.setPrimaryClip(android.content.ClipData.newPlainText("NowUs invite",link))
+     copied=true
+    },modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)){Text(if(copied)"已复制邀请链接" else "复制邀请链接")}
     OutlinedButton(onClick={
      val send=Intent(Intent.ACTION_SEND).apply{type="text/plain";putExtra(Intent.EXTRA_TEXT,"加入 NowUs 与我同步跨时区日常：$link（邀请码 ${invite.code}）")}
      context.startActivity(Intent.createChooser(send,"分享 NowUs 邀请"))
-    }){Text("分享邀请链接")}
+    },modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)){Text("分享邀请链接")}
    }else Text("此设备未保存邀请码。可撤销并重建邀请。",style=MaterialTheme.typography.bodySmall,color=Muted)
    TextButton(enabled=!saving,onClick=vm::revokeInvite){Text("撤销邀请")}
   }
@@ -305,21 +278,21 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
  }
 }
 
-@Composable private fun Onboarding(vm:AppViewModel,state:AppState,error:String?,saving:Boolean,realAccount:Boolean=false,pendingInviteCode:String?=null,onPendingInviteConsumed:()->Unit={}){
+@Composable private fun Onboarding(vm:AppViewModel,state:AppState,error:String?,saving:Boolean,realAccount:Boolean=false,pendingInviteCode:String?=null,onPendingInviteConsumed:()->Unit={},onExitDemo:()->Unit={}){
  val readFailed by vm.readFailed.collectAsStateWithLifecycle()
  var step by rememberSaveable {mutableIntStateOf(if(state.schedule!=null)2 else if(state.me.name.isNotBlank())1 else 0)}
  var name by rememberSaveable {mutableStateOf(state.me.name)}
- var city by rememberSaveable {mutableStateOf(state.me.cityId)}
+ var city by rememberSaveable {mutableStateOf(if(state.me.name.isBlank())"" else state.me.cityId)}
  var scheduleJson by rememberSaveable {mutableStateOf(Json.encodeToString(state.schedule?:defaultSchedule(city)))}
  val schedule=Json.decodeFromString<Schedule>(scheduleJson)
  BackHandler(enabled=step>0){step--}
- Column(Modifier.fillMaxSize().safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(24.dp),verticalArrangement=Arrangement.spacedBy(18.dp)){
-  Text("NowUs",color=Forest,style=MaterialTheme.typography.headlineLarge)
+ Column(Modifier.fillMaxSize().background(Page).safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(24.dp),verticalArrangement=Arrangement.spacedBy(18.dp)){
+  DaylightLogo(Modifier.width(134.dp).height(37.dp))
   Text("${step+1} / 4 · ${listOf("认识你","我的节奏","留一个位置","准备好了")[step]}",style=MaterialTheme.typography.titleMedium)
   Text(if(realAccount)"真实账号 · 资料保存到账号；不导入演示伴侣资料" else "本地体验 · 邀请和对方仅作演示",color=Muted)
   if(error!=null)ErrorText(error)
   when(step){
-   0->{Text("从你的城市开始",style=MaterialTheme.typography.headlineSmall);ProfileFields(name,{name=it},city,{city=it;if(state.schedule==null)scheduleJson=Json.encodeToString(defaultSchedule(it))});Button(enabled=!saving,onClick={vm.saveProfile(Profile(name.trim(),city)){step=1}}){Text("下一步：我的节奏")}}
+   0->{Text("从你的城市开始",style=MaterialTheme.typography.headlineSmall);Text("手动选择城市；NowUs 不会获取你的实时位置。",style=MaterialTheme.typography.bodySmall,color=Muted);ProfileFields(name,{name=it},city,{city=it;if(state.schedule==null)scheduleJson=Json.encodeToString(defaultSchedule(it))});Button(enabled=!saving&&name.isNotBlank()&&city.isNotBlank(),onClick={vm.saveProfile(Profile(name.trim(),city)){step=1}}){Text("下一步：我的节奏")}}
    1->{Text("让作息替你轻声说明",style=MaterialTheme.typography.headlineSmall);if(realAccount&&state.schedule==null)Text("先从按城市提供的可编辑作息建议开始；调整并保存后才会同步。",style=MaterialTheme.typography.bodySmall,color=Muted);RhythmFields(schedule,city,{scheduleJson=Json.encodeToString(it)});Button(enabled=!saving,onClick={vm.saveSchedule(schedule){step=2}}){Text("保存节奏并继续")}}
    2->{SectionCard(if(realAccount)"伴侣邀请" else "演示邀请"){
     if(state.partner==null&&!state.paired)Invitation(vm,state,saving,error,realAccount,pendingInviteCode,onPendingInviteConsumed){step=3}
@@ -330,10 +303,11 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
   if(error!=null)ErrorText(error)
   if(readFailed)Button(onClick=vm::retry){Text("重试加载")}
   if(step>0)TextButton(onClick={step--}){Text("上一步")}
+  if(!realAccount)TextButton(onClick=onExitDemo){Text("返回登录")}
  }
 }
 
-@Composable private fun ProfileFields(name:String,onName:(String)->Unit,city:String,onCity:(String)->Unit){
+@Composable internal fun ProfileFields(name:String,onName:(String)->Unit,city:String,onCity:(String)->Unit){
  OutlinedTextField(name,onName,label={Text("昵称")},supportingText={Text("1–20 个字符")},modifier=Modifier.fillMaxWidth().testTag("profileName"),singleLine=true)
  var expanded by remember {mutableStateOf(false)}
  Box{
@@ -365,6 +339,7 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
  Text(if(rest)"休息日 · 周六、周日" else "工作日 · 周一至周五",style=MaterialTheme.typography.titleMedium)
  val rhythm=if(rest)schedule.rest else schedule.weekday
  val dayKey=if(rest)"rest" else "weekday"
+ RhythmOverviewCard(rhythm,cityId,rest)
  fun update(value:Rhythm){onChange(if(rest)schedule.copy(rest=value)else schedule.copy(weekday=value))}
  Text("滚动选择每段时间。睡觉可以跨夜；其他时段按当天安排且不可互相重叠。未安排的空档会显示为“未安排”。",style=MaterialTheme.typography.bodySmall,color=Muted)
  if(rhythm.blocks.isEmpty()){
@@ -396,13 +371,22 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
    update(updateBlocks(rhythm,rhythm.blocks+RoutineBlock(id,"新时段",String.format(Locale.ROOT,"%02d:%02d",start/60,start%60),String.format(Locale.ROOT,"%02d:%02d",(start+30)/60,(start+30)%60))))
   },modifier=Modifier.fillMaxWidth()){Text(if(rhythm.blocks.size<20)"＋ 添加时段" else "已达到 20 个时段上限")}
  }
- Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text("通常联系偏好",Modifier.weight(1f));Switch(checked=rhythm.contactKnown,onCheckedChange={update(rhythm.copy(contactKnown=it))})}
- Text(if(rhythm.contactKnown)"以下时段愿意联系，不推断实时状态" else "联系意愿保持未知")
- if(rhythm.contactKnown)TimePair("联系","rhythm-$dayKey-contact",rhythm.contactStart,rhythm.contactEnd,{update(rhythm.copy(contactStart=it))},{update(rhythm.copy(contactEnd=it))})
+ Surface(color=DaylightContactSoft,shape=RoundedCornerShape(14.dp),modifier=Modifier.fillMaxWidth()){
+  Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
+   Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){
+    Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)){
+     Text("愿意联系的时间",style=MaterialTheme.typography.titleMedium,color=DaylightContact)
+     Text(if(rhythm.contactKnown)"联系偏好独立于活动与在线状态" else "联系意愿保持未知",style=MaterialTheme.typography.bodySmall,color=Muted)
+    }
+    Switch(checked=rhythm.contactKnown,onCheckedChange={update(rhythm.copy(contactKnown=it))})
+   }
+   if(rhythm.contactKnown)TimePair("联系","rhythm-$dayKey-contact",rhythm.contactStart,rhythm.contactEnd,{update(rhythm.copy(contactStart=it))},{update(rhythm.copy(contactEnd=it))})
+  }
+ }
  Text("保存时同时校验工作日和休息日模板。联系偏好仍可与上课或工作时段重合，但不能覆盖睡觉时间。",style=MaterialTheme.typography.bodySmall,color=Muted)
 }
 
-@Composable private fun RoutineCategoryPicker(category:RoutineCategory,testTag:String,onCategoryChange:(RoutineCategory)->Unit){
+@Composable internal fun RoutineCategoryPicker(category:RoutineCategory,testTag:String,onCategoryChange:(RoutineCategory)->Unit){
  var expanded by rememberSaveable(testTag){mutableStateOf(false)}
  Box {
   AssistChip(
@@ -430,12 +414,12 @@ fun defaultSchedule(cityId:String="beijing",template:RoutineTemplate=RoutineTemp
  }
 }
 
-private fun updateBlocks(rhythm:Rhythm,blocks:List<RoutineBlock>):Rhythm{
+internal fun updateBlocks(rhythm:Rhythm,blocks:List<RoutineBlock>):Rhythm{
  val sleep=blocks.first { it.id=="sleep" }
  val primary=blocks.firstOrNull { it.id.startsWith("morning-") }
  return rhythm.copy(sleepStart=sleep.start,sleepEnd=sleep.end,activity=primary?.label?:"休息",activityStart=primary?.start?:"10:00",activityEnd=primary?.end?:"12:00",blocks=blocks)
 }
-@Composable private fun TimePair(title:String,tagPrefix:String,start:String,end:String,onStart:(String)->Unit,onEnd:(String)->Unit){
+@Composable internal fun TimePair(title:String,tagPrefix:String,start:String,end:String,onStart:(String)->Unit,onEnd:(String)->Unit){
  Column(verticalArrangement=Arrangement.spacedBy(4.dp)){
   Text(title,style=MaterialTheme.typography.titleSmall)
   Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(12.dp)){
@@ -519,13 +503,14 @@ private fun updateBlocks(rhythm:Rhythm,blocks:List<RoutineBlock>):Rhythm{
  }
 }
 
-@Composable private fun MyRhythm(vm:AppViewModel,state:AppState,error:String?,saving:Boolean,demo:Boolean,realAccount:Boolean=false,onLogout:()->Unit={}){
+@Composable internal fun MyRhythm(vm:AppViewModel,state:AppState,error:String?,saving:Boolean,demo:Boolean,realAccount:Boolean=false,now:Instant,onLogout:()->Unit={},onOpenAbout:()->Unit={},onExitDemo:()->Unit={}){
  var profileOpen by rememberSaveable {mutableStateOf(false)}
  var name by rememberSaveable {mutableStateOf(state.me.name)}
  var city by rememberSaveable {mutableStateOf(state.me.cityId)}
  var draft by rememberSaveable {mutableStateOf(Json.encodeToString(state.schedule?:defaultSchedule(state.me.cityId)))}
  var rhythmSaved by rememberSaveable {mutableStateOf(false)}
  Text("我的节奏",style=MaterialTheme.typography.headlineSmall)
+ TemporaryCard(vm,state,now,demo,error,saving)
  SectionCard("${state.me.name} · ${state.me.cityName()}"){
    Text(if(realAccount)"仅编辑自己的资料；配对后伴侣可见" else "资料与节奏仅保存在本机",color=Muted)
   TextButton(onClick={vm.clearError();profileOpen=true}){Text("编辑昵称与城市")}
@@ -536,13 +521,12 @@ private fun updateBlocks(rhythm:Rhythm,blocks:List<RoutineBlock>):Rhythm{
   RhythmFields(schedule,state.me.cityId,{draft=Json.encodeToString(it);rhythmSaved=false})
   Button(enabled=!saving,onClick={rhythmSaved=false;vm.saveSchedule(schedule){rhythmSaved=true}}){Text("保存我的节奏")}
   if(error!=null)ErrorText(error)
-   if(rhythmSaved)Text(if(realAccount)"已保存并同步" else "已保存到本机",color=Forest)
+   if(rhythmSaved)Text(if(realAccount)"已保存并同步" else "已保存到本机",color=Accent)
  }
-  if(!realAccount)SectionCard("演示设置"){
-  Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text("固定时间演示",Modifier.weight(1f));Switch(checked=demo,onCheckedChange=vm::setDemo)}
-  Text("开启后固定为 2026/9/29，北京 22:00。退出或重新启动回到真实时间。邀请有效期始终使用真实时间。",style=MaterialTheme.typography.bodySmall,color=Muted)
-  if(state.partner!=null){Text("模拟对方：${state.partner.name} · ${state.partner.cityName()}");if(state.partnerSchedule==null)Button(enabled=!saving,onClick=vm::samplePartner){Text("填入对方示例作息")}}else Invitation(vm,state,saving,error)
- }
+  if(!realAccount)SectionCard("本机体验"){
+   Text("资料、作息与便签只保存在此设备。配对流程为本机模拟，不会连接账号服务。",style=MaterialTheme.typography.bodySmall,color=Muted)
+   TextButton(onClick=onExitDemo){Text("返回登录")}
+  }
   if(realAccount){
    var confirmUnpair by rememberSaveable {mutableStateOf(false)}
    val imported by vm.localImport.collectAsStateWithLifecycle()
@@ -579,13 +563,18 @@ private fun updateBlocks(rhythm:Rhythm,blocks:List<RoutineBlock>):Rhythm{
     dismissButton={TextButton(onClick={confirmUnpair=false}){Text("取消")}},
    )
   }
+ SectionCard("邀请与说明"){
+  if(state.partner==null)Text("${if(realAccount)"创建邀请或输入伴侣邀请码。" else "可以在本机模拟邀请流程。"}",color=Muted)
+  if(state.partner==null)Invitation(vm,state,saving,error,realAccount)
+  OutlinedButton(onClick=onOpenAbout,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)){Text("关于 NowUs")}
+ }
  if(profileOpen)EditorDialog("编辑我的资料",{profileOpen=false}){
   ProfileFields(name,{name=it},city,{city=it})
   if(error!=null)ErrorText(error)
   Button(enabled=!saving,onClick={vm.saveProfile(Profile(name.trim(),city)){profileOpen=false}}){Text("保存资料")}
  }
 }
-@Composable private fun EditorDialog(title:String,onDismiss:()->Unit,content:@Composable ColumnScope.()->Unit){
+@Composable internal fun EditorDialog(title:String,onDismiss:()->Unit,content:@Composable ColumnScope.()->Unit){
  Dialog(onDismissRequest=onDismiss){
   Surface(shape=RoundedCornerShape(24.dp),color=MaterialTheme.colorScheme.surface){
    Column(Modifier.fillMaxWidth().heightIn(max=560.dp).imePadding().verticalScroll(rememberScrollState()).padding(20.dp),verticalArrangement=Arrangement.spacedBy(14.dp)){

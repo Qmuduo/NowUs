@@ -25,18 +25,21 @@ class AppViewModel(private val repository:StateRepository, private val localDemo
  val invitePreview=_invitePreview.asStateFlow()
  private val _localImport=MutableStateFlow<LocalDataImport?>(null)
  val localImport=_localImport.asStateFlow()
+ private val _deletedNote=MutableStateFlow<Note?>(null)
+ val deletedNote=_deletedNote.asStateFlow()
+ private var draftJob:Job?=null
  private var loadJob:Job?=null
  init {retry()}
  fun retry(){
   loadJob?.cancel();error.value=null;readFailed.value=false
   loadJob=viewModelScope.launch {
-   try{repository.states.collect{state.value=it}}
+   try{repository.states.collect{state.value=it;_deletedNote.value=it.deletedNote}}
    catch(e:CancellationException){throw e}
    catch(e:Exception){readFailed.value=true;error.value="加载失败，请重试"}
   }
  }
  fun refreshTime(){if(!demo.value) now.value=Instant.now()}
- fun setDemo(enabled:Boolean){demo.value=enabled;now.value=if(enabled) Instant.parse("2026-09-29T14:00:00Z") else Instant.now()}
+ fun setDemo(enabled:Boolean){demo.value=enabled;now.value=if(enabled) Instant.parse("2026-09-29T12:00:00Z") else Instant.now()}
  fun clearError(){error.value=null}
  private fun action(onSuccess:()->Unit={},operation:suspend()->Unit){
   if(saving.value)return
@@ -60,12 +63,29 @@ class AppViewModel(private val repository:StateRepository, private val localDemo
   require(errors.isEmpty()){errors.distinct().joinToString("；")};it.copy(schedule=schedule)
  }
  fun completeSetup(onSuccess:()->Unit={})=write(onSuccess){it.copy(setupComplete=true)}
- fun saveNote(text:String,onSuccess:()->Unit={})=write(onSuccess){checked(Rules.saveNote(it,text,Instant.now().toEpochMilli()))}
+ fun updateNoteDraft(text:String){
+  val previous=draftJob
+  draftJob=viewModelScope.launch{
+   previous?.join()
+   try{repository.updateNoteDraft(text)}
+   catch(e:CancellationException){throw e}
+   catch(e:Exception){error.value="草稿保存失败，请重试"}
+  }
+ }
+ fun saveNote(text:String,onSuccess:()->Unit={})=action(onSuccess){
+  draftJob?.join()
+  repository.saveNote(text,Instant.now().toEpochMilli())
+ }
+ fun deleteNote(expectedNote:Note,onSuccess:()->Unit={})=action(onSuccess){
+  draftJob?.join()
+  repository.deleteNote(expectedNote)
+ }
+ fun restoreNote(note:Note,onSuccess:()->Unit={})=action(onSuccess){repository.restoreNote(note)}
  fun temporary(available:Boolean,minutes:Int,onSuccess:()->Unit={})=write({refreshTime();onSuccess()}){
   require(minutes in listOf(30,60,180)){"请选择有效时长"}
   val start=Instant.now().toEpochMilli();it.copy(temporary=TemporaryStatus(available,start+minutes*60000L,start))
  }
- fun resetTemporary()=write{it.copy(temporary=null)}
+ fun resetTemporary(onSuccess:()->Unit={})=write(onSuccess){it.copy(temporary=null)}
  fun createInvite()=action{repository.createInvitation(UUID.randomUUID().toString().take(10).uppercase(),Instant.now().toEpochMilli())}
  fun revokeInvite()=action{repository.revokeInvitation()}
  fun previewInvite(code:String){_invitePreview.value=null;action{_invitePreview.value=repository.previewInvitation(code.trim(),Instant.now().toEpochMilli())}}
@@ -112,6 +132,8 @@ class AppViewModel(private val repository:StateRepository, private val localDemo
   "not_paired"->"当前没有有效配对"
   "profile_invalid"->"昵称或城市信息无效"
   "rhythm_invalid"->"作息时间无效，请检查后重试"
+  "note_conflict"->"留言已更新，请刷新后重试"
+  "note_revision_invalid"->"留言版本无效，请刷新后重试"
   "note_empty"->"留言不能为空"
   "note_too_long"->"留言最多 120 个字符"
   "mail_send_failed"->"邮件发送失败，请稍后重试"
