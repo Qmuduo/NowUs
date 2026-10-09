@@ -48,19 +48,11 @@ class DaylightNavigationTest {
         compose.setContent { NowUsTheme { NowUsApp(viewModel) } }
 
         compose.onNodeWithTag("clock-self").assertHeightIsEqualTo(170.dp)
-        compose.onNodeWithText("小满与阿远 · 各自生活，也彼此惦记").assertExists()
-        compose.onNodeWithText("北京快 12 小时").assertExists()
-        compose.onNodeWithTag("home-note-preview").performScrollTo().assertExists()
-        compose.onNodeWithText("留给你的话").assertDoesNotExist()
-        compose.onNodeWithText("下一段可能适合联系的时间").assertDoesNotExist()
-        compose.waitUntil(5_000) {
-            compose.onAllNodesWithText("按联系偏好估计，尚未约定").fetchSemanticsNodes().isNotEmpty()
-        }
-        compose.onNodeWithText("按联系偏好估计，尚未约定").performScrollTo().assertExists()
-        compose.onNodeWithContentDescription("查看共同时间详情").performScrollTo().performClick()
-        compose.onNodeWithText("共同联系时间").assertIsDisplayed()
-        compose.onNodeWithText("在一天中查看").performClick()
-        compose.onNodeWithTag("screen-tab-1").assertExists()
+        compose.onNodeWithTag("clock-partner").assertHeightIsEqualTo(170.dp)
+        compose.onNodeWithText("小满 与 阿远 · 各自生活，也彼此惦记").assertExists()
+        compose.onNodeWithTag("partner-note-preview").performScrollTo().assertExists()
+        compose.onNodeWithText("今天的第一杯咖啡，替你也喝了一口。")
+            .performScrollTo().assertExists()
     }
 
     @Test
@@ -78,9 +70,11 @@ class DaylightNavigationTest {
         val viewModel = AppViewModel(repository)
         compose.setContent { NowUsTheme { NowUsApp(viewModel) } }
 
-        compose.onNodeWithContentDescription("我的资料与设置").performClick()
+        compose.onNodeWithContentDescription("打开我的设置").performClick()
         compose.onNodeWithText("我的", useUnmergedTree = true).assertIsDisplayed()
         compose.onNodeWithContentDescription("向对方分享日常").assertIsDisplayed().performClick()
+        compose.onNodeWithText("暂停分享日常？").assertIsDisplayed()
+        compose.onNodeWithText("暂停分享").performClick()
         compose.waitUntil(5_000) { !repository.data.value.sharingEnabled }
     }
 
@@ -89,7 +83,7 @@ class DaylightNavigationTest {
         val viewModel = AppViewModel(MemoryRepository(pairedState()))
         compose.setContent { NowUsTheme { NowUsApp(viewModel) } }
 
-        compose.onNodeWithContentDescription("我的资料与设置").performClick()
+        compose.onNodeWithContentDescription("打开我的设置").performClick()
         compose.onNodeWithText("我的节奏").performScrollTo().performClick()
         compose.onNodeWithText("安排好平常的一天，就不用每天填写。").assertExists()
     }
@@ -99,9 +93,8 @@ class DaylightNavigationTest {
         val viewModel = AppViewModel(MemoryRepository(AppState(Profile("阿青", "beijing"), setupComplete = true)))
         compose.setContent { NowUsTheme { NowUsApp(viewModel) } }
 
-        compose.onNodeWithText("邀请伴侣").performScrollTo().performClick()
-        compose.onNodeWithText("从你的此刻，").assertExists()
-        compose.onNodeWithText("到你们的日常。").assertExists()
+        compose.onNodeWithText("给彼此留一个位置").performScrollTo().performClick()
+        compose.onNodeWithText("从你的此刻，\n到你们的日常。").assertExists()
     }
 
     @Test
@@ -113,12 +106,12 @@ class DaylightNavigationTest {
 
         compose.onNodeWithText("留话").performClick()
         compose.onNodeWithTag("note-delete").performScrollTo().performClick()
-        compose.onNodeWithText("删除这条便签？").assertIsDisplayed()
-        compose.onNodeWithText("取消").performClick()
+        compose.onNodeWithText("删除这张便签？").assertIsDisplayed()
+        compose.onNodeWithText("再想想").performClick()
         compose.onNodeWithText("留给你的旧留言").assertExists()
         compose.onNodeWithTag("note-delete").performScrollTo().performClick()
-        compose.onNodeWithText("删除这条便签？").assertIsDisplayed()
-        compose.onNodeWithText("删除", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("删除这张便签？").assertIsDisplayed()
+        compose.onNodeWithText("删除留言").performClick()
         compose.onNodeWithText("撤销").performClick()
 
         compose.waitUntil(5_000) { repository.data.value.note?.text == original.text }
@@ -140,7 +133,7 @@ class DaylightNavigationTest {
         compose.onNodeWithTag("note-open-editor").performClick()
 
         compose.onNodeWithTag("noteDraft").assertTextContains("路过时想起你")
-        compose.runOnIdle { assert(repository.data.value.noteDraft == "路过时想起你") }
+        compose.runOnIdle { assert(repository.data.value.noteDraft == null) }
     }
 
     private class MemoryRepository(initial: AppState) : StateRepository {

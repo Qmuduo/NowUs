@@ -54,7 +54,11 @@ object Rules {
   }
   return ValidationResult(errors.isEmpty(),errors.distinct())
  }
- fun saveNote(state: AppState,text: String,nowMillis: Long): RuleResult = if(text.codePointCount(0,text.length)>120) RuleResult(state,"留言最多 120 个字符") else if(text.isBlank()) RuleResult(state,"请通过删除操作清空留言") else RuleResult(state.copy(note=Note(text,nowMillis,java.util.UUID.randomUUID().toString()),noteDraft=null,deletedNote=null))
+ fun saveNote(state: AppState,text: String,nowMillis: Long): RuleResult = when {
+  text.isBlank() -> RuleResult(state,"留言不能为空")
+  text.codePointCount(0,text.length)>120 -> RuleResult(state,"留言最多 120 个字符")
+  else -> RuleResult(state.copy(note=Note(text,nowMillis,java.util.UUID.randomUUID().toString()),noteDraft=null,deletedNote=null))
+ }
  fun createInvite(state: AppState,code: String,nowMillis: Long): RuleResult = when {
   state.partner!=null -> RuleResult(state,"已经配对")
   code.isBlank() -> RuleResult(state,"邀请码不能为空")

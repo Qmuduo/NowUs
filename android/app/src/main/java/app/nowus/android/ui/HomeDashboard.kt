@@ -1,182 +1,157 @@
 package app.nowus.android.ui
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.nowus.android.R
 import app.nowus.android.domain.*
-import java.time.Duration
 import java.time.Instant
+import java.time.Duration
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-/** Paired home uses account data only; simulated fixtures are opt-in elsewhere. */
-@Composable internal fun ClockPair(state: AppState, now: Instant) {
-    val partner = state.partner
-    Surface(shape = RoundedCornerShape(19.dp), color = Color.Transparent) {
-        BoxWithConstraints(Modifier.fillMaxWidth().clip(RoundedCornerShape(19.dp))) {
-            val horizontal = partner != null && maxWidth >= 230.dp && LocalDensity.current.fontScale <= 1.15f
-            if (horizontal) Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+/** Matched pair of local sky panels. Times and schedule labels always come from account state. */
+@Composable
+internal fun ClockPair(state: AppState, now: Instant, modifier: Modifier = Modifier) {
+    val partner = state.partner.takeUnless { state.sharingPaused || state.syncStale }
+    BoxWithConstraints(modifier.fillMaxWidth().clip(RoundedCornerShape(19.dp))) {
+        val stack = partner != null && (LocalDensity.current.fontScale > 1.3f || maxWidth < 300.dp)
+        if (stack) {
+            Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                ClockFace(state.me, state.schedule, now, true, Modifier.fillMaxWidth().heightIn(min = 160.dp).height(170.dp))
+                ClockFace(partner, state.partnerSchedule, now, false, Modifier.fillMaxWidth().heightIn(min = 160.dp).height(170.dp))
+            }
+        } else {
+            Row(Modifier.fillMaxWidth().height(170.dp), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                 ClockFace(state.me, state.schedule, now, true, Modifier.weight(1f).fillMaxHeight())
-                ClockFace(partner, state.partnerSchedule, now, false, Modifier.weight(1f).fillMaxHeight())
-            } else Column {
-                ClockFace(state.me, state.schedule, now, true)
-                if (partner != null) ClockFace(partner, state.partnerSchedule, now, false)
+                if (partner != null) ClockFace(partner, state.partnerSchedule, now, false, Modifier.weight(1f).fillMaxHeight())
+                else SoloSkyPlaceholder(Modifier.weight(1f).fillMaxHeight())
             }
         }
     }
 }
 
-@Composable private fun ClockFace(profile: Profile, schedule: Schedule?, now: Instant, self: Boolean, modifier: Modifier = Modifier) {
+@Composable
+private fun ClockFace(profile: Profile, schedule: Schedule?, now: Instant, self: Boolean, modifier: Modifier = Modifier) {
     val local = now.atZone(profile.zone())
-    val night = local.hour < 6 || local.hour >= 18
-    val ink = if (night) OnNight else Ink
-    val secondary = if (night) Color(0xFFBCC7D4) else Muted
+    val daylight = local.hour in 6..17
+    val ink = if (daylight) DaylightInk else OnNight
+    val secondary = if (daylight) DaylightInk.copy(alpha = .76f) else NightSub
     val activity = TimeEngine.activityAt(profile, schedule, null, now)
-    val fontScale = LocalDensity.current.fontScale
-    val screenWidth = LocalConfiguration.current.screenWidthDp
     Box(
-        modifier.fillMaxWidth().height(
-            when {
-                fontScale > 1.15f -> 252.dp
-                screenWidth <= 350 -> 160.dp
-                else -> 170.dp
-            },
-        ).clip(RoundedCornerShape(2.dp))
-            .background(if (night) Night else Day).testTag(if (self) "clock-self" else "clock-partner"),
+        modifier
+            .background(if (daylight) Daylight else Night)
+            .testTag(if (self) "clock-self" else "clock-partner")
+            .padding(horizontal = 15.dp, vertical = 14.dp),
     ) {
-        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
-            val orbRadius = if (night) 13.dp.toPx() else 18.dp.toPx()
-            val orbCenter = Offset(
-                if (night) size.width - 26.dp.toPx() else size.width + 10.dp.toPx(),
-                66.dp.toPx(),
-            )
-            if (night) {
-                drawCircle(DaylightNightInk.copy(alpha = .87f), orbRadius, orbCenter)
-                drawCircle(Night, orbRadius, Offset(orbCenter.x - 7.dp.toPx(), orbCenter.y - 4.dp.toPx()))
-            } else drawCircle(DaylightBrandLight.copy(alpha = .85f), orbRadius, orbCenter)
-            val hill = Path().apply {
-                moveTo(0f, size.height - 20.dp.toPx())
-                cubicTo(size.width * .28f, size.height - 64.dp.toPx(), size.width * .52f, size.height - 7.dp.toPx(), size.width, size.height - 43.dp.toPx())
-                lineTo(size.width, size.height)
-                lineTo(0f, size.height)
-                close()
-            }
-            drawPath(hill, ink.copy(alpha = .045f))
-        }
-        Column(Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Canvas(Modifier.fillMaxSize()) { drawSky(daylight) }
+        Column(Modifier.fillMaxSize()) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(profile.cityName(), color = ink, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(if (self) "我" else profile.name, color = secondary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(profile.cityName(), color = ink, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(if (self) "我 · ${profile.name}" else profile.name, color = secondary, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            Spacer(Modifier.height(10.dp))
-            Text(localTime(now, profile), color = ink, fontSize = if (screenWidth <= 350) 33.sp else 36.sp, lineHeight = 42.sp, letterSpacing = (-1.5).sp, fontWeight = FontWeight.Medium, maxLines = 1)
-            Text(local.format(DateTimeFormatter.ofPattern("M/d · EEE", Locale.CHINA)), color = secondary, style = MaterialTheme.typography.bodySmall, maxLines = 1)
+            Text(
+                local.format(DateTimeFormatter.ofPattern("HH:mm", Locale.ROOT)),
+                color = ink,
+                fontSize = 36.sp,
+                lineHeight = 43.sp,
+                letterSpacing = (-1).sp,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.padding(top = 20.dp),
+            )
+            Text(local.format(DateTimeFormatter.ofPattern("M/d EEE", Locale.CHINA)), color = secondary, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp))
+            Spacer(Modifier.weight(1f))
+            Text(
+                when {
+                    activity.source == ActivitySource.UNKNOWN -> "作息待补充"
+                    else -> activity.label
+                },
+                color = ink,
+                fontSize = 12.sp,
+                lineHeight = 17.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
-        Text(
-            when { activity.source == ActivitySource.UNKNOWN -> "作息待填写"; activity.category == RoutineCategory.UNSCHEDULED -> "此段未安排"; else -> activity.label },
-            color = secondary,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.align(Alignment.BottomStart).padding(start = 14.dp, bottom = 15.dp),
-        )
     }
 }
 
-@Composable internal fun ContactWindowCard(
-    state: AppState,
-    now: Instant,
-    windows: List<Window>?,
-    onViewWindow: ((Window) -> Unit)? = null,
-    onOpenRhythm: (() -> Unit)? = null,
-) {
-    val partner = state.partner
+@Composable
+private fun SoloSkyPlaceholder(modifier: Modifier = Modifier) {
+    Box(modifier.background(Tint).padding(15.dp), contentAlignment = Alignment.Center) {
+        Text("这里，为另一个人留着。\n配对后显示对方的当地时间", color = Muted, fontSize = 12.sp, lineHeight = 20.sp)
+    }
+}
+
+private fun DrawScope.drawSky(daylight: Boolean) {
+    if (daylight) {
+        drawCircle(Peach.copy(alpha = .75f), radius = 18.dp.toPx(), center = androidx.compose.ui.geometry.Offset(size.width - 10.dp.toPx(), 53.dp.toPx()))
+    } else {
+        drawCircle(OnNight.copy(alpha = .85f), radius = 13.dp.toPx(), center = androidx.compose.ui.geometry.Offset(size.width - 25.dp.toPx(), 66.dp.toPx()))
+        drawCircle(Night, radius = 12.dp.toPx(), center = androidx.compose.ui.geometry.Offset(size.width - 30.dp.toPx(), 61.dp.toPx()))
+    }
+    drawOval(
+        color = (if (daylight) DaylightInk else OnNight).copy(alpha = .05f),
+        topLeft = androidx.compose.ui.geometry.Offset(-40.dp.toPx(), size.height - 72.dp.toPx()),
+        size = androidx.compose.ui.geometry.Size(230.dp.toPx(), 115.dp.toPx()),
+    )
+    drawOval(
+        color = (if (daylight) DaylightInk else OnNight).copy(alpha = .05f),
+        topLeft = androidx.compose.ui.geometry.Offset(40.dp.toPx(), size.height - 30.dp.toPx()),
+        size = androidx.compose.ui.geometry.Size(240.dp.toPx(), 110.dp.toPx()),
+    )
+}
+
+@Composable
+internal fun ContactWindowCard(state: AppState, now: Instant, windows: List<Window>?, onOpenTimeline: (Instant) -> Unit = {}) {
+    val partner = state.partner.takeUnless { state.sharingPaused || state.syncStale }
     val next = windows?.firstOrNull { it.end > now }
-    var detailsOpen by rememberSaveable { mutableStateOf(false) }
-    Surface(shape = RoundedCornerShape(17.dp), color = DaylightContactSoft) {
-        Column(Modifier.fillMaxWidth().padding(horizontal = 17.dp, vertical = 15.dp), verticalArrangement = Arrangement.spacedBy(0.dp)) {
+    var detailsOpen by rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
+    Surface(color = Tint, shape = RoundedCornerShape(17.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Line)) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 17.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                androidx.compose.material3.Icon(androidx.compose.ui.res.painterResource(app.nowus.android.R.drawable.icon_link), null, tint = Accent, modifier = Modifier.size(17.dp))
+                Text("${if (next?.start?.let { it <= now } == true) "现在" else "下一段共同时间"} · 双方愿意联系", color = Accent, fontSize = 11.sp)
+            }
             if (windows == null) Text("正在寻找共同时间…", color = Muted)
             else if (next == null || partner == null) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    DaylightIcon(R.drawable.daylight_icon_clock, null, Modifier.size(15.dp), DaylightContact)
-                    Text(if (state.sharingPaused) "分享已暂停" else "未来七天", color = DaylightContact, style = MaterialTheme.typography.bodySmall)
-                }
-                Spacer(Modifier.height(8.dp))
-                if (state.sharingPaused) {
-                    Text("按照自己的节奏来", color = DaylightInk, style = MaterialTheme.typography.titleLarge)
-                    Text("恢复分享后，再查看共同联系时间。", color = Muted, style = MaterialTheme.typography.bodySmall)
-                    return@Column
-                }
-                if (state.paired && state.syncStale) {
-                    Text("等待彼此的节奏", color = DaylightInk, style = MaterialTheme.typography.titleLarge)
-                    Text("联网并同步后再查看共同联系时间。", color = Muted, style = MaterialTheme.typography.bodySmall)
-                    return@Column
-                }
                 val unknown = partner == null || state.schedule == null || state.partnerSchedule == null ||
                     state.schedule.let { !it.weekday.contactKnown && !it.rest.contactKnown } ||
                     state.partnerSchedule.let { !it.weekday.contactKnown && !it.rest.contactKnown }
-                Text(if (unknown) "等待彼此的节奏" else "暂时没有重合的联系时间", color = DaylightInk, style = MaterialTheme.typography.titleLarge)
-                Spacer(Modifier.height(3.dp))
-                Text(if (unknown) "对方还没有填写作息，暂时不能估计共同时间。" else "可以调整自己的联系偏好，也可以先留一句话。", color = Muted, style = MaterialTheme.typography.bodySmall)
-                if (!unknown && onOpenRhythm != null) {
-                    TextButton(onClick = onOpenRhythm, contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 44.dp)) {
-                        Text("调整我的联系偏好", color = DaylightContact)
-                        DaylightIcon(R.drawable.daylight_icon_arrow, null, Modifier.size(16.dp), DaylightContact)
-                    }
-                }
+                Text(if (unknown) "联系偏好尚不完整，暂未找到共同时间" else "未来七天暂无共同联系窗口", color = Ink, fontSize = 16.sp, lineHeight = 23.sp)
+                Text("双方可以调整各自愿意联系的时段。作息不是实时在线状态。", color = Muted, fontSize = 11.sp, lineHeight = 17.sp)
             } else {
                 val start = maxOf(next.start, now)
-                val minutes = Duration.between(start, next.end).toMinutes().coerceAtLeast(0)
-                val until = Duration.between(now, next.start).toMinutes().coerceAtLeast(0)
-                val isToday = start.atZone(state.me.zone()).toLocalDate() == now.atZone(state.me.zone()).toLocalDate()
-                val heading = when {
-                    next.start <= now -> "现在 · 双方愿意联系"
-                    isToday -> if (until < 60) "$until 分钟后" else "${until / 60} 小时后"
-                    else -> "${start.atZone(state.me.zone()).format(DateTimeFormatter.ofPattern("M/d"))} · 下一段共同时间"
-                }
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    DaylightIcon(R.drawable.daylight_icon_link, null, Modifier.size(15.dp), DaylightContact)
-                    Text(heading, color = DaylightContact, style = MaterialTheme.typography.bodySmall)
-                }
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    "有 $minutes 分钟，可以慢慢聊",
-                    color = DaylightInk,
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Spacer(Modifier.height(10.dp))
+                Text("有 ${Duration.between(start, next.end).toMinutes()} 分钟，可以慢慢聊", color = Ink, fontSize = 19.sp, lineHeight = 25.sp)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                    WindowColumn(state.me, start, next.end, now, true, Modifier.weight(1f))
-                Spacer(Modifier.width(1.dp).height(43.dp).background(DaylightLine))
-                    WindowColumn(partner, start, next.end, now, false, Modifier.weight(1f))
+                    ContactTime(state.me, start, next.end, self = true, Modifier.weight(1f))
+                    ContactTime(partner, start, next.end, self = false, Modifier.weight(1f))
                 }
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("按联系偏好估计，尚未约定", color = Muted, style = MaterialTheme.typography.labelSmall)
-                    TextButton(
-                        onClick = { detailsOpen = true },
-                        contentPadding = PaddingValues(horizontal = 8.dp),
-                        modifier = Modifier.heightIn(min = 40.dp).semantics { contentDescription = "查看共同时间详情" },
-                    ) { DaylightIcon(R.drawable.daylight_icon_arrow, null, Modifier.size(17.dp), DaylightContact) }
+                    Text("按双方联系偏好估计，尚未约定", color = Muted, fontSize = 10.sp)
+                    androidx.compose.material3.TextButton(onClick = { detailsOpen = true }, contentPadding = PaddingValues(horizontal = 4.dp), modifier = Modifier.heightIn(min = 40.dp)) {
+                        Text("查看这段时间  →", color = Accent, fontSize = 12.sp)
+                    }
                 }
             }
         }
@@ -184,53 +159,27 @@ import java.util.Locale
     if (detailsOpen) AlertDialog(
         onDismissRequest = { detailsOpen = false },
         title = { Text("共同联系时间") },
-        text = { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        text = { Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             if (next != null && partner != null) {
-                WindowLine(partner, maxOf(next.start, now), next.end, false)
-                WindowLine(state.me, maxOf(next.start, now), next.end, true)
-            } else Text("这段时间已结束，请查看下一次窗口。")
-            Text("来自通常联系偏好与双方尚未到期的主动设置。作息不是实时在线状态，请先和对方确认。")
+                ContactTime(state.me, maxOf(next.start, now), next.end, true)
+                ContactTime(partner, maxOf(next.start, now), next.end, false)
+            }
+            Text("来自双方通常联系偏好与尚未到期的主动设置。时间是建议，请先和对方确认。", color = Muted)
         } },
         confirmButton = {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (next != null && onViewWindow != null) TextButton(onClick = { detailsOpen = false; onViewWindow(next) }) { Text("在一天中查看") }
-                TextButton(onClick = { detailsOpen = false }) { Text("知道了") }
-            }
+            androidx.compose.material3.TextButton(onClick = {
+                detailsOpen = false
+                next?.let { onOpenTimeline(it.start) }
+            }) { Text("放到一天里看看") }
         },
+        dismissButton = { androidx.compose.material3.TextButton(onClick = { detailsOpen = false }) { Text("关闭") } },
     )
 }
 
-@Composable private fun WindowColumn(profile: Profile, start: Instant, end: Instant, now: Instant, self: Boolean, modifier: Modifier = Modifier) {
-    val zone = profile.zone()
-    val startDate = start.atZone(zone).toLocalDate()
-    val endDate = end.atZone(zone).toLocalDate()
-    val today = now.atZone(zone).toLocalDate()
-    val dateLabel = if (startDate != today) " · ${startDate.format(DateTimeFormatter.ofPattern("M/d"))}" else ""
-    val endLabel = if (startDate == endDate) localTime(end, profile) else "${endDate.format(DateTimeFormatter.ofPattern("M/d"))} ${localTime(end, profile)}"
-    Column(modifier) {
-        Text("${if (self) "你" else profile.name} · ${profile.cityName()}$dateLabel", color = Muted, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(
-            "${localTime(start, profile)}–$endLabel",
-            color = DaylightInk,
-            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-            fontSize = 17.sp,
-            lineHeight = 24.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Clip,
-        )
-    }
-}
-
-@Composable private fun WindowLine(profile: Profile, start: Instant, end: Instant, self: Boolean) {
-    val endLabel = if (start.atZone(profile.zone()).toLocalDate() == end.atZone(profile.zone()).toLocalDate()) localTime(end, profile) else shortDateTime(end, profile)
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
-        val sameDate=start.atZone(profile.zone()).toLocalDate()==end.atZone(profile.zone()).toLocalDate()
-        if(maxWidth>=248.dp&&LocalDensity.current.fontScale<=1.15f&&sameDate)Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) {
-            Text("${localTime(start,profile)} – $endLabel",style=MaterialTheme.typography.titleMedium,color=Ink)
-            Text("${start.atZone(profile.zone()).format(DateTimeFormatter.ofPattern("M/d"))} ${profile.cityName()}${if(self)" · 我" else ""}",color=Muted,style=MaterialTheme.typography.bodySmall)
-        }else Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text("${if (self) "我" else profile.name} · ${profile.cityName()}", color = Muted, style = MaterialTheme.typography.bodySmall)
-            Text("${shortDateTime(start, profile)} – $endLabel", style = MaterialTheme.typography.titleMedium, color = Ink)
-        }
+@Composable
+private fun ContactTime(profile: Profile, start: Instant, end: Instant, self: Boolean, modifier: Modifier = Modifier) {
+    Column(modifier.padding(vertical = 2.dp)) {
+        Text("${if (self) "你" else profile.name} · ${profile.cityName()}", color = Muted, fontSize = 10.sp, maxLines = 1)
+        Text("${localTime(start, profile)} – ${localTime(end, profile)}", color = Ink, fontSize = 18.sp, fontFamily = FontFamily.Monospace, maxLines = 1)
     }
 }

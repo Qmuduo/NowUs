@@ -156,7 +156,9 @@ internal fun DaylightHome(
             } ?: emptyList()
         }
     }
-    ContactWindowCard(state, now, windows, onOpenWindow, onOpenRhythm)
+    ContactWindowCard(state, now, windows) { instant ->
+        windows?.firstOrNull { it.start <= instant && it.end > instant }?.let(onOpenWindow) ?: onOpenRhythm()
+    }
     if (state.note != null) {
         TextButton(onClick = onOpenNote, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("查看我的便签") }
     }

@@ -3,10 +3,10 @@ package app.nowus.android.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.imePadding
@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
@@ -99,6 +100,7 @@ fun NowUsEntry(
             pendingInviteCode = pendingInviteCode,
             onPendingInviteConsumed = onPendingInviteConsumed,
             onLogout = { accountViewModel.logout { authViewModel.forgetSession() } },
+            draftScopeKey = "account:" + activeSession.userId,
         )
     }
 }
@@ -118,7 +120,11 @@ private fun AuthenticationScreen(vm: AuthViewModel, pendingInviteCode: String?, 
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         Spacer(Modifier.height(18.dp))
-        DaylightLogo(Modifier.width(134.dp).height(37.dp))
+        androidx.compose.foundation.Image(
+            painter = painterResource(app.nowus.android.R.drawable.logo_lockup),
+            contentDescription = "NowUs 完整标志",
+            modifier = Modifier.width(208.dp).height(58.dp),
+        )
         Text("让相隔时区的日常，也能彼此靠近。", style = MaterialTheme.typography.titleMedium)
         if (pendingInviteCode != null) Text("已保存邀请码 $pendingInviteCode。登录后可查看邀请人和共享范围。", color = Accent)
         SectionCard(if (step == AuthStep.EMAIL) "邮箱登录 / 注册" else "输入邮箱验证码") {

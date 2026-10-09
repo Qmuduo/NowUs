@@ -43,6 +43,43 @@ class DomainTest {
         assertEquals(1,segments.size)
         assertEquals("上班",segments.single().activity.label)
     }
+    @Test fun nearbyViewportKeepsTheOriginalActivityStartAndEnd() {
+        val p=Profile("小满","beijing")
+        val day=Rhythm(activity="自己的时间",activityStart="09:00",activityEnd="23:30",blocks=listOf(
+            RoutineBlock("long","自己的时间","09:00","23:30",RoutineCategory.REST),
+        ))
+        val viewport=instant("2026-10-03T14:00:00Z")
+        val activity=TimeEngine.segments(viewport.minusSeconds(13*3600L),viewport.plusSeconds(2*3600L),p,Schedule(day,day))
+            .single { it.activity.label=="自己的时间" }
+        assertEquals(instant("2026-10-03T01:00:00Z"),activity.start)
+        assertEquals(instant("2026-10-03T15:30:00Z"),activity.end)
+    }
+    @Test fun activityBoundariesRetainActualElapsedTimeAcrossDstTransitions() {
+        val p=Profile("纽约朋友","new-york")
+        listOf(
+            Triple(LocalDate.parse("2026-03-08"),"00:00" to "04:00",3L),
+            Triple(LocalDate.parse("2026-11-01"),"00:00" to "03:00",4L),
+        ).forEach { (date,times,expectedHours)->
+            val rhythm=Rhythm(blocks=listOf(RoutineBlock("event","活动",times.first,times.second,RoutineCategory.OTHER)))
+            val zone=Cities.byId(p.cityId)!!.zone
+            val start=date.atStartOfDay(zone).toInstant()
+            val end=date.plusDays(1).atStartOfDay(zone).toInstant()
+            val event=TimeEngine.segments(start,end,p,Schedule(rhythm,rhythm)).single{it.activity.label=="活动"}
+            assertEquals(expectedHours,Duration.between(event.start,event.end).toHours())
+        }
+    }
+    @Test fun personalContactRailHasItsOwnIntervalsWithoutSplittingActivities() {
+        val start=instant("2026-09-29T01:00:00Z")
+        val end=start.plusSeconds(4*3600)
+        val rhythm=Schedule(Rhythm(contactStart="10:00",contactEnd="13:00"),Rhythm(contactStart="10:00",contactEnd="13:00"))
+        val pause=TemporaryStatus(false,instant("2026-09-29T03:30:00Z").toEpochMilli(),instant("2026-09-29T02:30:00Z").toEpochMilli())
+        assertEquals(
+            listOf(Window(instant("2026-09-29T02:00:00Z"),instant("2026-09-29T02:30:00Z")),Window(instant("2026-09-29T03:30:00Z"),instant("2026-09-29T05:00:00Z"))),
+            TimeEngine.contactWindows(start,end,me,rhythm,pause),
+        )
+        assertEquals(1,TimeEngine.segments(start,end,me,rhythm).size)
+        assertTrue(TimeEngine.contactWindows(start,end,me,null,null).isEmpty())
+    }
     @Test fun validatesCodepointsCityAndIntervals() {
         assertTrue(Rules.validateProfile(Profile("😀".repeat(20),"beijing")).valid)
         assertFalse(Rules.validateProfile(Profile("😀".repeat(21),"beijing")).valid)
@@ -76,6 +113,9 @@ class DomainTest {
         assertNull(paired.partnerSchedule)
         assertNotNull(Rules.acceptInvite(paired,"unique",me,2000).error)
         assertNotNull(Rules.saveNote(state,"😀".repeat(121),1000).error)
+        val existing=state.copy(note=Note("留待撤销",900L))
+        assertNotNull(Rules.saveNote(existing,"  \n",1000).error)
+        assertEquals(existing,Rules.saveNote(existing,"  \n",1000).state)
         assertEquals(120,Rules.saveNote(state,"😀".repeat(120),1000).state.note!!.text.codePointCount(0,240))
     }
     @Test fun overnightSleepCrossesRealLocalDates() {

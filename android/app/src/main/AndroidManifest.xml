@@ -4,8 +4,8 @@
     <application
         android:allowBackup="false"
         android:label="NowUs"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:icon="@mipmap/ic_nowus"
+        android:roundIcon="@mipmap/ic_nowus"
         android:supportsRtl="true"
         android:theme="@style/Theme.NowUs">
         <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:windowSoftInputMode="adjustResize">

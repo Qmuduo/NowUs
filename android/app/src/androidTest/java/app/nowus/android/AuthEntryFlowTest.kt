@@ -43,6 +43,7 @@ class AuthEntryFlowTest {
             }
         }
 
+        compose.onNodeWithContentDescription("NowUs 完整标志").assertExists()
         compose.onNodeWithText("已保存邀请码 $inviteCode。登录后可查看邀请人和共享范围。").assertExists()
         compose.onNodeWithTag("authEmail").performTextInput("person@example.net")
         compose.onNodeWithText("发送 6 位验证码").performScrollTo().assertIsDisplayed().performClick()
@@ -51,11 +52,11 @@ class AuthEntryFlowTest {
         compose.onNodeWithText("验证并继续").performScrollTo().assertIsDisplayed().performClick()
         compose.waitUntil(10_000) { sessions.current.value?.userId == "user-a" }
         compose.waitUntil(10_000) {
-            compose.onAllNodesWithText("真实账号 · 仅与已配对伴侣共享").fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodesWithText("邀请另一半").fetchSemanticsNodes().isNotEmpty()
         }
-        compose.onNodeWithText("真实账号 · 仅与已配对伴侣共享").assertIsDisplayed()
+        compose.onNodeWithText("邀请另一半").assertIsDisplayed()
         compose.waitUntil(10_000) { api.previewedCode == inviteCode }
-        compose.onNodeWithText("邀请来自：小舟 · 北京").assertExists()
+        compose.onNodeWithText("小舟在北京，想与你分享彼此的日常。").assertExists()
         compose.runOnIdle {
             assertEquals("person@example.net", api.requestedEmail)
             assertEquals("246810", api.verifiedCode)
@@ -76,9 +77,9 @@ class AuthEntryFlowTest {
         }
 
         compose.waitUntil(10_000) {
-            compose.onAllNodesWithText("真实账号 · 仅与已配对伴侣共享").fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodesWithText("留话").fetchSemanticsNodes().isNotEmpty()
         }
-        compose.onNodeWithText("真实账号 · 仅与已配对伴侣共享").assertIsDisplayed()
+        compose.onNodeWithText("留话").assertIsDisplayed()
         compose.onNodeWithText("发送 6 位验证码").assertDoesNotExist()
     }
 
@@ -93,16 +94,17 @@ class AuthEntryFlowTest {
         }
 
         compose.waitUntil(10_000) {
-            compose.onAllNodesWithText("真实账号 · 仅与已配对伴侣共享").fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodesWithText("留话").fetchSemanticsNodes().isNotEmpty()
         }
-        compose.onNodeWithText("邀请伴侣").performScrollTo().performClick()
+        compose.onNodeWithText("给彼此留一个位置").performScrollTo().performClick()
         compose.onNodeWithText("创建我的邀请").performScrollTo().assertExists()
-        compose.onNodeWithText("创建邀请").performScrollTo().performClick()
+        compose.onNodeWithText("创建我的邀请").performScrollTo().performClick()
+        compose.waitUntil(10_000) { api.createdInvitationCode != null }
+        val expectedTicket = requireNotNull(api.createdInvitationCode).chunked(3).joinToString(" ")
         compose.waitUntil(10_000) {
-            api.createdInvitationCode != null &&
-                compose.onAllNodesWithText("等待对方接受 · 24 小时有效").fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodesWithText(expectedTicket).fetchSemanticsNodes().isNotEmpty()
         }
-        compose.onNodeWithText("23456 789AB").assertIsDisplayed()
+        compose.onNodeWithText(expectedTicket).assertIsDisplayed()
         capture("nowus-invite.png")
     }
 
