@@ -1,0 +1,71 @@
+{
+  "source": "design-history/2026-10-03-b/round-121/source/prototype",
+  "checks": [
+    "Both default local times and dates",
+    "Default window and uncertainty wording",
+    "Complete default note",
+    "No horizontal overflow",
+    "Reply is visible, clickable and separated from navigation",
+    "Reply touch region has at least 44px height",
+    "Rhythm save accepted",
+    "Window responds to changed contact preference",
+    "Day view agrees with updated window",
+    "Partner note opens intact",
+    "Reply opens editable textarea",
+    "No JavaScript page errors",
+    "styles.css served HTTP 200 with exact source bytes",
+    "app.mjs served HTTP 200 with exact source bytes",
+    "index.html served HTTP 200 with exact source bytes",
+    "Archived screenshot served HTTP 200 with matching hash"
+  ],
+  "geometry": {
+    "reply": {
+      "x": 54,
+      "y": 606.390625,
+      "width": 87.5,
+      "height": 44,
+      "top": 606.390625,
+      "right": 141.5,
+      "bottom": 650.390625,
+      "left": 54
+    },
+    "nav": {
+      "x": 0,
+      "y": 732,
+      "width": 375,
+      "height": 64,
+      "top": 732,
+      "right": 375,
+      "bottom": 796,
+      "left": 0
+    },
+    "hit": true,
+    "width": 375
+  },
+  "changedWindow": "纽约\n10:15–10:30\n北京\n22:15–22:30",
+  "daySummary": "共同可联系 · 10:15 / 22:15 · 15 分钟",
+  "errors": [],
+  "resources": [
+    {
+      "name": "styles.css",
+      "status": 200,
+      "sha256": "ce2ca95908cd066f0eb099b3ffbf44b42c1c56c9070dd284a7c382fe370a06e7"
+    },
+    {
+      "name": "app.mjs",
+      "status": 200,
+      "sha256": "f83a3047804bec377ce78fc95bd41fd6763da637f99a8c00570f62f3cedd5161"
+    },
+    {
+      "name": "index.html",
+      "status": 200,
+      "sha256": "7f4744c2c7bdff34ed702c529e440c805c30aedb21be8f29ab9c7cc0fa0efdba"
+    }
+  ],
+  "screenshot": {
+    "url": "http://127.0.0.1:8765/design-history/2026-10-03-b/round-121/home.png",
+    "status": 200,
+    "sha256": "707fffeae88cf373d6ceb9dae3ea9f539724e8b62af3c2ab5e4e300a5a941c59"
+  },
+  "reviewed": false
+}

@@ -1,0 +1,58 @@
+const { chromium } = require('C:/Users/MUDUO/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),crypto=require('node:crypto');
+const [source,output]=process.argv.slice(2);
+const root=path.resolve(__dirname,'..'),folder=path.resolve(output);
+if(!source || !folder.startsWith(root+path.sep)) throw Error('Expected source path and output inside round-120');
+(async()=>{
+  const browser=await chromium.launch({headless:true});
+  const context=await browser.newContext({viewport:{width:375,height:812},deviceScaleFactor:1,locale:'zh-CN',timezoneId:'Asia/Shanghai'});
+  const page=await context.newPage(),errors=[],checks=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  const check=(name,pass)=>{assert.ok(pass,name);checks.push(name)};
+  const url='http://127.0.0.1:8765/'+source.replaceAll('\\','/')+'/';
+  await page.goto(url,{waitUntil:'networkidle'});await page.evaluate(()=>document.fonts.ready);
+  const text=await page.locator('#home-view').innerText();
+  check('Both default local times and dates',text.includes('08:00')&&text.includes('20:00')&&(text.match(/9\/29/g)||[]).length===2);
+  check('Default window and uncertainty wording',text.includes('10:00–10:30')&&text.includes('22:00–22:30')&&text.includes('尚未约定'));
+  check('Complete default note',text.replace(/\s/g,'').includes('我找到你说的那家唱片店了，地址发你，周末一起去？'));
+  const geometry=await page.evaluate(()=>{
+    const reply=document.querySelector('.note-compose').getBoundingClientRect(),nav=document.querySelector('.tabbar').getBoundingClientRect();
+    const point={x:reply.x+reply.width/2,y:reply.y+reply.height/2};
+    return {reply:reply.toJSON(),nav:nav.toJSON(),hit:document.elementFromPoint(point.x,point.y)?.closest('button')?.matches('.note-compose'),width:document.documentElement.scrollWidth};
+  });
+  check('No horizontal overflow',geometry.width===375);
+  check('Reply is visible, clickable and separated from navigation',geometry.hit&&geometry.reply.bottom<geometry.nav.top);
+  await page.locator('[data-tab="rhythm"]').click();
+  await page.locator('[name="contactStart"]').fill('22:15');
+  await page.locator('[name="contactEnd"]').fill('22:45');
+  await page.locator('#rhythm-form button[type="submit"]').click();
+  check('Rhythm save accepted',await page.locator('#rhythm-error').isHidden());
+  await page.locator('[data-tab="home"]').click();
+  const changed=await page.locator('.common-times').innerText();
+  check('Window responds to changed contact preference',changed.includes('10:15–10:30')&&changed.includes('22:15–22:30'));
+  await page.locator('[data-tab="day"]').click();
+  const day=await page.locator('.window-summary').innerText();
+  check('Day view agrees with updated window',day.includes('10:15 / 22:15')&&day.includes('15 分钟'));
+  await page.locator('[data-tab="home"]').click();
+  await page.locator('[data-action="read-note"]').click();
+  check('Partner note opens intact',(await page.locator('#sheet-content').innerText()).includes('我找到你说的那家唱片店了，地址发你，周末一起去？'));
+  await page.locator('#close-sheet').click();
+  await page.locator('.note-compose').click();
+  check('Reply opens editable textarea',await page.locator('#sheet-content textarea').isVisible());
+  await page.locator('#close-sheet').click();
+  check('No JavaScript page errors',errors.length===0);
+  const hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
+  const resources=[];
+  for(const name of ['styles.css','app.mjs','index.html']) {
+    const response=await fetch(url+name),bytes=Buffer.from(await response.arrayBuffer());
+    check(name+' served HTTP 200 with exact source bytes',response.status===200&&hash(bytes)===hash(fs.readFileSync(path.resolve(source,name))));
+    resources.push({name,status:response.status,sha256:hash(bytes)});
+  }
+  const screenshotUrl='http://127.0.0.1:8765/'+path.relative(process.cwd(),folder).replaceAll('\\','/')+'/home.png';
+  const response=await fetch(screenshotUrl),bytes=Buffer.from(await response.arrayBuffer());
+  check('Archived screenshot served HTTP 200 with matching hash',response.status===200&&hash(bytes)===hash(fs.readFileSync(path.join(folder,'home.png'))));
+  const evidence={source,checks,geometry,changedWindow:changed,daySummary:day,errors,resources,screenshot:{url:screenshotUrl,status:response.status,sha256:hash(bytes)},reviewed:false};
+  fs.writeFileSync(path.join(folder,'loop-check.json'),JSON.stringify(evidence,null,2));
+  console.log(JSON.stringify({source,checks:checks.length,errors,replyHeight:geometry.reply.height,replyToNavigation:geometry.nav.top-geometry.reply.bottom,screenshotHash:evidence.screenshot.sha256}));
+  await browser.close();
+})().catch(e=>{console.error(e);process.exitCode=1});

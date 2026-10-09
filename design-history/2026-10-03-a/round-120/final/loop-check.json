@@ -1,0 +1,70 @@
+{
+  "source": "prototype",
+  "checks": [
+    "Both default local times and dates",
+    "Default window and uncertainty wording",
+    "Complete default note",
+    "No horizontal overflow",
+    "Reply is visible, clickable and separated from navigation",
+    "Rhythm save accepted",
+    "Window responds to changed contact preference",
+    "Day view agrees with updated window",
+    "Partner note opens intact",
+    "Reply opens editable textarea",
+    "No JavaScript page errors",
+    "styles.css served HTTP 200 with exact source bytes",
+    "app.mjs served HTTP 200 with exact source bytes",
+    "index.html served HTTP 200 with exact source bytes",
+    "Archived screenshot served HTTP 200 with matching hash"
+  ],
+  "geometry": {
+    "reply": {
+      "x": 54,
+      "y": 571.796875,
+      "width": 87.5,
+      "height": 32,
+      "top": 571.796875,
+      "right": 141.5,
+      "bottom": 603.796875,
+      "left": 54
+    },
+    "nav": {
+      "x": 0,
+      "y": 732,
+      "width": 375,
+      "height": 64,
+      "top": 732,
+      "right": 375,
+      "bottom": 796,
+      "left": 0
+    },
+    "hit": true,
+    "width": 375
+  },
+  "changedWindow": "纽约\n10:15–10:30\n北京\n22:15–22:30",
+  "daySummary": "共同可联系 · 10:15 / 22:15 · 15 分钟",
+  "errors": [],
+  "resources": [
+    {
+      "name": "styles.css",
+      "status": 200,
+      "sha256": "36f343fb7dfff5e0d18240ff7f85d352f7630ee83c0e51774ed5a29438a733bf"
+    },
+    {
+      "name": "app.mjs",
+      "status": 200,
+      "sha256": "f83a3047804bec377ce78fc95bd41fd6763da637f99a8c00570f62f3cedd5161"
+    },
+    {
+      "name": "index.html",
+      "status": 200,
+      "sha256": "7f4744c2c7bdff34ed702c529e440c805c30aedb21be8f29ab9c7cc0fa0efdba"
+    }
+  ],
+  "screenshot": {
+    "url": "http://127.0.0.1:8765/design-history/2026-10-03-a/round-120/final/home.png",
+    "status": 200,
+    "sha256": "a4bdf13d9995d7451e4f0c005751f5010a9450d8fb3b3b600833ada86d95d69d"
+  },
+  "reviewed": false
+}

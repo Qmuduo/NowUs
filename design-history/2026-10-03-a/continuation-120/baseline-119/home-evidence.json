@@ -1,0 +1,349 @@
+{
+  "source": "prototype",
+  "errors": [],
+  "marginRules": [
+    {
+      "selector": ".time-pair",
+      "properties": [
+        {
+          "name": "margin-top",
+          "value": "12px",
+          "implicit": false,
+          "text": "margin-top: 12px;",
+          "disabled": false,
+          "range": {
+            "startLine": 81,
+            "startColumn": 13,
+            "endLine": 81,
+            "endColumn": 30
+          }
+        },
+        {
+          "name": "margin-top",
+          "value": "12px"
+        }
+      ],
+      "line": 82,
+      "stylesheet": "style-sheet-24008-1"
+    },
+    {
+      "selector": "#home-view .time-pair",
+      "properties": [
+        {
+          "name": "margin-top",
+          "value": "7px",
+          "implicit": false,
+          "text": "margin-top: 7px;",
+          "disabled": false,
+          "range": {
+            "startLine": 155,
+            "startColumn": 101,
+            "endLine": 155,
+            "endColumn": 117
+          }
+        },
+        {
+          "name": "margin-top",
+          "value": "7px"
+        }
+      ],
+      "line": 156,
+      "stylesheet": "style-sheet-24008-1"
+    },
+    {
+      "selector": "#home-view .time-pair",
+      "properties": [
+        {
+          "name": "margin-top",
+          "value": "3px",
+          "implicit": false,
+          "text": "margin-top: 3px;",
+          "disabled": false,
+          "range": {
+            "startLine": 508,
+            "startColumn": 24,
+            "endLine": 508,
+            "endColumn": 40
+          }
+        },
+        {
+          "name": "margin-top",
+          "value": "3px"
+        }
+      ],
+      "line": 509,
+      "stylesheet": "style-sheet-24008-1"
+    },
+    {
+      "selector": "#home-view .time-pair",
+      "properties": [
+        {
+          "name": "margin",
+          "value": "0 16px",
+          "implicit": false,
+          "text": "margin:0 16px;",
+          "disabled": false,
+          "range": {
+            "startLine": 598,
+            "startColumn": 23,
+            "endLine": 598,
+            "endColumn": 37
+          },
+          "longhandProperties": [
+            {
+              "name": "margin-top",
+              "value": "0px"
+            },
+            {
+              "name": "margin-right",
+              "value": "16px"
+            },
+            {
+              "name": "margin-bottom",
+              "value": "0px"
+            },
+            {
+              "name": "margin-left",
+              "value": "16px"
+            }
+          ]
+        },
+        {
+          "name": "margin-top",
+          "value": "0px"
+        }
+      ],
+      "line": 599,
+      "stylesheet": "style-sheet-24008-1"
+    },
+    {
+      "selector": "#home-view .time-pair",
+      "properties": [
+        {
+          "name": "margin",
+          "value": "14px 16px 0",
+          "implicit": false,
+          "text": "margin:14px 16px 0;",
+          "disabled": false,
+          "range": {
+            "startLine": 682,
+            "startColumn": 23,
+            "endLine": 682,
+            "endColumn": 42
+          },
+          "longhandProperties": [
+            {
+              "name": "margin-top",
+              "value": "14px"
+            },
+            {
+              "name": "margin-right",
+              "value": "16px"
+            },
+            {
+              "name": "margin-bottom",
+              "value": "0px"
+            },
+            {
+              "name": "margin-left",
+              "value": "16px"
+            }
+          ]
+        },
+        {
+          "name": "margin-top",
+          "value": "14px"
+        }
+      ],
+      "line": 683,
+      "stylesheet": "style-sheet-24008-1"
+    },
+    {
+      "selector": "#home-view .time-pair",
+      "properties": [
+        {
+          "name": "margin",
+          "value": "19px 16px 0",
+          "implicit": false,
+          "text": "margin:19px 16px 0;",
+          "disabled": false,
+          "range": {
+            "startLine": 689,
+            "startColumn": 23,
+            "endLine": 689,
+            "endColumn": 42
+          },
+          "longhandProperties": [
+            {
+              "name": "margin-top",
+              "value": "19px"
+            },
+            {
+              "name": "margin-right",
+              "value": "16px"
+            },
+            {
+              "name": "margin-bottom",
+              "value": "0px"
+            },
+            {
+              "name": "margin-left",
+              "value": "16px"
+            }
+          ]
+        },
+        {
+          "name": "margin-top",
+          "value": "19px"
+        }
+      ],
+      "line": 690,
+      "stylesheet": "style-sheet-24008-1"
+    },
+    {
+      "selector": "#home-view .time-pair.identity-heading",
+      "properties": [
+        {
+          "name": "margin-top",
+          "value": "4px",
+          "implicit": false,
+          "text": "margin-top: 4px;",
+          "disabled": false,
+          "range": {
+            "startLine": 163,
+            "startColumn": 41,
+            "endLine": 163,
+            "endColumn": 57
+          }
+        },
+        {
+          "name": "margin-top",
+          "value": "4px"
+        }
+      ],
+      "line": 164,
+      "stylesheet": "style-sheet-24008-1"
+    }
+  ],
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "dpr": 1,
+    "zoom": 1
+  },
+  "text": "阿远 · 纽约\n我 · 北京\n白天 · 9/29 周二\n08:00\n通常在通勤路上\n09:00\n开始上课\n夜晚 · 9/29 周二\n20:00\n晚间休息\n可联系的时间\n2小时后开始\n设置提醒\n纽约\n10:00–10:30\n北京\n22:00–22:30\n\n按双方联系偏好估计，尚未约定\n\n阿远\n15分钟前\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n回阿远一句",
+  "rects": {
+    "#app": {
+      "x": 0,
+      "y": 76,
+      "width": 375,
+      "height": 736,
+      "top": 76,
+      "right": 375,
+      "bottom": 812,
+      "left": 0
+    },
+    "#home-view": {
+      "x": 22,
+      "y": 76,
+      "width": 331,
+      "height": 622,
+      "top": 76,
+      "right": 353,
+      "bottom": 698,
+      "left": 22
+    },
+    ".home-thesis": {
+      "x": 38,
+      "y": 90,
+      "width": 299,
+      "height": 22.421875,
+      "top": 90,
+      "right": 337,
+      "bottom": 112.421875,
+      "left": 38
+    },
+    ".time-pair": {
+      "x": 38,
+      "y": 116.421875,
+      "width": 299,
+      "height": 131.796875,
+      "top": 116.421875,
+      "right": 337,
+      "bottom": 248.21875,
+      "left": 38
+    },
+    ".connection-panel": {
+      "x": 38,
+      "y": 262.21875,
+      "width": 299,
+      "height": 182.21875,
+      "top": 262.21875,
+      "right": 337,
+      "bottom": 444.4375,
+      "left": 38
+    },
+    ".note-section": {
+      "x": 38,
+      "y": 458.4375,
+      "width": 299,
+      "height": 152.59375,
+      "top": 458.4375,
+      "right": 337,
+      "bottom": 611.03125,
+      "left": 38
+    },
+    ".note-preview": {
+      "x": 54,
+      "y": 472.4375,
+      "width": 267,
+      "height": 84.59375,
+      "top": 472.4375,
+      "right": 321,
+      "bottom": 557.03125,
+      "left": 54
+    },
+    ".note-compose": {
+      "x": 54,
+      "y": 566.03125,
+      "width": 87.5,
+      "height": 32,
+      "top": 566.03125,
+      "right": 141.5,
+      "bottom": 598.03125,
+      "left": 54
+    },
+    ".tabbar": {
+      "x": 0,
+      "y": 732,
+      "width": 375,
+      "height": 64,
+      "top": 732,
+      "right": 375,
+      "bottom": 796,
+      "left": 0
+    }
+  },
+  "pairClass": "time-pair day-pair} identity-heading",
+  "computedMarginTop": "4px",
+  "gaps": {
+    "headingToPair": 4,
+    "noteToNav": 120.96875
+  },
+  "scroll": {
+    "documentWidth": 375,
+    "appHeight": 736,
+    "appScrollHeight": 736
+  },
+  "tokens": {
+    "--accent": "#3A6EA5",
+    "--page": "#EAEDF1",
+    "--muted": "#6B7280",
+    "--day": "#EEF1F4",
+    "--day-ink": "#1A1D21",
+    "--night": "#1E2733",
+    "--night-ink": "#EEF2F7"
+  },
+  "brandDot": "rgb(58, 110, 165)",
+  "favicon": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%232F6B4F'/%3E%3Cpath d='M18 42V22l28 20V22' stroke='%23FAFCFA' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
+}

@@ -1,0 +1,2305 @@
+[
+  {
+    "view": "home",
+    "checked": [
+      {
+        "text": "阿远",
+        "tag": "SPAN",
+        "class": "person-name",
+        "ratio": 9.526,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 0.82,
+        "size": 14,
+        "weight": 700,
+        "top": 105,
+        "bottom": 124
+      },
+      {
+        "text": "· 纽约",
+        "tag": "SPAN",
+        "class": "person-city",
+        "ratio": 5.672,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 0.6723999999999999,
+        "size": 12,
+        "weight": 450,
+        "top": 107,
+        "bottom": 123
+      },
+      {
+        "text": "白天 · 9/29 周二",
+        "tag": "DIV",
+        "class": "person-date",
+        "ratio": 6.683,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 0.72,
+        "size": 12,
+        "weight": 400,
+        "top": 125.1875,
+        "bottom": 141.1875
+      },
+      {
+        "text": "08",
+        "tag": "DIV",
+        "class": "local-time",
+        "ratio": 16.913,
+        "threshold": 3,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 50,
+        "weight": 700,
+        "top": 134.1875,
+        "bottom": 201.1875
+      },
+      {
+        "text": ":",
+        "tag": "SPAN",
+        "class": "time-colon",
+        "ratio": 3.816,
+        "threshold": 3,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 0.55,
+        "size": 50,
+        "weight": 400,
+        "top": 134.1875,
+        "bottom": 201.1875
+      },
+      {
+        "text": "00",
+        "tag": "DIV",
+        "class": "local-time",
+        "ratio": 16.913,
+        "threshold": 3,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 50,
+        "weight": 700,
+        "top": 134.1875,
+        "bottom": 201.1875
+      },
+      {
+        "text": "通常在通勤路上",
+        "tag": "STRONG",
+        "class": "",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 500,
+        "top": 197.1875,
+        "bottom": 212.1875
+      },
+      {
+        "text": "09:00",
+        "tag": "TIME",
+        "class": "",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 13,
+        "weight": 600,
+        "top": 216.4375,
+        "bottom": 233.4375
+      },
+      {
+        "text": "开始上课",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 13,
+        "weight": 400,
+        "top": 216.4375,
+        "bottom": 233.4375
+      },
+      {
+        "text": "我",
+        "tag": "SPAN",
+        "class": "person-name",
+        "ratio": 9.471,
+        "threshold": 4.5,
+        "color": "rgb(238, 242, 247)",
+        "background": [
+          30,
+          39,
+          51,
+          1
+        ],
+        "opacity": 0.82,
+        "size": 14,
+        "weight": 700,
+        "top": 105,
+        "bottom": 124
+      },
+      {
+        "text": "· 北京",
+        "tag": "SPAN",
+        "class": "person-city",
+        "ratio": 6.861,
+        "threshold": 4.5,
+        "color": "rgb(238, 242, 247)",
+        "background": [
+          30,
+          39,
+          51,
+          1
+        ],
+        "opacity": 0.6723999999999999,
+        "size": 12,
+        "weight": 450,
+        "top": 107,
+        "bottom": 123
+      },
+      {
+        "text": "夜晚 · 9/29 周二",
+        "tag": "DIV",
+        "class": "person-date",
+        "ratio": 7.644,
+        "threshold": 4.5,
+        "color": "rgb(238, 242, 247)",
+        "background": [
+          30,
+          39,
+          51,
+          1
+        ],
+        "opacity": 0.72,
+        "size": 12,
+        "weight": 400,
+        "top": 125.1875,
+        "bottom": 141.1875
+      },
+      {
+        "text": "20",
+        "tag": "DIV",
+        "class": "local-time",
+        "ratio": 13.407,
+        "threshold": 3,
+        "color": "rgb(238, 242, 247)",
+        "background": [
+          30,
+          39,
+          51,
+          1
+        ],
+        "opacity": 1,
+        "size": 50,
+        "weight": 700,
+        "top": 134.1875,
+        "bottom": 201.1875
+      },
+      {
+        "text": ":",
+        "tag": "SPAN",
+        "class": "time-colon",
+        "ratio": 5.094,
+        "threshold": 3,
+        "color": "rgb(238, 242, 247)",
+        "background": [
+          30,
+          39,
+          51,
+          1
+        ],
+        "opacity": 0.55,
+        "size": 50,
+        "weight": 400,
+        "top": 134.1875,
+        "bottom": 201.1875
+      },
+      {
+        "text": "00",
+        "tag": "DIV",
+        "class": "local-time",
+        "ratio": 13.407,
+        "threshold": 3,
+        "color": "rgb(238, 242, 247)",
+        "background": [
+          30,
+          39,
+          51,
+          1
+        ],
+        "opacity": 1,
+        "size": 50,
+        "weight": 700,
+        "top": 134.1875,
+        "bottom": 201.1875
+      },
+      {
+        "text": "晚间休息",
+        "tag": "STRONG",
+        "class": "self-activity",
+        "ratio": 13.407,
+        "threshold": 4.5,
+        "color": "rgb(238, 242, 247)",
+        "background": [
+          30,
+          39,
+          51,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 500,
+        "top": 200.1875,
+        "bottom": 215.1875
+      },
+      {
+        "text": "可联系的时间",
+        "tag": "SPAN",
+        "class": "common-label",
+        "ratio": 4.551,
+        "threshold": 4.5,
+        "color": "rgb(58, 110, 165)",
+        "background": [
+          232,
+          238,
+          246,
+          1
+        ],
+        "opacity": 1,
+        "size": 15.5,
+        "weight": 700,
+        "top": 305.671875,
+        "bottom": 326.671875
+      },
+      {
+        "text": "2小时后开始",
+        "tag": "SPAN",
+        "class": "common-when",
+        "ratio": 4.674,
+        "threshold": 4.5,
+        "color": "rgb(90, 107, 128)",
+        "background": [
+          232,
+          238,
+          246,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 500,
+        "top": 307.546875,
+        "bottom": 323.546875
+      },
+      {
+        "text": "设置提醒",
+        "tag": "BUTTON",
+        "class": "common-action",
+        "ratio": 4.551,
+        "threshold": 4.5,
+        "color": "rgb(58, 110, 165)",
+        "background": [
+          232,
+          238,
+          246,
+          1
+        ],
+        "opacity": 1,
+        "size": 12.5,
+        "weight": 600,
+        "top": 309.671875,
+        "bottom": 325.671875
+      },
+      {
+        "text": "纽约",
+        "tag": "SMALL",
+        "class": "",
+        "ratio": 4.674,
+        "threshold": 4.5,
+        "color": "rgb(90, 107, 128)",
+        "background": [
+          232,
+          238,
+          246,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 353.984375,
+        "bottom": 368.984375
+      },
+      {
+        "text": "10:00–10:30",
+        "tag": "STRONG",
+        "class": "",
+        "ratio": 14.49,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          232,
+          238,
+          246,
+          1
+        ],
+        "opacity": 1,
+        "size": 17.5,
+        "weight": 700,
+        "top": 372.953125,
+        "bottom": 395.953125
+      },
+      {
+        "text": "北京",
+        "tag": "SMALL",
+        "class": "",
+        "ratio": 4.674,
+        "threshold": 4.5,
+        "color": "rgb(90, 107, 128)",
+        "background": [
+          232,
+          238,
+          246,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 353.984375,
+        "bottom": 368.984375
+      },
+      {
+        "text": "22:00–22:30",
+        "tag": "STRONG",
+        "class": "",
+        "ratio": 12.914,
+        "threshold": 4.5,
+        "color": "rgb(30, 39, 51)",
+        "background": [
+          232,
+          238,
+          246,
+          1
+        ],
+        "opacity": 1,
+        "size": 17.5,
+        "weight": 700,
+        "top": 372.953125,
+        "bottom": 395.953125
+      },
+      {
+        "text": "按双方联系偏好估计，尚未约定",
+        "tag": "P",
+        "class": "common-source",
+        "ratio": 4.674,
+        "threshold": 4.5,
+        "color": "rgb(90, 107, 128)",
+        "background": [
+          232,
+          238,
+          246,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 402.953125,
+        "bottom": 417.953125
+      },
+      {
+        "text": "阿远",
+        "tag": "SPAN",
+        "class": "note-author",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 14,
+        "weight": 650,
+        "top": 514.796875,
+        "bottom": 533.796875
+      },
+      {
+        "text": "15分钟前",
+        "tag": "TIME",
+        "class": "",
+        "ratio": 4.834,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 516.796875,
+        "bottom": 532.796875
+      },
+      {
+        "text": "我找到你说的那家唱片店了，",
+        "tag": "SPAN",
+        "class": "note-preview-text",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 15,
+        "weight": 700,
+        "top": 551.890625,
+        "bottom": 571.890625
+      },
+      {
+        "text": "地址发你，周末一起去？",
+        "tag": "SPAN",
+        "class": "note-preview-text",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 15,
+        "weight": 700,
+        "top": 575.140625,
+        "bottom": 595.140625
+      },
+      {
+        "text": "回阿远一句",
+        "tag": "SPAN",
+        "class": "note-compose-placeholder",
+        "ratio": 5.312,
+        "threshold": 4.5,
+        "color": "rgb(58, 110, 165)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12.5,
+        "weight": 700,
+        "top": 619.640625,
+        "bottom": 635.640625
+      }
+    ],
+    "failures": [],
+    "method": "Solid CSS backgrounds and opacity; gradient and pseudo-element backgrounds need manual review."
+  },
+  {
+    "view": "day",
+    "checked": [
+      {
+        "text": "我们的一天",
+        "tag": "H1",
+        "class": "screen-title",
+        "ratio": 14.402,
+        "threshold": 3,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 23,
+        "weight": 700,
+        "top": 85,
+        "bottom": 116
+      },
+      {
+        "text": "活动各自连续，同一高度是同一时刻。",
+        "tag": "P",
+        "class": "screen-subtitle",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 13,
+        "weight": 400,
+        "top": 125.046875,
+        "bottom": 142.046875
+      },
+      {
+        "text": "‹",
+        "tag": "BUTTON",
+        "class": "",
+        "ratio": 14.402,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 20,
+        "weight": 400,
+        "top": 164.984375,
+        "bottom": 191.984375
+      },
+      {
+        "text": "我的 9月29日",
+        "tag": "STRONG",
+        "class": "",
+        "ratio": 14.402,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 13,
+        "weight": 700,
+        "top": 169.765625,
+        "bottom": 186.765625
+      },
+      {
+        "text": "›",
+        "tag": "BUTTON",
+        "class": "",
+        "ratio": 14.402,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 20,
+        "weight": 400,
+        "top": 164.984375,
+        "bottom": 191.984375
+      },
+      {
+        "text": "回到此刻",
+        "tag": "BUTTON",
+        "class": "text-button",
+        "ratio": 4.523,
+        "threshold": 4.5,
+        "color": "rgb(58, 110, 165)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 170,
+        "bottom": 185
+      },
+      {
+        "text": "附近几小时",
+        "tag": "BUTTON",
+        "class": "",
+        "ratio": 5.312,
+        "threshold": 4.5,
+        "color": "rgb(58, 110, 165)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 216.578125,
+        "bottom": 232.578125
+      },
+      {
+        "text": "展开全天",
+        "tag": "BUTTON",
+        "class": "",
+        "ratio": 14.672,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          237,
+          239,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 216.578125,
+        "bottom": 232.578125
+      },
+      {
+        "text": "阿远 · 纽约",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 14.402,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 265.484375,
+        "bottom": 281.484375
+      },
+      {
+        "text": "9月29日",
+        "tag": "SMALL",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11,
+        "weight": 400,
+        "top": 285.28125,
+        "bottom": 300.28125
+      },
+      {
+        "text": "你 / 我",
+        "tag": "SPAN",
+        "class": "axis-key",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 400,
+        "top": 276.203125,
+        "bottom": 290.203125
+      },
+      {
+        "text": "我 · 北京",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 14.402,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 265.484375,
+        "bottom": 281.484375
+      },
+      {
+        "text": "9月29日",
+        "tag": "SMALL",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11,
+        "weight": 400,
+        "top": 285.28125,
+        "bottom": 300.28125
+      },
+      {
+        "text": "共同可联系 · 10:00 / 22:00 · 30 分钟",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.551,
+        "threshold": 4.5,
+        "color": "rgb(58, 110, 165)",
+        "background": [
+          232,
+          238,
+          246,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 321.9375,
+        "bottom": 336.9375
+      },
+      {
+        "text": "19:30–20:00",
+        "tag": "SPAN",
+        "class": "block-time",
+        "ratio": 14.592,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          236.03529411764703,
+          238.35686274509806,
+          241.67843137254903,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 500,
+        "top": 381.421875,
+        "bottom": 396.421875
+      },
+      {
+        "text": "通勤",
+        "tag": "SPAN",
+        "class": "block-label",
+        "ratio": 14.592,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          236.03529411764703,
+          238.35686274509806,
+          241.67843137254903,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 400.671875,
+        "bottom": 416.671875
+      },
+      {
+        "text": "20:00–23:00",
+        "tag": "SPAN",
+        "class": "block-time",
+        "ratio": 6.252,
+        "threshold": 4.5,
+        "color": "rgb(101, 84, 38)",
+        "background": [
+          240.1058823529412,
+          236.32156862745097,
+          223.3607843137255,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 500,
+        "top": 469.421875,
+        "bottom": 484.421875
+      },
+      {
+        "text": "晚间休息",
+        "tag": "SPAN",
+        "class": "block-label",
+        "ratio": 6.252,
+        "threshold": 4.5,
+        "color": "rgb(101, 84, 38)",
+        "background": [
+          240.1058823529412,
+          236.32156862745097,
+          223.3607843137255,
+          1
+        ],
+        "opacity": 1,
+        "size": 13,
+        "weight": 400,
+        "top": 491.671875,
+        "bottom": 508.671875
+      },
+      {
+        "text": "通常安排",
+        "tag": "SPAN",
+        "class": "block-source",
+        "ratio": 4.101,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          240.1058823529412,
+          236.32156862745097,
+          223.3607843137255,
+          1
+        ],
+        "opacity": 1,
+        "size": 10.5,
+        "weight": 400,
+        "top": 515.46875,
+        "bottom": 529.46875
+      },
+      {
+        "text": "23:00–00:00",
+        "tag": "SPAN",
+        "class": "block-time",
+        "ratio": 6.874,
+        "threshold": 4.5,
+        "color": "rgb(68, 80, 94)",
+        "background": [
+          231.96470588235292,
+          234.96470588235292,
+          239.64313725490194,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 500,
+        "top": 973.421875,
+        "bottom": 988.421875
+      },
+      {
+        "text": "9月29日 → 9月30日",
+        "tag": "SPAN",
+        "class": "block-date",
+        "ratio": 6.874,
+        "threshold": 4.5,
+        "color": "rgb(68, 80, 94)",
+        "background": [
+          231.96470588235292,
+          234.96470588235292,
+          239.64313725490194,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 990.671875,
+        "bottom": 1005.671875
+      },
+      {
+        "text": "睡觉",
+        "tag": "SPAN",
+        "class": "block-label",
+        "ratio": 6.874,
+        "threshold": 4.5,
+        "color": "rgb(68, 80, 94)",
+        "background": [
+          231.96470588235292,
+          234.96470588235292,
+          239.64313725490194,
+          1
+        ],
+        "opacity": 1,
+        "size": 13,
+        "weight": 400,
+        "top": 1014.0625,
+        "bottom": 1031.0625
+      },
+      {
+        "text": "通常安排",
+        "tag": "SPAN",
+        "class": "block-source",
+        "ratio": 4.043,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          231.96470588235292,
+          234.96470588235292,
+          239.64313725490194,
+          1
+        ],
+        "opacity": 1,
+        "size": 10.5,
+        "weight": 400,
+        "top": 1037.859375,
+        "bottom": 1051.859375
+      },
+      {
+        "text": "07:30–08:00",
+        "tag": "SPAN",
+        "class": "block-time",
+        "ratio": 6.252,
+        "threshold": 4.5,
+        "color": "rgb(101, 84, 38)",
+        "background": [
+          240.1058823529412,
+          236.32156862745097,
+          223.3607843137255,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 500,
+        "top": 381.421875,
+        "bottom": 396.421875
+      },
+      {
+        "text": "早餐",
+        "tag": "SPAN",
+        "class": "block-label",
+        "ratio": 6.252,
+        "threshold": 4.5,
+        "color": "rgb(101, 84, 38)",
+        "background": [
+          240.1058823529412,
+          236.32156862745097,
+          223.3607843137255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 400.671875,
+        "bottom": 416.671875
+      },
+      {
+        "text": "08:00–09:00",
+        "tag": "SPAN",
+        "class": "block-time",
+        "ratio": 14.592,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          236.03529411764703,
+          238.35686274509806,
+          241.67843137254903,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 500,
+        "top": 469.421875,
+        "bottom": 484.421875
+      },
+      {
+        "text": "通勤",
+        "tag": "SPAN",
+        "class": "block-label",
+        "ratio": 14.592,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          236.03529411764703,
+          238.35686274509806,
+          241.67843137254903,
+          1
+        ],
+        "opacity": 1,
+        "size": 13,
+        "weight": 400,
+        "top": 491.671875,
+        "bottom": 508.671875
+      },
+      {
+        "text": "通常安排",
+        "tag": "SPAN",
+        "class": "block-source",
+        "ratio": 4.171,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          236.03529411764703,
+          238.35686274509806,
+          241.67843137254903,
+          1
+        ],
+        "opacity": 1,
+        "size": 10.5,
+        "weight": 400,
+        "top": 515.46875,
+        "bottom": 529.46875
+      },
+      {
+        "text": "09:00–12:00",
+        "tag": "SPAN",
+        "class": "block-time",
+        "ratio": 14.592,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          236.03529411764703,
+          238.35686274509806,
+          241.67843137254903,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 500,
+        "top": 637.421875,
+        "bottom": 652.421875
+      },
+      {
+        "text": "上课",
+        "tag": "SPAN",
+        "class": "block-label",
+        "ratio": 14.592,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          236.03529411764703,
+          238.35686274509806,
+          241.67843137254903,
+          1
+        ],
+        "opacity": 1,
+        "size": 13,
+        "weight": 400,
+        "top": 659.671875,
+        "bottom": 676.671875
+      },
+      {
+        "text": "通常安排",
+        "tag": "SPAN",
+        "class": "block-source",
+        "ratio": 4.171,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          236.03529411764703,
+          238.35686274509806,
+          241.67843137254903,
+          1
+        ],
+        "opacity": 1,
+        "size": 10.5,
+        "weight": 400,
+        "top": 683.46875,
+        "bottom": 697.46875
+      },
+      {
+        "text": "07:30",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 14.402,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 600,
+        "top": 379.421875,
+        "bottom": 393.421875
+      },
+      {
+        "text": "19:30",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 400,
+        "top": 394.421875,
+        "bottom": 408.421875
+      },
+      {
+        "text": "08:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 14.402,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 600,
+        "top": 463.421875,
+        "bottom": 477.421875
+      },
+      {
+        "text": "20:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 400,
+        "top": 478.421875,
+        "bottom": 492.421875
+      },
+      {
+        "text": "09:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 14.402,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 600,
+        "top": 631.421875,
+        "bottom": 645.421875
+      },
+      {
+        "text": "21:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 400,
+        "top": 646.421875,
+        "bottom": 660.421875
+      },
+      {
+        "text": "10:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 14.402,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 600,
+        "top": 799.421875,
+        "bottom": 813.421875
+      },
+      {
+        "text": "22:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 400,
+        "top": 814.421875,
+        "bottom": 828.421875
+      },
+      {
+        "text": "11:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 14.402,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 600,
+        "top": 967.421875,
+        "bottom": 981.421875
+      },
+      {
+        "text": "23:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 400,
+        "top": 982.421875,
+        "bottom": 996.421875
+      },
+      {
+        "text": "此刻",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 5.312,
+        "threshold": 4.5,
+        "color": "rgb(58, 110, 165)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 449.9375,
+        "bottom": 464.9375
+      },
+      {
+        "text": "9月30日 00:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 1141.421875,
+        "bottom": 1156.421875
+      },
+      {
+        "text": "9月29日 12:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 1141.421875,
+        "bottom": 1156.421875
+      },
+      {
+        "text": "绿色横带按联系偏好估计，尚未约定。",
+        "tag": "P",
+        "class": "quiet-footnote",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 1172.390625,
+        "bottom": 1187.390625
+      }
+    ],
+    "failures": [
+      {
+        "text": "活动各自连续，同一高度是同一时刻。",
+        "tag": "P",
+        "class": "screen-subtitle",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 13,
+        "weight": 400,
+        "top": 125.046875,
+        "bottom": 142.046875
+      },
+      {
+        "text": "9月29日",
+        "tag": "SMALL",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11,
+        "weight": 400,
+        "top": 285.28125,
+        "bottom": 300.28125
+      },
+      {
+        "text": "你 / 我",
+        "tag": "SPAN",
+        "class": "axis-key",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 400,
+        "top": 276.203125,
+        "bottom": 290.203125
+      },
+      {
+        "text": "9月29日",
+        "tag": "SMALL",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11,
+        "weight": 400,
+        "top": 285.28125,
+        "bottom": 300.28125
+      },
+      {
+        "text": "通常安排",
+        "tag": "SPAN",
+        "class": "block-source",
+        "ratio": 4.101,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          240.1058823529412,
+          236.32156862745097,
+          223.3607843137255,
+          1
+        ],
+        "opacity": 1,
+        "size": 10.5,
+        "weight": 400,
+        "top": 515.46875,
+        "bottom": 529.46875
+      },
+      {
+        "text": "通常安排",
+        "tag": "SPAN",
+        "class": "block-source",
+        "ratio": 4.043,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          231.96470588235292,
+          234.96470588235292,
+          239.64313725490194,
+          1
+        ],
+        "opacity": 1,
+        "size": 10.5,
+        "weight": 400,
+        "top": 1037.859375,
+        "bottom": 1051.859375
+      },
+      {
+        "text": "通常安排",
+        "tag": "SPAN",
+        "class": "block-source",
+        "ratio": 4.171,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          236.03529411764703,
+          238.35686274509806,
+          241.67843137254903,
+          1
+        ],
+        "opacity": 1,
+        "size": 10.5,
+        "weight": 400,
+        "top": 515.46875,
+        "bottom": 529.46875
+      },
+      {
+        "text": "通常安排",
+        "tag": "SPAN",
+        "class": "block-source",
+        "ratio": 4.171,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          236.03529411764703,
+          238.35686274509806,
+          241.67843137254903,
+          1
+        ],
+        "opacity": 1,
+        "size": 10.5,
+        "weight": 400,
+        "top": 683.46875,
+        "bottom": 697.46875
+      },
+      {
+        "text": "19:30",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 400,
+        "top": 394.421875,
+        "bottom": 408.421875
+      },
+      {
+        "text": "20:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 400,
+        "top": 478.421875,
+        "bottom": 492.421875
+      },
+      {
+        "text": "21:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 400,
+        "top": 646.421875,
+        "bottom": 660.421875
+      },
+      {
+        "text": "22:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 400,
+        "top": 814.421875,
+        "bottom": 828.421875
+      },
+      {
+        "text": "23:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 10,
+        "weight": 400,
+        "top": 982.421875,
+        "bottom": 996.421875
+      },
+      {
+        "text": "9月30日 00:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 1141.421875,
+        "bottom": 1156.421875
+      },
+      {
+        "text": "9月29日 12:00",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 1141.421875,
+        "bottom": 1156.421875
+      },
+      {
+        "text": "绿色横带按联系偏好估计，尚未约定。",
+        "tag": "P",
+        "class": "quiet-footnote",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11.5,
+        "weight": 400,
+        "top": 1172.390625,
+        "bottom": 1187.390625
+      }
+    ],
+    "method": "Solid CSS backgrounds and opacity; gradient and pseudo-element backgrounds need manual review."
+  },
+  {
+    "view": "rhythm",
+    "checked": [
+      {
+        "text": "我的节奏",
+        "tag": "H1",
+        "class": "screen-title",
+        "ratio": 14.402,
+        "threshold": 3,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 23,
+        "weight": 700,
+        "top": 85,
+        "bottom": 116
+      },
+      {
+        "text": "先填三件事，其他生活细节慢慢补充。",
+        "tag": "P",
+        "class": "screen-subtitle",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 13,
+        "weight": 400,
+        "top": 125.046875,
+        "bottom": 142.046875
+      },
+      {
+        "text": "工作日",
+        "tag": "BUTTON",
+        "class": "",
+        "ratio": 5.312,
+        "threshold": 4.5,
+        "color": "rgb(58, 110, 165)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 180.578125,
+        "bottom": 196.578125
+      },
+      {
+        "text": "休息日",
+        "tag": "BUTTON",
+        "class": "",
+        "ratio": 14.672,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          237,
+          239,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 180.578125,
+        "bottom": 196.578125
+      },
+      {
+        "text": "按北京当地时间填写。工作日为周一至周五，休息日为周六、周日。",
+        "tag": "P",
+        "class": "rhythm-context",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 225.484375,
+        "bottom": 261.28125
+      },
+      {
+        "text": "1",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.551,
+        "threshold": 4.5,
+        "color": "rgb(58, 110, 165)",
+        "background": [
+          232,
+          238,
+          246,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 302.265625,
+        "bottom": 318.265625
+      },
+      {
+        "text": "睡眠",
+        "tag": "H2",
+        "class": "",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 16,
+        "weight": 700,
+        "top": 299.078125,
+        "bottom": 320.078125
+      },
+      {
+        "text": "可以跨过午夜，例如 23:00 到 07:00。",
+        "tag": "P",
+        "class": "",
+        "ratio": 4.834,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 332.46875,
+        "bottom": 348.46875
+      },
+      {
+        "text": "入睡",
+        "tag": "LABEL",
+        "class": "time-field",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 364.265625,
+        "bottom": 380.265625
+      },
+      {
+        "text": "起床",
+        "tag": "LABEL",
+        "class": "time-field",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 364.265625,
+        "bottom": 380.265625
+      },
+      {
+        "text": "2",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.551,
+        "threshold": 4.5,
+        "color": "rgb(58, 110, 165)",
+        "background": [
+          232,
+          238,
+          246,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 489.25,
+        "bottom": 505.25
+      },
+      {
+        "text": "上班或上课",
+        "tag": "H2",
+        "class": "",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 16,
+        "weight": 700,
+        "top": 486.0625,
+        "bottom": 507.0625
+      },
+      {
+        "text": "主要安排",
+        "tag": "LABEL",
+        "class": "select-label",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 523.453125,
+        "bottom": 539.453125
+      },
+      {
+        "text": "开始",
+        "tag": "LABEL",
+        "class": "time-field",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 608.25,
+        "bottom": 624.25
+      },
+      {
+        "text": "结束",
+        "tag": "LABEL",
+        "class": "time-field",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 608.25,
+        "bottom": 624.25
+      },
+      {
+        "text": "只记录固定时段；其他时间显示为未细分安排。",
+        "tag": "P",
+        "class": "",
+        "ratio": 4.834,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 689.046875,
+        "bottom": 705.046875
+      },
+      {
+        "text": "3",
+        "tag": "SPAN",
+        "class": "",
+        "ratio": 4.551,
+        "threshold": 4.5,
+        "color": "rgb(58, 110, 165)",
+        "background": [
+          232,
+          238,
+          246,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 761.03125,
+        "bottom": 777.03125
+      },
+      {
+        "text": "愿意联系的时间",
+        "tag": "H2",
+        "class": "",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 16,
+        "weight": 700,
+        "top": 757.84375,
+        "bottom": 778.84375
+      },
+      {
+        "text": "独立于活动设置，不代表必须回复。",
+        "tag": "P",
+        "class": "",
+        "ratio": 4.834,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 791.234375,
+        "bottom": 807.234375
+      },
+      {
+        "text": "联系偏好",
+        "tag": "LABEL",
+        "class": "select-label",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 823.03125,
+        "bottom": 839.03125
+      },
+      {
+        "text": "开始",
+        "tag": "LABEL",
+        "class": "time-field",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 907.828125,
+        "bottom": 923.828125
+      },
+      {
+        "text": "结束",
+        "tag": "LABEL",
+        "class": "time-field",
+        "ratio": 16.913,
+        "threshold": 4.5,
+        "color": "rgb(26, 29, 33)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 600,
+        "top": 907.828125,
+        "bottom": 923.828125
+      },
+      {
+        "text": "可跨午夜；请避开睡眠。上班／上课期间的设置会单独说明。",
+        "tag": "P",
+        "class": "",
+        "ratio": 4.834,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          255,
+          255,
+          255,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 988.625,
+        "bottom": 1024.421875
+      },
+      {
+        "text": "工作日 · 睡眠 23:00–07:00 · 可联系 20:00–23:00",
+        "tag": "P",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 1063.21875,
+        "bottom": 1079.21875
+      },
+      {
+        "text": "保存我的节奏",
+        "tag": "BUTTON",
+        "class": "primary-button",
+        "ratio": 5.312,
+        "threshold": 4.5,
+        "color": "rgb(255, 255, 255)",
+        "background": [
+          58,
+          110,
+          165,
+          1
+        ],
+        "opacity": 1,
+        "size": 14,
+        "weight": 600,
+        "top": 1106.46875,
+        "bottom": 1125.46875
+      },
+      {
+        "text": "同时保存两套模板，替换自己的通常作息。",
+        "tag": "P",
+        "class": "save-help",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11,
+        "weight": 400,
+        "top": 1151.015625,
+        "bottom": 1166.015625
+      }
+    ],
+    "failures": [
+      {
+        "text": "先填三件事，其他生活细节慢慢补充。",
+        "tag": "P",
+        "class": "screen-subtitle",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 13,
+        "weight": 400,
+        "top": 125.046875,
+        "bottom": 142.046875
+      },
+      {
+        "text": "按北京当地时间填写。工作日为周一至周五，休息日为周六、周日。",
+        "tag": "P",
+        "class": "rhythm-context",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 225.484375,
+        "bottom": 261.28125
+      },
+      {
+        "text": "工作日 · 睡眠 23:00–07:00 · 可联系 20:00–23:00",
+        "tag": "P",
+        "class": "",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 12,
+        "weight": 400,
+        "top": 1063.21875,
+        "bottom": 1079.21875
+      },
+      {
+        "text": "同时保存两套模板，替换自己的通常作息。",
+        "tag": "P",
+        "class": "save-help",
+        "ratio": 4.117,
+        "threshold": 4.5,
+        "color": "rgb(107, 114, 128)",
+        "background": [
+          234,
+          237,
+          241,
+          1
+        ],
+        "opacity": 1,
+        "size": 11,
+        "weight": 400,
+        "top": 1151.015625,
+        "bottom": 1166.015625
+      }
+    ],
+    "method": "Solid CSS backgrounds and opacity; gradient and pseudo-element backgrounds need manual review."
+  }
+]
