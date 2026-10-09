@@ -40,16 +40,18 @@ class AuthEntryFlowTest {
             }
         }
 
+        compose.onNodeWithContentDescription("NowUs 完整标志").assertExists()
+        compose.onNodeWithText("NowUs").assertDoesNotExist()
         compose.onNodeWithText("已保存邀请码 $inviteCode。登录后可查看邀请人和共享范围。").assertExists()
         compose.onNodeWithTag("authEmail").performTextInput("person@example.net")
-        compose.onNodeWithText("发送 6 位验证码").performClick()
+        compose.onNodeWithText("发送 6 位验证码").performScrollTo().assertIsDisplayed().performClick()
         compose.onNodeWithTag("authOtpCode").assertIsDisplayed()
         compose.onNodeWithTag("authOtpCode").performTextInput("246810")
-        compose.onNodeWithText("验证并继续").performClick()
+        compose.onNodeWithText("验证并继续").performScrollTo().assertIsDisplayed().performClick()
         compose.waitUntil(10_000) { sessions.current.value?.userId == "user-a" }
-        compose.onNodeWithText("真实账号 · 作息与留言仅和已配对伴侣共享").assertIsDisplayed()
+        compose.onNodeWithText("留话").assertIsDisplayed()
         compose.waitUntil(10_000) { api.previewedCode == inviteCode }
-        compose.onNodeWithText("邀请来自：小舟 · 北京").assertExists()
+        compose.onNodeWithText("小舟在北京，想与你分享彼此的日常。").assertExists()
         compose.runOnIdle {
             assertEquals("person@example.net", api.requestedEmail)
             assertEquals("246810", api.verifiedCode)
@@ -69,7 +71,7 @@ class AuthEntryFlowTest {
             }
         }
 
-        compose.onNodeWithText("真实账号 · 作息与留言仅和已配对伴侣共享").assertIsDisplayed()
+        compose.onNodeWithText("留话").assertIsDisplayed()
         compose.onNodeWithText("发送 6 位验证码").assertDoesNotExist()
     }
 
@@ -86,9 +88,9 @@ class AuthEntryFlowTest {
         }
 
         compose.onNodeWithTag("authEmail").performTextInput("new-person@example.net")
-        compose.onNodeWithText("发送 6 位验证码").performClick()
+        compose.onNodeWithText("发送 6 位验证码").performScrollTo().assertIsDisplayed().performClick()
         compose.onNodeWithTag("authOtpCode").performTextInput("246810")
-        compose.onNodeWithText("验证并继续").performClick()
+        compose.onNodeWithText("验证并继续").performScrollTo().assertIsDisplayed().performClick()
         compose.waitUntil(10_000) { sessions.current.value?.userId == "user-a" }
 
         compose.onNodeWithText("城市：请选择 ▾").assertExists()
@@ -102,7 +104,7 @@ class AuthEntryFlowTest {
         compose.onNodeWithText("休息日").performClick()
         compose.onNodeWithTag("rhythm-rest-sleep-end").assertTextEquals("08:30")
         compose.onNodeWithText("工作日").performClick()
-        compose.onNodeWithTag("rhythm-weekday-sleep-start").performClick()
+        compose.onNodeWithTag("rhythm-weekday-sleep-start").performScrollTo().performClick()
         compose.onNodeWithText("设置睡眠开始").assertExists()
         compose.onNodeWithTag("time-wheel-hour").performScrollToIndex(0)
         compose.onNodeWithTag("time-wheel-minute").performScrollToIndex(5)

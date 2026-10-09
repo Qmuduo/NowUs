@@ -9,45 +9,60 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import app.nowus.android.domain.RoutineCategory
 
-val Forest = Color(0xFF2F6B4F)
-val Sage = Color(0xFFE3EEE5)
-val Page = Color(0xFFF2F5F2)
-val Ink = Color(0xFF232A25)
-val Muted = Color(0xFF536357)
-val Night = Color(0xFF27354B)
-val Sunlight = Color(0xFFF5E5B8)
+val Accent = Color(0xFF246B65)
+val Tint = Color(0xFFE7F0EC)
+val Page = Color(0xFFF5F7FA)
+val Panel = Color(0xFFFCFDFD)
+val Line = Color(0xFFDCE3E7)
+val Ink = Color(0xFF25364A)
+val Muted = Color(0xFF657381)
+val Night = Color(0xFF2D425D)
+val OnNight = Color(0xFFF0F4FB)
+val NightSub = Color(0xFFC3D0E0)
+val Daylight = Color(0xFFF9E5C9)
+val DaylightInk = Color(0xFF5C4836)
+val Peach = Color(0xFFF4D1A5)
+val Paper = Color(0xFFF5E8B9)
+val PaperBottom = Color(0xFFEEE0AB)
+val PaperInk = Color(0xFF554D36)
+val PaperRule = Color(0x268C7743)
+val PaperTape = Color(0x9CAEC9C1)
+val PaperTapeEdge = Color(0x75F0F6E9)
+val PaperFold = Color(0xFFD9C98F)
 
 fun routineCategoryColor(category:RoutineCategory):Color = when(category){
-    RoutineCategory.SLEEP -> Color(0xFFDDE4F3)
-    RoutineCategory.PREPARATION -> Color(0xFFF0E3D2)
-    RoutineCategory.MEAL -> Color(0xFFF4E2B7)
-    RoutineCategory.COMMUTE -> Color(0xFFD5EAE7)
-    RoutineCategory.STUDY_WORK -> Color(0xFFDCE7F6)
-    RoutineCategory.REST -> Color(0xFFE9E0F1)
-    RoutineCategory.EXERCISE -> Color(0xFFF2DCD4)
-    RoutineCategory.LIFE_ADMIN -> Color(0xFFDCE8D9)
-    RoutineCategory.SOCIAL -> Color(0xFFF0DDE8)
-    RoutineCategory.OTHER -> Color(0xFFDDE3DE)
-    RoutineCategory.UNSCHEDULED -> Color(0xFFE9ECE8)
+    RoutineCategory.SLEEP -> Night
+    RoutineCategory.PREPARATION -> Daylight
+    RoutineCategory.MEAL -> Daylight
+    RoutineCategory.COMMUTE -> Tint
+    RoutineCategory.STUDY_WORK -> Panel
+    RoutineCategory.REST -> Tint
+    RoutineCategory.EXERCISE -> Peach
+    RoutineCategory.LIFE_ADMIN -> Panel
+    RoutineCategory.SOCIAL -> Daylight
+    RoutineCategory.OTHER -> Panel
+    RoutineCategory.UNSCHEDULED -> Color(0xFFEDF0F1)
 }
 
 @Composable
 fun NowUsTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = lightColorScheme(
-            primary=Forest, onPrimary=Color.White, primaryContainer=Sage, onPrimaryContainer=Forest,
-            background=Page, onBackground=Ink, surface=Color(0xFFFAFCFA), onSurface=Ink,
-            surfaceVariant=Sage, onSurfaceVariant=Muted, outline=Color(0xFF78887C),
+            primary=Accent, onPrimary=Color.White, primaryContainer=Tint, onPrimaryContainer=Accent,
+            background=Page, onBackground=Ink, surface=Panel, onSurface=Ink,
+            surfaceVariant=Tint, onSurfaceVariant=Muted, outline=Muted, outlineVariant=Line,
+            secondary=Accent, onSecondary=Color.White, secondaryContainer=Tint, onSecondaryContainer=Ink,
+            surfaceContainer=Panel, surfaceContainerLow=Panel, surfaceContainerHighest=Tint,
             error=Color(0xFF9F392F)
         ),
         typography = Typography(
-            headlineLarge=TextStyle(fontFamily=FontFamily.SansSerif,fontWeight=FontWeight.SemiBold,fontSize=28.sp,lineHeight=36.sp),
-            headlineSmall=TextStyle(fontFamily=FontFamily.SansSerif,fontWeight=FontWeight.SemiBold,fontSize=23.sp,lineHeight=32.sp),
-            titleLarge=TextStyle(fontFamily=FontFamily.SansSerif,fontWeight=FontWeight.SemiBold,fontSize=20.sp,lineHeight=28.sp),
-            titleMedium=TextStyle(fontFamily=FontFamily.SansSerif,fontWeight=FontWeight.SemiBold,fontSize=16.sp,lineHeight=24.sp),
-            bodyLarge=TextStyle(fontFamily=FontFamily.SansSerif,fontSize=16.sp,lineHeight=25.sp),
-            bodyMedium=TextStyle(fontFamily=FontFamily.SansSerif,fontSize=14.sp,lineHeight=22.sp),
-            bodySmall=TextStyle(fontFamily=FontFamily.SansSerif,fontSize=12.sp,lineHeight=19.sp)
+            headlineLarge=TextStyle(fontFamily=FontFamily.SansSerif,fontWeight=FontWeight.Medium,fontSize=27.sp,lineHeight=38.sp),
+            headlineSmall=TextStyle(fontFamily=FontFamily.SansSerif,fontWeight=FontWeight.Medium,fontSize=22.sp,lineHeight=32.sp),
+            titleLarge=TextStyle(fontFamily=FontFamily.SansSerif,fontWeight=FontWeight.Medium,fontSize=20.sp,lineHeight=28.sp),
+            titleMedium=TextStyle(fontFamily=FontFamily.SansSerif,fontWeight=FontWeight.Medium,fontSize=14.sp,lineHeight=22.sp),
+            bodyLarge=TextStyle(fontFamily=FontFamily.SansSerif,fontSize=16.sp,lineHeight=27.sp),
+            bodyMedium=TextStyle(fontFamily=FontFamily.SansSerif,fontSize=14.sp,lineHeight=24.sp),
+            bodySmall=TextStyle(fontFamily=FontFamily.SansSerif,fontSize=12.sp,lineHeight=20.sp)
         ),
         content=content
     )

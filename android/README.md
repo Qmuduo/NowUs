@@ -1,5 +1,7 @@
 # NowUs Android
 
+2026-10-03: the accepted round 120 design is implemented in native Compose. The home now uses paired day/night clocks, a pale-blue shared contact window, and a compact partner-note reply. Both temporary contact preferences participate in the algorithm, and partner detail dialogs disappear when sharing access is revoked. See [round 120 acceptance](../docs/android-120-acceptance.md) for tested behavior, APK locations, and remaining deployment requirements. Earlier test records below are historical.
+
 Android first release candidate: Kotlin + Jetpack Compose, minimum Android 8.0 (API 26). The app has two deliberately separate entry paths:
 
 - **Email account** uses the FastAPI service for six-digit email OTP, pairing, and server-synced personal data.
@@ -8,6 +10,10 @@ Android first release candidate: Kotlin + Jetpack Compose, minimum Android 8.0 (
 The local environment proves the feature flow only. It does not prove that a deployed service is reachable from Mainland China or a particular overseas network, or that production email reaches inboxes.
 
 ## Start the local server
+
+The user's phone now has the Wi-Fi build targeting `http://192.168.3.46:8000`. See [same-Wi-Fi setup](../docs/android-wifi-test.md) for the scoped firewall rule, verified phone HTTP account flow, APK and restart instructions. The development inbox remains accessible only on the computer.
+
+The current machine's Docker engine is unavailable. Local account acceptance instead passed on dedicated PostgreSQL 16.15, Windows Python and Mailpit services, all bound to loopback. See [fallback startup and test commands](../docs/android-120-backend-acceptance.md); Docker's PostgreSQL 18 baseline still needs a separate rerun when its engine is restored.
 
 From the repository root, copy the development template and start PostgreSQL, Mailpit, and the API:
 

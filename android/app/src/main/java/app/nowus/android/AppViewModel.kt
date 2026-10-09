@@ -26,6 +26,7 @@ class AppViewModel(private val repository:StateRepository, private val localDemo
  private val _localImport=MutableStateFlow<LocalDataImport?>(null)
  val localImport=_localImport.asStateFlow()
  private var loadJob:Job?=null
+ private var deletedNote:Note?=null
  init {retry()}
  fun retry(){
   loadJob?.cancel();error.value=null;readFailed.value=false
@@ -36,7 +37,7 @@ class AppViewModel(private val repository:StateRepository, private val localDemo
   }
  }
  fun refreshTime(){if(!demo.value) now.value=Instant.now()}
- fun setDemo(enabled:Boolean){demo.value=enabled;now.value=if(enabled) Instant.parse("2026-09-29T14:00:00Z") else Instant.now()}
+ fun setDemo(enabled:Boolean){demo.value=enabled;now.value=if(enabled) Instant.parse("2026-09-29T12:00:00Z") else Instant.now()}
  fun clearError(){error.value=null}
  private fun action(onSuccess:()->Unit={},operation:suspend()->Unit){
   if(saving.value)return
@@ -60,12 +61,27 @@ class AppViewModel(private val repository:StateRepository, private val localDemo
   require(errors.isEmpty()){errors.distinct().joinToString("；")};it.copy(schedule=schedule)
  }
  fun completeSetup(onSuccess:()->Unit={})=write(onSuccess){it.copy(setupComplete=true)}
- fun saveNote(text:String,onSuccess:()->Unit={})=write(onSuccess){checked(Rules.saveNote(it,text,Instant.now().toEpochMilli()))}
+ fun saveNote(text:String,onSuccess:()->Unit={})=write({deletedNote=null;onSuccess()}){checked(Rules.saveNote(it,text,Instant.now().toEpochMilli()))}
+ fun deleteNote(onSuccess:()->Unit={}) {
+  var removing:Note?=null
+  write({deletedNote=removing;onSuccess()}) { current ->
+   require(current.note!=null){"没有可删除的便签"}
+   removing=current.note
+   checked(Rules.deleteNote(current))
+  }
+ }
+ fun undoDeleteNote(onSuccess:()->Unit={})=action({deletedNote=null;onSuccess()}){
+  val restore=deletedNote?:throw IllegalStateException("没有可撤销的删除")
+  repository.update { current ->
+   require(current.note==null){"已有新的便签，无法覆盖"}
+   current.copy(note=restore)
+  }
+ }
  fun temporary(available:Boolean,minutes:Int,onSuccess:()->Unit={})=write({refreshTime();onSuccess()}){
   require(minutes in listOf(30,60,180)){"请选择有效时长"}
   val start=Instant.now().toEpochMilli();it.copy(temporary=TemporaryStatus(available,start+minutes*60000L,start))
  }
- fun resetTemporary()=write{it.copy(temporary=null)}
+ fun resetTemporary(onSuccess:()->Unit={})=write(onSuccess){it.copy(temporary=null)}
  fun createInvite()=action{repository.createInvitation(UUID.randomUUID().toString().take(10).uppercase(),Instant.now().toEpochMilli())}
  fun revokeInvite()=action{repository.revokeInvitation()}
  fun previewInvite(code:String){_invitePreview.value=null;action{_invitePreview.value=repository.previewInvitation(code.trim(),Instant.now().toEpochMilli())}}

@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.nio.ByteBuffer
+import java.security.MessageDigest
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -117,9 +118,38 @@ class EncryptedAccountSnapshotStore(context: Context) : AccountSnapshotStore {
     }
 }
 
+/** Private device-only drafts are scoped to one local profile or authenticated account. */
+class EncryptedNoteDraftStore(context: Context) {
+    private val preferences = context.applicationContext.getSharedPreferences("nowus_encrypted_note_drafts", Context.MODE_PRIVATE)
+
+    fun load(scope: String): String? = try {
+        preferences.getString(preferenceKey(scope), null)?.let { SecureBlob.decrypt(KEY_ALIAS, it) }
+    } catch (_: Exception) {
+        preferences.edit().remove(preferenceKey(scope)).commit()
+        null
+    }
+
+    fun save(scope: String, text: String) {
+        preferences.edit().putString(preferenceKey(scope), SecureBlob.encrypt(KEY_ALIAS, text)).apply()
+    }
+
+    fun clear(scope: String) {
+        preferences.edit().remove(preferenceKey(scope)).apply()
+    }
+
+    private fun preferenceKey(scope: String): String {
+        val digest = MessageDigest.getInstance("SHA-256").digest(scope.toByteArray(Charsets.UTF_8))
+        return "draft_${Base64.encodeToString(digest, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)}"
+    }
+
+    private companion object {
+        const val KEY_ALIAS = "nowus_note_draft_key_v1"
+    }
+}
+
 @Serializable private data class SnapshotRecord(val userId: String, val state: AppState)
 
-private object SecureBlob {
+internal object SecureBlob {
     private const val TRANSFORMATION = "AES/GCM/NoPadding"
 
     fun encrypt(alias: String, value: String): String {

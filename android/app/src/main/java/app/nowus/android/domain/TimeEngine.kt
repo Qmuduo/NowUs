@@ -61,10 +61,51 @@ object TimeEngine {
   result.add(end)
   return result.distinct().sorted()
  }
- fun commonWindows(start: Instant,end: Instant,me: Profile,meSchedule: Schedule?,temporary: TemporaryStatus?,partner: Profile,partnerSchedule: Schedule?): List<Window> {
+ /** Activity changes only at local day, saved routine, or IANA offset-transition boundaries. */
+ private fun activityBoundaries(start:Instant,end:Instant,profile:Profile,schedule:Schedule?):List<Instant>{
+  require(start<=end)
+  val zone=Cities.byId(profile.cityId)!!.zone
+  val result=mutableListOf(start,end)
+  var date=start.atZone(zone).toLocalDate().minusDays(1)
+  val last=end.atZone(zone).toLocalDate().plusDays(1)
+  while(!date.isAfter(last)){
+   val midnight=date.atStartOfDay(zone).toInstant()
+   if(midnight>start&&midnight<end)result.add(midnight)
+   val daily=when(date.dayOfWeek){DayOfWeek.SATURDAY,DayOfWeek.SUNDAY->schedule?.rest;else->schedule?.weekday}
+   val times=if(daily?.blocks?.isNotEmpty()==true)daily.blocks.flatMap{listOf(it.start,it.end)}else listOfNotNull(daily?.sleepStart,daily?.sleepEnd,daily?.activityStart,daily?.activityEnd)
+   times.mapNotNull(::parseMinute).forEach{minute->
+    val point=date.atTime(minute/60,minute%60).atZone(zone).toInstant()
+    if(point>start&&point<end)result.add(point)
+   }
+   date=date.plusDays(1)
+  }
+  var transition=zone.rules.nextTransition(start.minusNanos(1))
+  while(transition!=null&&transition.instant<=end){
+   if(transition.instant>start)result.add(transition.instant)
+   transition=zone.rules.nextTransition(transition.instant.plusNanos(1))
+  }
+  return result.distinct().sorted()
+ }
+ fun commonWindows(start: Instant,end: Instant,me: Profile,meSchedule: Schedule?,temporary: TemporaryStatus?,partner: Profile,partnerSchedule: Schedule?,partnerTemporary: TemporaryStatus? = null): List<Window> {
   val result=mutableListOf<Window>()
-  boundaries(start,end,temporary?.let { listOf(Instant.ofEpochMilli(it.fromMillis), Instant.ofEpochMilli(it.untilMillis)) } ?: emptyList()).zipWithNext().forEach { (a,b)->
-   if(a<b && contactAt(me,meSchedule,temporary,a)==true && contactAt(partner,partnerSchedule,null,a)==true) {
+  val temporaryBoundaries=listOfNotNull(temporary,partnerTemporary).flatMap {
+   listOf(Instant.ofEpochMilli(it.fromMillis),Instant.ofEpochMilli(it.untilMillis))
+  }
+  boundaries(start,end,temporaryBoundaries).zipWithNext().forEach { (a,b)->
+   if(a<b && contactAt(me,meSchedule,temporary,a)==true && contactAt(partner,partnerSchedule,partnerTemporary,a)==true) {
+    if(result.lastOrNull()?.end==a) result[result.lastIndex]=result.last().copy(end=b) else result.add(Window(a,b))
+   }
+  }
+  return result
+ }
+ /** True contact preference intervals for one person, kept separate from activity segments. */
+ fun contactWindows(start: Instant,end: Instant,profile: Profile,schedule: Schedule?,temporary: TemporaryStatus?): List<Window> {
+  val result=mutableListOf<Window>()
+  val temporaryBoundaries=listOfNotNull(temporary).flatMap {
+   listOf(Instant.ofEpochMilli(it.fromMillis),Instant.ofEpochMilli(it.untilMillis))
+  }
+  boundaries(start,end,temporaryBoundaries).zipWithNext().forEach { (a,b)->
+   if(a<b && contactAt(profile,schedule,temporary,a)==true) {
     if(result.lastOrNull()?.end==a) result[result.lastIndex]=result.last().copy(end=b) else result.add(Window(a,b))
    }
   }
@@ -72,7 +113,7 @@ object TimeEngine {
  }
  fun segments(start: Instant,end: Instant,profile: Profile,schedule: Schedule?): List<Segment> {
   val result=mutableListOf<Segment>()
-  boundaries(start,end).zipWithNext().forEach { (a,b)->
+  activityBoundaries(start,end,profile,schedule).zipWithNext().forEach { (a,b)->
    if(a<b) { val activity=activityAt(profile,schedule,null,a)
     if(result.lastOrNull()?.let {it.end==a && it.activity==activity}==true) result[result.lastIndex]=result.last().copy(end=b) else result.add(Segment(a,b,activity))
    }

@@ -43,6 +43,43 @@ class DomainTest {
         assertEquals(1,segments.size)
         assertEquals("上班",segments.single().activity.label)
     }
+    @Test fun nearbyViewportKeepsTheOriginalActivityStartAndEnd() {
+        val p=Profile("小满","beijing")
+        val day=Rhythm(activity="自己的时间",activityStart="09:00",activityEnd="23:30",blocks=listOf(
+            RoutineBlock("long","自己的时间","09:00","23:30",RoutineCategory.REST),
+        ))
+        val viewport=instant("2026-10-03T14:00:00Z")
+        val activity=TimeEngine.segments(viewport.minusSeconds(13*3600L),viewport.plusSeconds(2*3600L),p,Schedule(day,day))
+            .single { it.activity.label=="自己的时间" }
+        assertEquals(instant("2026-10-03T01:00:00Z"),activity.start)
+        assertEquals(instant("2026-10-03T15:30:00Z"),activity.end)
+    }
+    @Test fun activityBoundariesRetainActualElapsedTimeAcrossDstTransitions() {
+        val p=Profile("纽约朋友","new-york")
+        listOf(
+            Triple(LocalDate.parse("2026-03-08"),"00:00" to "04:00",3L),
+            Triple(LocalDate.parse("2026-11-01"),"00:00" to "03:00",4L),
+        ).forEach { (date,times,expectedHours)->
+            val rhythm=Rhythm(blocks=listOf(RoutineBlock("event","活动",times.first,times.second,RoutineCategory.OTHER)))
+            val zone=Cities.byId(p.cityId)!!.zone
+            val start=date.atStartOfDay(zone).toInstant()
+            val end=date.plusDays(1).atStartOfDay(zone).toInstant()
+            val event=TimeEngine.segments(start,end,p,Schedule(rhythm,rhythm)).single{it.activity.label=="活动"}
+            assertEquals(expectedHours,Duration.between(event.start,event.end).toHours())
+        }
+    }
+    @Test fun personalContactRailHasItsOwnIntervalsWithoutSplittingActivities() {
+        val start=instant("2026-09-29T01:00:00Z")
+        val end=start.plusSeconds(4*3600)
+        val rhythm=Schedule(Rhythm(contactStart="10:00",contactEnd="13:00"),Rhythm(contactStart="10:00",contactEnd="13:00"))
+        val pause=TemporaryStatus(false,instant("2026-09-29T03:30:00Z").toEpochMilli(),instant("2026-09-29T02:30:00Z").toEpochMilli())
+        assertEquals(
+            listOf(Window(instant("2026-09-29T02:00:00Z"),instant("2026-09-29T02:30:00Z")),Window(instant("2026-09-29T03:30:00Z"),instant("2026-09-29T05:00:00Z"))),
+            TimeEngine.contactWindows(start,end,me,rhythm,pause),
+        )
+        assertEquals(1,TimeEngine.segments(start,end,me,rhythm).size)
+        assertTrue(TimeEngine.contactWindows(start,end,me,null,null).isEmpty())
+    }
     @Test fun validatesCodepointsCityAndIntervals() {
         assertTrue(Rules.validateProfile(Profile("😀".repeat(20),"beijing")).valid)
         assertFalse(Rules.validateProfile(Profile("😀".repeat(21),"beijing")).valid)
@@ -76,6 +113,9 @@ class DomainTest {
         assertNull(paired.partnerSchedule)
         assertNotNull(Rules.acceptInvite(paired,"unique",me,2000).error)
         assertNotNull(Rules.saveNote(state,"😀".repeat(121),1000).error)
+        val existing=state.copy(note=Note("留待撤销",900L))
+        assertNotNull(Rules.saveNote(existing,"  \n",1000).error)
+        assertEquals(existing,Rules.saveNote(existing,"  \n",1000).state)
         assertEquals(120,Rules.saveNote(state,"😀".repeat(120),1000).state.note!!.text.codePointCount(0,240))
     }
     @Test fun overnightSleepCrossesRealLocalDates() {
@@ -104,6 +144,60 @@ class DomainTest {
         val partnerRhythm=Rhythm(contactStart="09:00",contactEnd="18:00")
         assertEquals(listOf(Window(from,until)),TimeEngine.commonWindows(from.minusSeconds(30),until.plusSeconds(30),me,schedule,temp,me,Schedule(partnerRhythm,partnerRhythm)))
         assertEquals("上班",TimeEngine.activityAt(me,schedule,temp,from).label)
+    }
+    @Test fun partnerBusyRemovesOnlyItsMillisecondLifetimeAndRestoresAtExpiry() {
+        val start=instant("2026-09-29T12:00:00Z")
+        val end=instant("2026-09-29T12:05:00Z")
+        val from=instant("2026-09-29T12:01:15.125Z")
+        val until=instant("2026-09-29T12:03:20.875Z")
+        val busy=TemporaryStatus(false,until.toEpochMilli(),from.toEpochMilli())
+        assertEquals(listOf(Window(start,from),Window(until,end)),
+            TimeEngine.commonWindows(start,end,me,schedule,null,me,schedule,busy))
+        assertFalse(TimeEngine.contactAt(me,schedule,busy,until.minusMillis(1))!!)
+        assertTrue(TimeEngine.contactAt(me,schedule,busy,until)!!)
+    }
+    @Test fun partnerAvailableCreatesWindowsForMissingOrUnknownContactPreferences() {
+        val start=instant("2026-09-29T12:00:00Z")
+        val end=instant("2026-09-29T12:05:00Z")
+        val from=instant("2026-09-29T12:00:10.001Z")
+        val until=instant("2026-09-29T12:04:50.999Z")
+        val available=TemporaryStatus(true,until.toEpochMilli(),from.toEpochMilli())
+        val unknown=Schedule(Rhythm(contactKnown=false),Rhythm(contactKnown=false))
+        for(partnerSchedule in listOf(null,unknown)) {
+            assertEquals(listOf(Window(from,until)),
+                TimeEngine.commonWindows(start,end,me,schedule,null,me,partnerSchedule,available))
+            assertNull(TimeEngine.contactAt(me,partnerSchedule,available,from.minusMillis(1)))
+            assertTrue(TimeEngine.contactAt(me,partnerSchedule,available,from)!!)
+            assertTrue(TimeEngine.contactAt(me,partnerSchedule,available,until.minusMillis(1))!!)
+            assertNull(TimeEngine.contactAt(me,partnerSchedule,available,until))
+        }
+    }
+    @Test fun simultaneousAvailableOverridesIntersectBothMillisecondLifetimes() {
+        val start=instant("2026-09-29T02:00:00Z")
+        val end=instant("2026-09-29T02:05:00Z")
+        val myFrom=instant("2026-09-29T02:00:10.125Z")
+        val myUntil=instant("2026-09-29T02:03:20.875Z")
+        val partnerFrom=instant("2026-09-29T02:01:15.625Z")
+        val partnerUntil=instant("2026-09-29T02:04:40.375Z")
+        val mine=TemporaryStatus(true,myUntil.toEpochMilli(),myFrom.toEpochMilli())
+        val theirs=TemporaryStatus(true,partnerUntil.toEpochMilli(),partnerFrom.toEpochMilli())
+        assertEquals(listOf(Window(partnerFrom,myUntil)),
+            TimeEngine.commonWindows(start,end,me,null,mine,me,null,theirs))
+        assertEquals(listOf(Window(partnerFrom,myUntil)),
+            TimeEngine.commonWindows(start,end,me,null,theirs,me,null,mine))
+    }
+    @Test fun partnerBusyWinsWhileMyAvailableOverrideIsActive() {
+        val start=instant("2026-09-29T02:00:00Z")
+        val end=instant("2026-09-29T02:05:00Z")
+        val myFrom=instant("2026-09-29T02:00:10.125Z")
+        val myUntil=instant("2026-09-29T02:04:50.875Z")
+        val partnerFrom=instant("2026-09-29T02:01:15.625Z")
+        val partnerUntil=instant("2026-09-29T02:03:20.375Z")
+        val mine=TemporaryStatus(true,myUntil.toEpochMilli(),myFrom.toEpochMilli())
+        val theirs=TemporaryStatus(false,partnerUntil.toEpochMilli(),partnerFrom.toEpochMilli())
+        val contact=Rhythm(contactStart="09:00",contactEnd="18:00")
+        assertEquals(listOf(Window(myFrom,partnerFrom),Window(partnerUntil,myUntil)),
+            TimeEngine.commonWindows(start,end,me,null,mine,me,Schedule(contact,contact),theirs))
     }
     @Test fun cityTemplatesProvideEditableStudentAndOfficeDayBlocks() {
         val student=RoutineTemplates.forCity("beijing",RoutineTemplate.STUDENT)
