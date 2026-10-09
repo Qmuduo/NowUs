@@ -154,10 +154,10 @@ function renderHome() {
   const partnerPeriod = partnerMoment.label, myPeriod = myMoment.label;
   const heading = !joined ? '先安顿好自己的一天' : differentDate ? '日期不同，彼此都在' : partnerPeriod === myPeriod ? `我们都在${partnerPeriod}` : `你的${partnerPeriod}，我的${myPeriod}`;
   const headingMarkup = joined
-    ? `<h1 class="home-thesis home-thesis-pair"><span><strong>${esc(PEOPLE.partner.name)}</strong><small> · ${esc(PEOPLE.partner.city)}</small></span><span><strong>我</strong><small> · ${esc(PEOPLE.me.city)}</small></span></h1>`
+    ? ''
     : `<h1 class="home-thesis">${heading}</h1>`;
   const partnerNote = partnerJoined() ? `<button type="button" class="note-preview" data-action="read-note"><span class="note-preview-head"><span class="note-from"><span class="note-author">${esc(PEOPLE.partner.name)}</span><time datetime="${new Date(initialNote.time).toISOString()}">${relativeNoteTime(initialNote.time)}</time></span></span><span class="note-preview-text">${esc(initialNote.text).replace('，', '，<br>')}</span><span class="note-preview-more">展开留言 ${icon('arrow')}</span></button>` : '';
-  const momentSection = `<div class="home-stack"><div class="moment-group">${headingMarkup}<div class="time-pair ${partnerMoment.kind}-pair}${joined ? ' identity-heading' : ''}">${timePerson('partner')}${timePerson('me')}</div></div></div>`;
+  const momentSection = `<div class="home-stack"><div class="moment-group">${headingMarkup}<div class="time-pair ${partnerMoment.kind}-pair" role="group" aria-label="双方此刻的当地时间与状态">${timePerson('partner')}${timePerson('me')}</div></div></div>`;
   const connectionSection = `<div class="connection-panel"><div class="home-contact">${commonCard()}</div></div>`;
   const noteSection = `<div class="note-section">${partnerNote}<button type="button" class="note-compose" data-action="edit-note"><span class="note-compose-placeholder">回${esc(PEOPLE.partner.name)}一句</span>${icon('arrow')}</button></div>`;
   $('#home-view').innerHTML = `${momentSection}${connectionSection}${noteSection}`;

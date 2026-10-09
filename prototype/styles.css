@@ -159,9 +159,6 @@ svg { display: block; width: 20px; height: 20px; flex: none; }
 #home-view .time-pair .time-person.day, #home-view .time-pair .time-person.night { background: transparent; }
 #home-view .time-pair .partner-person { grid-column: 1; }
 #home-view .time-pair .self-person { grid-column: 2; border-left: 0; }
-#home-view .time-pair.identity-heading .time-person .person-label { display: none; }
-#home-view .time-pair.identity-heading .time-person { padding-top: 1px; }
-#home-view .time-pair.identity-heading { margin-top: 4px; }
 #home-view .person-label { align-items: baseline; gap: 4px; font-size: 13px; white-space: nowrap; min-width: 0; }
 #home-view .person-date { grid-area: date; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.2; font-weight: 400; letter-spacing: -.15px; }
 #home-view .time-weather { margin-top: 8px; }
@@ -596,13 +593,17 @@ svg { display: block; width: 20px; height: 20px; flex: none; }
 }
 
 /* 两栏：内缩 16px、圆角 10、细边——与下面的卡片同一种物体 */
-#home-view .time-pair{ margin:0 16px; gap:0; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--panel); }
+#home-view .time-pair{ margin:9px 16px 0; gap:0; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--panel); }
 #home-view .time-pair::after{ content:none; }
 #home-view .time-pair .time-person{ border:0; border-radius:0; padding:15px 16px 17px; }
 #home-view .time-pair .time-person.dawn,
 #home-view .time-pair .time-person.day{ background:var(--panel); color:var(--ink); }
 #home-view .time-pair .time-person.dusk{ background:#E9EDF1; color:var(--ink); }
 #home-view .time-pair .time-person.night{ background:var(--night); color:var(--night-ink); }
+/* 待评候选：身份属于各自半栏，按身份 → 日期 → 时间 → 状态阅读。 */
+#home-view .time-pair .time-person .person-label{ opacity:1; font-size:14px; line-height:1.3; }
+#home-view .time-pair .time-person .person-name{ color:inherit; font-size:14px; font-weight:700; }
+#home-view .time-pair .time-person .person-city{ color:inherit; font-size:12px; font-weight:450; }
 #home-view .time-pair .time-person .person-label,
 #home-view .time-pair .time-person .person-city,
 #home-view .time-pair .time-person .person-date,
@@ -680,11 +681,9 @@ svg { display: block; width: 20px; height: 20px; flex: none; }
    实测四个相邻间距为 31 / 0 / 14 / 144——其中「两栏 → 共同时间」是 0（贴死），
    相邻两块却各用不同的值，这就是「卡片之间间距不协调」。
    统一为 14px，左右仍是 16px。 */
-#home-view .time-pair{ margin:14px 16px 0; }
 #home-view .connection-panel{ margin:14px 16px 0; }
 #home-view .note-section{ margin:14px 16px 0; }
 #home-view .home-stack{ display:flex; flex-direction:column; }
 
 /* 名字行与卡片对齐；名字行的盒高含约 5px 行距，故用 9px 边距得到 14px 视觉间距 */
 #home-view .home-thesis{ margin:9px 16px 0; }
-#home-view .time-pair{ margin:19px 16px 0; }

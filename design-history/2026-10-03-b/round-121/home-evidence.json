@@ -1,0 +1,354 @@
+{
+  "source": "design-history/2026-10-03-b/round-121/source/prototype",
+  "errors": [],
+  "marginRules": [
+    {
+      "selector": ".time-pair",
+      "properties": [
+        {
+          "name": "margin-top",
+          "value": "12px",
+          "implicit": false,
+          "text": "margin-top: 12px;",
+          "disabled": false,
+          "range": {
+            "startLine": 81,
+            "startColumn": 13,
+            "endLine": 81,
+            "endColumn": 30
+          }
+        },
+        {
+          "name": "margin-top",
+          "value": "12px"
+        }
+      ],
+      "line": 82,
+      "stylesheet": "style-sheet-19604-1"
+    },
+    {
+      "selector": "#home-view .time-pair",
+      "properties": [
+        {
+          "name": "margin-top",
+          "value": "7px",
+          "implicit": false,
+          "text": "margin-top: 7px;",
+          "disabled": false,
+          "range": {
+            "startLine": 155,
+            "startColumn": 101,
+            "endLine": 155,
+            "endColumn": 117
+          }
+        },
+        {
+          "name": "margin-top",
+          "value": "7px"
+        }
+      ],
+      "line": 156,
+      "stylesheet": "style-sheet-19604-1"
+    },
+    {
+      "selector": "#home-view .time-pair",
+      "properties": [
+        {
+          "name": "margin-top",
+          "value": "3px",
+          "implicit": false,
+          "text": "margin-top: 3px;",
+          "disabled": false,
+          "range": {
+            "startLine": 505,
+            "startColumn": 24,
+            "endLine": 505,
+            "endColumn": 40
+          }
+        },
+        {
+          "name": "margin-top",
+          "value": "3px"
+        }
+      ],
+      "line": 506,
+      "stylesheet": "style-sheet-19604-1"
+    },
+    {
+      "selector": "#home-view .time-pair",
+      "properties": [
+        {
+          "name": "margin",
+          "value": "9px 16px 0",
+          "implicit": false,
+          "text": "margin:9px 16px 0;",
+          "disabled": false,
+          "range": {
+            "startLine": 594,
+            "startColumn": 23,
+            "endLine": 594,
+            "endColumn": 41
+          },
+          "longhandProperties": [
+            {
+              "name": "margin-top",
+              "value": "9px"
+            },
+            {
+              "name": "margin-right",
+              "value": "16px"
+            },
+            {
+              "name": "margin-bottom",
+              "value": "0px"
+            },
+            {
+              "name": "margin-left",
+              "value": "16px"
+            }
+          ]
+        },
+        {
+          "name": "margin-top",
+          "value": "9px"
+        }
+      ],
+      "line": 595,
+      "stylesheet": "style-sheet-19604-1"
+    }
+  ],
+  "viewport": {
+    "width": 375,
+    "height": 812,
+    "dpr": 1,
+    "zoom": 1
+  },
+  "text": "阿远\n· 纽约\n白天 · 9/29 周二\n08:00\n通常在通勤路上\n09:00\n开始上课\n我\n· 北京\n夜晚 · 9/29 周二\n20:00\n晚间休息\n可联系的时间\n2小时后开始\n设置提醒\n纽约\n10:00–10:30\n北京\n22:00–22:30\n\n按双方联系偏好估计，尚未约定\n\n阿远\n15分钟前\n我找到你说的那家唱片店了，\n地址发你，周末一起去？\n回阿远一句",
+  "rects": {
+    "#app": {
+      "x": 0,
+      "y": 76,
+      "width": 375,
+      "height": 736,
+      "top": 76,
+      "right": 375,
+      "bottom": 812,
+      "left": 0
+    },
+    "#home-view": {
+      "x": 22,
+      "y": 76,
+      "width": 331,
+      "height": 622,
+      "top": 76,
+      "right": 353,
+      "bottom": 698,
+      "left": 22
+    },
+    ".time-pair": {
+      "x": 38,
+      "y": 90,
+      "width": 299,
+      "height": 163.984375,
+      "top": 90,
+      "right": 337,
+      "bottom": 253.984375,
+      "left": 38
+    },
+    ".connection-panel": {
+      "x": 38,
+      "y": 267.984375,
+      "width": 299,
+      "height": 182.21875,
+      "top": 267.984375,
+      "right": 337,
+      "bottom": 450.203125,
+      "left": 38
+    },
+    ".note-section": {
+      "x": 38,
+      "y": 464.203125,
+      "width": 299,
+      "height": 233.796875,
+      "top": 464.203125,
+      "right": 337,
+      "bottom": 698,
+      "left": 38
+    },
+    ".note-preview": {
+      "x": 54,
+      "y": 512.796875,
+      "width": 267,
+      "height": 84.59375,
+      "top": 512.796875,
+      "right": 321,
+      "bottom": 597.390625,
+      "left": 54
+    },
+    ".note-compose": {
+      "x": 54,
+      "y": 606.390625,
+      "width": 87.5,
+      "height": 44,
+      "top": 606.390625,
+      "right": 141.5,
+      "bottom": 650.390625,
+      "left": 54
+    },
+    ".tabbar": {
+      "x": 0,
+      "y": 732,
+      "width": 375,
+      "height": 64,
+      "top": 732,
+      "right": 375,
+      "bottom": 796,
+      "left": 0
+    }
+  },
+  "pairClass": "time-pair day-pair",
+  "computedMarginTop": "9px",
+  "gaps": {
+    "headingToPair": null,
+    "noteToNav": 34
+  },
+  "scroll": {
+    "documentWidth": 375,
+    "appHeight": 736,
+    "appScrollHeight": 736
+  },
+  "tokens": {
+    "--accent": "#3A6EA5",
+    "--page": "#EAEDF1",
+    "--muted": "#6B7280",
+    "--day": "#EEF1F4",
+    "--day-ink": "#1A1D21",
+    "--night": "#1E2733",
+    "--night-ink": "#EEF2F7"
+  },
+  "brandDot": "rgb(58, 110, 165)",
+  "favicon": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%232F6B4F'/%3E%3Cpath d='M18 42V22l28 20V22' stroke='%23FAFCFA' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E",
+  "noteLayoutRules": [
+    {
+      "selector": "#home-view .note-section",
+      "line": 275,
+      "properties": [
+        {
+          "name": "flex",
+          "value": "1 0 auto",
+          "implicit": false,
+          "text": "flex: 1 0 auto;",
+          "disabled": false,
+          "range": {
+            "startLine": 274,
+            "startColumn": 42,
+            "endLine": 274,
+            "endColumn": 57
+          },
+          "longhandProperties": [
+            {
+              "name": "flex-grow",
+              "value": "1"
+            },
+            {
+              "name": "flex-shrink",
+              "value": "0"
+            },
+            {
+              "name": "flex-basis",
+              "value": "auto"
+            }
+          ]
+        },
+        {
+          "name": "justify-content",
+          "value": "flex-start",
+          "implicit": false,
+          "text": "justify-content: flex-start;",
+          "disabled": false,
+          "range": {
+            "startLine": 274,
+            "startColumn": 82,
+            "endLine": 274,
+            "endColumn": 110
+          }
+        },
+        {
+          "name": "flex-grow",
+          "value": "1"
+        },
+        {
+          "name": "flex-shrink",
+          "value": "0"
+        },
+        {
+          "name": "justify-content",
+          "value": "flex-start"
+        }
+      ]
+    },
+    {
+      "selector": "#home-view .note-section",
+      "line": 637,
+      "properties": [
+        {
+          "name": "flex",
+          "value": "1 0 auto",
+          "implicit": false,
+          "text": "flex:1 0 auto;",
+          "disabled": false,
+          "range": {
+            "startLine": 638,
+            "startColumn": 2,
+            "endLine": 638,
+            "endColumn": 16
+          },
+          "longhandProperties": [
+            {
+              "name": "flex-grow",
+              "value": "1"
+            },
+            {
+              "name": "flex-shrink",
+              "value": "0"
+            },
+            {
+              "name": "flex-basis",
+              "value": "auto"
+            }
+          ]
+        },
+        {
+          "name": "justify-content",
+          "value": "center",
+          "implicit": false,
+          "text": "justify-content:center;",
+          "disabled": false,
+          "range": {
+            "startLine": 638,
+            "startColumn": 17,
+            "endLine": 638,
+            "endColumn": 40
+          }
+        },
+        {
+          "name": "flex-grow",
+          "value": "1"
+        },
+        {
+          "name": "flex-shrink",
+          "value": "0"
+        },
+        {
+          "name": "justify-content",
+          "value": "center"
+        }
+      ]
+    }
+  ],
+  "noteComputed": {
+    "flex": "1 0 auto",
+    "justifyContent": "center",
+    "minHeight": "auto"
+  }
+}

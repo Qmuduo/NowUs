@@ -1,0 +1,12 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const {snapshot}=require('./schedule.js');
+const now=Date.parse('2026-10-03T12:30:00Z');
+const make=()=>({scene:'normal',paired:true,paused:false,status:'normal',dayOffset:0,contacts:{weekday:['21:00','23:00'],rest:['21:00','23:00']},rhythm:{weekday:[['睡眠','23:30','07:30','moon'],['工作','09:00','18:00','work']],rest:[['睡眠','23:30','09:00','moon'],['自己的时间','09:00','23:30','sun']]}});
+test('shared window uses both local preferences',()=>{const x=snapshot(make(),now);assert.equal(x.window.start,Date.parse('2026-10-03T13:00Z'));assert.equal(x.window.end-x.window.start,30*60000);assert.equal(x.people.partner.time,'08:30')});
+test('editing rest preference changes home and timeline together',()=>{const s=make();s.contacts.rest=['22:00','23:00'];const x=snapshot(s,now);assert.ok(x.window.start>=Date.parse('2026-10-05T13:00Z'));assert.deepEqual(x.day.contacts.me,[{start:1320,end:1380}])});
+test('temporary busy excludes minutes only until expiry',()=>{const s=make();s.status='busy';s.statusUntil=now+3600000;const x=snapshot(s,now);assert.ok(x.window.start>=Date.parse('2026-10-04T13:00Z'));assert.deepEqual(x.day.contacts.me,[{start:1290,end:1380}]);assert.equal(snapshot(s,now+3600000).status,'normal')});
+test('unknown, paused and unpaired never invent a shared window',()=>{for(const patch of [{scene:'unknown'},{paused:true},{paired:false}]){const x=snapshot({...make(),...patch},now);assert.equal(x.window,null);assert.equal(x.available,false)}});
+test('midnight has correct dates and next window avoids sleep',()=>{const x=snapshot(make(),Date.parse('2026-10-03T16:30Z'));assert.equal(x.people.me.date,'2026-10-04');assert.equal(x.people.partner.date,'2026-10-03');assert.equal(x.people.me.activity.label,'睡眠');assert.equal(x.window.start,Date.parse('2026-10-04T13:00Z'))});
+test('future day activity uses the matching weekday template',()=>{const s=make();s.dayOffset=2;const x=snapshot(s,now);assert.ok(x.day.activities.me.some(x=>x.label==='工作'&&x.start===540&&x.end===1080))});
+test('known absence of overlap stays distinct from missing data',()=>{const x=snapshot({...make(),scene:'none'},now);assert.equal(x.available,true);assert.equal(x.window,null);assert.deepEqual(x.day.contacts.partner,[])});

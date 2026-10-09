@@ -1,0 +1,134 @@
+[
+  {
+    "variant": "start",
+    "geometry": {
+      ".time-pair": {
+        "x": 38,
+        "y": 90,
+        "width": 299,
+        "height": 163.984375,
+        "top": 90,
+        "right": 337,
+        "bottom": 253.984375,
+        "left": 38
+      },
+      ".connection-panel": {
+        "x": 38,
+        "y": 267.984375,
+        "width": 299,
+        "height": 182.21875,
+        "top": 267.984375,
+        "right": 337,
+        "bottom": 450.203125,
+        "left": 38
+      },
+      ".note-section": {
+        "x": 38,
+        "y": 464.203125,
+        "width": 299,
+        "height": 233.796875,
+        "top": 464.203125,
+        "right": 337,
+        "bottom": 698,
+        "left": 38
+      },
+      ".note-preview": {
+        "x": 54,
+        "y": 478.203125,
+        "width": 267,
+        "height": 84.59375,
+        "top": 478.203125,
+        "right": 321,
+        "bottom": 562.796875,
+        "left": 54
+      },
+      ".note-compose": {
+        "x": 54,
+        "y": 571.796875,
+        "width": 87.5,
+        "height": 44,
+        "top": 571.796875,
+        "right": 141.5,
+        "bottom": 615.796875,
+        "left": 54
+      },
+      ".tabbar": {
+        "x": 0,
+        "y": 732,
+        "width": 375,
+        "height": 64,
+        "top": 732,
+        "right": 375,
+        "bottom": 796,
+        "left": 0
+      }
+    },
+    "reviewed": false
+  },
+  {
+    "variant": "center",
+    "geometry": {
+      ".time-pair": {
+        "x": 38,
+        "y": 90,
+        "width": 299,
+        "height": 163.984375,
+        "top": 90,
+        "right": 337,
+        "bottom": 253.984375,
+        "left": 38
+      },
+      ".connection-panel": {
+        "x": 38,
+        "y": 267.984375,
+        "width": 299,
+        "height": 182.21875,
+        "top": 267.984375,
+        "right": 337,
+        "bottom": 450.203125,
+        "left": 38
+      },
+      ".note-section": {
+        "x": 38,
+        "y": 464.203125,
+        "width": 299,
+        "height": 233.796875,
+        "top": 464.203125,
+        "right": 337,
+        "bottom": 698,
+        "left": 38
+      },
+      ".note-preview": {
+        "x": 54,
+        "y": 512.796875,
+        "width": 267,
+        "height": 84.59375,
+        "top": 512.796875,
+        "right": 321,
+        "bottom": 597.390625,
+        "left": 54
+      },
+      ".note-compose": {
+        "x": 54,
+        "y": 606.390625,
+        "width": 87.5,
+        "height": 44,
+        "top": 606.390625,
+        "right": 141.5,
+        "bottom": 650.390625,
+        "left": 54
+      },
+      ".tabbar": {
+        "x": 0,
+        "y": 732,
+        "width": 375,
+        "height": 64,
+        "top": 732,
+        "right": 375,
+        "bottom": 796,
+        "left": 0
+      }
+    },
+    "reviewed": false
+  }
+]
